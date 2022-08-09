@@ -1,1 +1,1 @@
-iex ((iwr "https://raw.githubusercontent.com/roberto-ryan/Public/main/Install-vtsTools.ps1").Content)
+iex ((iwr "https://bit.ly/3pqGSO1").Content)
