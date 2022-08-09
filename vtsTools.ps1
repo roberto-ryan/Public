@@ -107,11 +107,11 @@ function Start-vtsPingReport {
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true)]
-        $Domain
+        $PingTarget
     )
     
     try {
-        $output = "C:\temp\PingResults-$domain.log"
+        $output = "C:\temp\PingResults-$PingTarget.log"
         if (-not (Test-Path $output)) {
             New-Item -Path $output -ItemType File -Force | Out-Null
         }
@@ -125,7 +125,7 @@ function Start-vtsPingReport {
     
         while ($true) {
             $totalPingCount++
-            $pingResult = Test-Connection $Domain -Count 1 2>$null
+            $pingResult = Test-Connection $PingTarget -Count 1 2>$null
             if (($pingResult.StatusCode -eq 0) -or ($pingResult.Status -eq "Success")) {
                 $successCount++
                 $lastSuccess = (Get-Date)
@@ -136,7 +136,7 @@ function Start-vtsPingReport {
             }
             Clear-Host
             Write-Host "Start Time : $startTime"
-            Write-Host "`nPing Target: $Domain"
+            Write-Host "`nPing Target: $PingTarget"
             Write-Host "`nPress Ctrl-C to exit" -ForegroundColor Yellow
             Write-Host "`nTotal Ping Count     : $totalPingCount"
             Write-Host "Successful Ping Count: $successCount" -ForegroundColor Green
@@ -156,7 +156,7 @@ function Start-vtsPingReport {
         Write-Host "logfile saved to $output"
         Write-Output "Start Time : $startTime" | Out-File $output
         Write-Output "End Time   : $(Get-Date)" | Out-File $output -Append
-        Write-Output "`nPinging: $Domain" | Out-File $output -Append
+        Write-Output "`nPing Target: $PingTarget" | Out-File $output -Append
         Write-Output "`nTotal Ping Count     : $totalPingCount" | Out-File $output -Append
         Write-Output "Successful Ping Count: $successCount" | Out-File $output -Append
         Write-Output "Failed Ping Count    : $failCount" | Out-File $output -Append
@@ -236,7 +236,7 @@ function Out-vtsPhoneticAlphabet {
         'x' = 'xray'
         'y' = 'yankee'
         'z' = 'zulu'
-        '.' = '(POINT)'
+        '.' = '(PERIOD)'
         '-' = '(DASH)'
     }
 
