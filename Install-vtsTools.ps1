@@ -36,7 +36,7 @@ Sort-Object Name |
 ForEach-Object {
     $commands += [pscustomobject]@{
         'Installed Commands' = $_.Name
-        Description          = $_.Description
+        Description          = (Get-Help $_.Name | Select-Object -ExpandProperty Description)
     }
 }
 
