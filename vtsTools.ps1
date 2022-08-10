@@ -1,3 +1,7 @@
+<#
+.Description
+Searches the last 500 System and Application logs for a specified search term.
+#>
 function Search-vtsEventLog {
     [CmdletBinding()]
     Param(
@@ -34,6 +38,10 @@ function Search-vtsEventLog {
     $result | Format-List
 }
 
+<#
+.Description
+Retrieves Mapped Drives from the Windows Registry.
+#>
 function Get-vtsMappedDrive {
     # This is required for Verbose to work correctly.
     # If you don't want the Verbose message, remove "-Verbose" from the Parameters field.
@@ -74,6 +82,10 @@ function Get-vtsMappedDrive {
     }
 }
 
+<#
+.Description
+Blocks Windows 11 update. Requires Windows 10 version 21H1 or 21H2.
+#>
 function Block-vtsWindows11Upgrade {
     $buildNumber = [System.Environment]::OSVersion.Version.Build
 
@@ -102,6 +114,10 @@ function Block-vtsWindows11Upgrade {
     }
 }
 
+<#
+.Description
+Continuous Ping Report. Tracks failed ping times and outputs data to a logfile.
+#>
 function Start-vtsPingReport {
     Param(
         [Parameter(
@@ -169,6 +185,10 @@ function Start-vtsPingReport {
     }
 }
 
+<#
+.Description
+Generates a random 12 character password and copies it to the clipboard.
+#>
 function New-vtsRandomPassword {
     $numbers = 0..9
     $symbols = '!', '@', '#', '$', '%', '*', '?', '+', '='
@@ -184,6 +204,10 @@ function New-vtsRandomPassword {
     Write-Output "Random Password Copied to Clipboard"
 }
 
+<#
+.Description
+Converts strings to the phonetic alphabet.
+#>
 function Out-vtsPhoneticAlphabet {
     [CmdletBinding()]
     [OutputType([String])]
@@ -263,6 +287,10 @@ function Out-vtsPhoneticAlphabet {
     $result
 }
 
+<#
+.Description
+Displays monitor connection type (HDMI, DisplayPort, etc.)
+#>
 function Get-vtsDisplayConnectionType {
     $adapterTypes = @{
         '-2'         = 'Unknown'
