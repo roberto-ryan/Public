@@ -8,7 +8,8 @@ Set-ExecutionPolicy Bypass -Scope Process
 
 if ($env:USERNAME -eq "SYSTEM") {
     $modulePath = "$env:SystemDrive\Tools"
-} else {
+}
+else {
     $modulePath = $env:PSModulePath -split ";" |
     Select-String "$env:USERNAME" |
     Select-Object -First 1
@@ -30,11 +31,12 @@ Import-Module $modulePath\$moduleName
 $commands = @()
 
 Get-Command -Module VTS |
-Select-Object -ExpandProperty Name |
-Sort-Object |
+Select-Object Name, Description |
+Sort-Object Name |
 ForEach-Object {
     $commands += [pscustomobject]@{
-        'Installed Commands' = $_
+        'Installed Commands' = $_.Name
+        Description          = $_.Description
     }
 }
 
