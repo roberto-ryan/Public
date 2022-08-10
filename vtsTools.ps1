@@ -287,11 +287,11 @@ function Out-vtsPhoneticAlphabet {
     $result
 }
 
+<#
+.Description
+Displays monitor connection type (HDMI, DisplayPort, etc.)
+#>
 function Get-vtsDisplayConnectionType {
-    <#
-    .Description
-    Displays monitor connection type (HDMI, DisplayPort, etc.)
-    #>
     $adapterTypes = @{
         '-2'         = 'Unknown'
         '-1'         = 'Unknown'
