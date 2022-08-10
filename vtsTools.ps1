@@ -137,7 +137,6 @@ function Start-vtsPingReport {
             Clear-Host
             Write-Host "Start Time : $startTime"
             Write-Host "`nPing Target: $PingTarget"
-            Write-Host "`nPress Ctrl-C to exit" -ForegroundColor Yellow
             Write-Host "`nTotal Ping Count     : $totalPingCount"
             Write-Host "Successful Ping Count: $successCount" -ForegroundColor Green
             Write-Host "Failed Ping Count    : $failCount" -ForegroundColor DarkRed
@@ -148,6 +147,7 @@ function Start-vtsPingReport {
                 $failedTimes | Select-Object -last 30 | Sort-Object -Descending
                 Write-Host "------------------------------" -ForegroundColor DarkRed
             }
+            Write-Host "`nPress Ctrl-C to exit" -ForegroundColor Yellow
     
             Start-Sleep 1    
         }
