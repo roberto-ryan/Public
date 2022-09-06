@@ -420,5 +420,3 @@ function Get-vtsTemperature {
     }
     return $returntemp
 }
-
-Get-vtsTemperature
