@@ -344,7 +344,7 @@ function Get-vtsDisplayConnectionType {
 .DESCRIPTION
 Adds a Google Chrome extension to the forced install list. Can be used for forcing installation of any Google Chrome extension. Takes existing extensions into account which might be added by other means, such as GPO and MDM.
 #>
-function Install-ChromeExtension {
+function Install-vtsChromeExtension {
     param(
         [string]$extensionId,
         [switch]$info
