@@ -35,7 +35,7 @@ function Search-vtsEventLog {
         }
     }
 
-    $result | Format-List
+    $result | Sort-Object TimeGenerated | Format-List
 }
 
 <#
