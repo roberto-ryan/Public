@@ -2,9 +2,9 @@
 .Description
 Searches the last 500 System and Application logs for a specified search term.
 .EXAMPLE
-PS> Search-vtsEventLog -SearchTerm <search term>
+PS> Search-vtsEventLog <search term>
 .EXAMPLE
-PS> Search-vtsEventLog -SearchTerm driver
+PS> Search-vtsEventLog driver
 
 Output:
 TimeGenerated : 9/13/2022 9:14:30 AM
