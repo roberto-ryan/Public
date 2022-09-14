@@ -36,11 +36,20 @@ Sort-Object Name |
 ForEach-Object {
     $commands += [pscustomobject]@{
         'Installed Command' = $_.Name
-        Description          = (Get-Help $_.Name |
+        Description         = (Get-Help $_.Name |
             Select-Object -ExpandProperty Description |
             Select-Object -ExpandProperty Text
+        )
+        Usage            = (Get-Help $_.Name |
+        Select-Object -ExpandProperty Examples |
+        Select-Object -ExpandProperty Example |
+        Select-Object -ExpandProperty Code
         )
     }
 }
 
-$commands
+$commands | Select-Object 'Installed Command', Usage, Description
+
+"`nType 'help' followed by the command name for more information.
+
+Example: PS> help Get-vtsMappedDrive"
