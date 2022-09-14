@@ -1,6 +1,16 @@
 <#
 .Description
 Searches the last 500 System and Application logs for a specified search term.
+.EXAMPLE
+PS> Search-vtsEventLog -SearchTerm <search term>
+.EXAMPLE
+PS> Search-vtsEventLog -SearchTerm driver
+
+Output:
+TimeGenerated : 9/13/2022 9:14:30 AM
+Message       : Media disconnected on NIC /DEVICE/{90E7B0EA-AE78-4836-8CBC-B73F1BCD5894} (Friendly Name: Microsoft
+                Network Adapter Multiplexor Driver).
+Log           : System
 #>
 function Search-vtsEventLog {
     [CmdletBinding()]
@@ -41,6 +51,15 @@ function Search-vtsEventLog {
 <#
 .Description
 Retrieves Mapped Drives from the Windows Registry.
+.EXAMPLE
+PS> Get-vtsMappedDrive
+
+Output:
+Username            : VTS-ROBERTO\rober
+DriveLetter         : Y
+RemotePath          : https://live.sysinternals.com
+ConnectWithUsername : rober
+SID                 : S-1-5-21-376445358-2603134888-3166729622-1001
 #>
 function Get-vtsMappedDrive {
     # This is required for Verbose to work correctly.
@@ -85,6 +104,13 @@ function Get-vtsMappedDrive {
 <#
 .Description
 Blocks Windows 11 update. Requires Windows 10 version 21H1 or 21H2.
+.EXAMPLE
+PS> Block-vtsWindows11Upgrade
+
+Output:
+The operation completed successfully.
+The operation completed successfully.
+Success - Current Version (21H2)
 #>
 function Block-vtsWindows11Upgrade {
     $buildNumber = [System.Environment]::OSVersion.Version.Build
@@ -117,6 +143,24 @@ function Block-vtsWindows11Upgrade {
 <#
 .Description
 Continuous Ping Report. Tracks failed ping times and outputs data to a logfile.
+.EXAMPLE
+PS> Start-vtsPingReport google.com
+.EXAMPLE
+PS> Start-vtsPingReport 8.8.8.8
+
+Output:
+Start Time : 09/14/2022 10:31:20
+
+Ping Target: 8.8.8.8
+
+Total Ping Count     : 10
+Successful Ping Count: 10
+Failed Ping Count    : 0
+
+Last Successful Ping : 09/14/2022 10:31:30
+
+Press Ctrl-C to exit
+logfile saved to C:\temp\PingResults-8.8.8.8.log
 #>
 function Start-vtsPingReport {
     Param(
@@ -188,6 +232,11 @@ function Start-vtsPingReport {
 <#
 .Description
 Generates a random 12 character password and copies it to the clipboard.
+.EXAMPLE
+PS> New-vtsRandomPassword
+
+Output:
+Random Password Copied to Clipboard
 #>
 function New-vtsRandomPassword {
     $numbers = 0..9
@@ -207,6 +256,22 @@ function New-vtsRandomPassword {
 <#
 .Description
 Converts strings to the phonetic alphabet.
+.EXAMPLE
+PS> "RandomString" | Out-vtsPhoneticAlphabet
+
+Output:
+ROMEO
+alfa
+november
+delta
+oscar
+mike
+SIERRA
+tango
+romeo
+india
+november
+golf
 #>
 function Out-vtsPhoneticAlphabet {
     [CmdletBinding()]
@@ -290,6 +355,12 @@ function Out-vtsPhoneticAlphabet {
 <#
 .Description
 Displays monitor connection type (HDMI, DisplayPort, etc.)
+.EXAMPLE
+PS> Get-vtsDisplayConnectionType
+
+Output:
+GSM M2362D (DisplayPort (external))
+GSM M2362D (HDMI)
 #>
 function Get-vtsDisplayConnectionType {
     $adapterTypes = @{
@@ -343,6 +414,8 @@ function Get-vtsDisplayConnectionType {
 <#
 .DESCRIPTION
 Adds a Google Chrome extension to the forced install list. Can be used for forcing installation of any Google Chrome extension. Takes existing extensions into account which might be added by other means, such as GPO and MDM.
+.EXAMPLE
+PS> Install-vtsChromeExtension -extensionId "ddloeodolhdfbohkokiflfbacbfpjahp"
 #>
 function Install-vtsChromeExtension {
     param(
@@ -402,6 +475,11 @@ function Install-vtsChromeExtension {
 <#
 .DESCRIPTION
 Returns temperature of thermal sensor on motherboard. Not accurate for CPU temp.
+.EXAMPLE
+PS> Get-vtsTemperature
+
+Output:
+27.85 C : 82.1300000000001 F : 301K
 #>
 function Get-vtsTemperature {
     $t = Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi"
