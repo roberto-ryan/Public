@@ -50,6 +50,6 @@ ForEach-Object {
 
 $commands | Select-Object 'Installed Command', Usage
 
-"`nType 'help -full' followed by the command name for more information.
+"`nType 'get-help -full' followed by the command name for more information.
 
-Example: PS> help -full Get-vtsMappedDrive"
+Example: PS> get-help -full Get-vtsMappedDrive"
