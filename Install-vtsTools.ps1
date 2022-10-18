@@ -48,7 +48,7 @@ ForEach-Object {
     }
 }
 
-$commands | Select-Object 'Installed Command', Usage
+$commands | Select-Object 'Installed Command', Description
 
 "`nType 'get-help -full' followed by the command name for more information.
 
