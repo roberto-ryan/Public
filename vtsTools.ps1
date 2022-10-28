@@ -485,16 +485,15 @@ function Get-vtsTemperature {
     $t = Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi"
     $returntemp = @()
 
-    foreach ($temp in $t.CurrentTemperature)
-    {
+    foreach ($temp in $t.CurrentTemperature) {
 
 
-    $currentTempKelvin = $temp / 10
-    $currentTempCelsius = $currentTempKelvin - 273.15
+        $currentTempKelvin = $temp / 10
+        $currentTempCelsius = $currentTempKelvin - 273.15
 
-    $currentTempFahrenheit = (9/5) * $currentTempCelsius + 32
+        $currentTempFahrenheit = (9 / 5) * $currentTempCelsius + 32
 
-    $returntemp += $currentTempCelsius.ToString() + " C : " + $currentTempFahrenheit.ToString() + " F : " + $currentTempKelvin + "K"  
+        $returntemp += $currentTempCelsius.ToString() + " C : " + $currentTempFahrenheit.ToString() + " F : " + $currentTempKelvin + "K"  
     }
     return $returntemp
 }
@@ -627,4 +626,26 @@ Installs Chocolatey.
 #>
 function Install-vtsChoco {
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+}
+
+<#
+.DESCRIPTION
+Runs speedtest by Ookla. Installs via chocolatey.
+#>
+function Start-vtsSpeedTest {
+    if (Test-Path "C:\ProgramData\chocolatey\bin\speedtest.exe") {
+        C:\ProgramData\chocolatey\bin\speedtest.exe
+    }
+    elseif (Test-Path C:\ProgramData\chocolatey\lib\speedtest\tools\speedtest.exe) {
+        C:\ProgramData\chocolatey\lib\speedtest\tools\speedtest.exe
+    }
+    elseif (Test-Path "C:\ProgramData\chocolatey\choco.exe") {
+        choco install speedtest -y
+        speedtest
+    }
+    else {
+        Install-vtsChoco
+        choco install speedtest -y
+        speedtest
+    }
 }
