@@ -620,3 +620,11 @@ function Get-vtsDiskStat {
         
     $stats | Sort-Object Value -Descending
 }
+
+<#
+.DESCRIPTION
+Installs Chocolatey.
+#>
+function Install-vtsChoco {
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+}
