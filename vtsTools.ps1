@@ -611,7 +611,7 @@ function Get-vtsDiskStat {
         
     foreach ($i in $a) {
         $stats += [PSCustomObject]@{
-            Drive    = $DriveLetter
+            Drive    = ($DriveLetter).ToUpper()
             Property = (($i.CounterSamples.Path).split(")") | Select-String ^\\[a-z%]) -replace '\\', ''
             Value    = $i.CounterSamples.CookedValue
         }
