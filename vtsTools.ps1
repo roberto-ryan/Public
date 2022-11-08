@@ -666,7 +666,7 @@ Ensuring Chocolatey commands are on the path
 Ensuring chocolatey.nupkg is in the lib folder
 #>
 function Install-vtsChoco {
-    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 }
 
 <#
@@ -702,4 +702,20 @@ function Start-vtsSpeedTest {
         choco install speedtest -y
         speedtest
     }
+}
+ 
+<#
+.DESCRIPTION
+Installs all pending Windows Updates.
+.EXAMPLE
+PS> Install-vtsWindowsUpdate
+
+Output:
+
+#>
+function Install-vtsWindowsUpdate {
+    Install-PackageProvider -Name NuGet -Force
+    Install-Module PSWindowsUpdate -Force -Confirm:$false
+    Import-Module PSWindowsUpdate -Force
+    Install-WindowsUpdate -AcceptAll
 }
