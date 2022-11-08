@@ -775,8 +775,16 @@ AutoSelection                   : 1
 AutoDownload                    : 2
 #>
 function Install-vtsWindowsUpdate {
-    Install-PackageProvider -Name NuGet -Force
-    Install-Module PSWindowsUpdate -Force -Confirm:$false
+    $NuGet = Get-PackageProvider -Name NuGet
+    if ($null -eq $NuGet){
+        Install-PackageProvider -Name NuGet -Force
+    }
+
+    $PSWindowsUpdate = Get-Module -Name PSWindowsUpdate
+    if ($null -eq $PSWindowsUpdate){
+        Install-Module PSWindowsUpdate -Force -Confirm:$false
+    }
+    
     Import-Module PSWindowsUpdate -Force
     Install-WindowsUpdate -AcceptAll
 }
