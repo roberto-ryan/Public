@@ -784,7 +784,8 @@ function Install-vtsWindowsUpdate {
     if ($null -eq $PSWindowsUpdate){
         Install-Module PSWindowsUpdate -Force -Confirm:$false
     }
-    
+
     Import-Module PSWindowsUpdate -Force
+    Get-WindowsUpdate
     Install-WindowsUpdate -AcceptAll
 }
