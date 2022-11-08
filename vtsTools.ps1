@@ -711,7 +711,68 @@ Installs all pending Windows Updates.
 PS> Install-vtsWindowsUpdate
 
 Output:
-
+Size                            : 57MB
+Status                          : AD-----
+ComputerName                    : CH-TRUSS-WS-13
+KB                              : KB5018859
+X                               : 2
+ChooseResult                    : Accepted
+Result                          : Downloaded
+DownloadResult                  : Downloaded
+Title                           : 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8.1 for Windows
+                                  11 for x64 (KB5018859)
+AutoSelectOnWebSites            : False
+BundledUpdates                  : System.__ComObject
+CanRequireSource                : False
+Categories                      : System.__ComObject
+Deadline                        :
+DeltaCompressedContentAvailable : False
+DeltaCompressedContentPreferred : True
+Description                     : Install this update to resolve issues in Windows. For a complete listing of the
+                                  issues that are included in this update, see the associated Microsoft Knowledge Base
+                                  article for more information. After you install this item, you may have to restart
+                                  your computer.
+EulaAccepted                    : True
+EulaText                        :
+HandlerID                       :
+Identity                        : System.__ComObject
+Image                           :
+InstallationBehavior            : System.__ComObject
+IsBeta                          : False
+IsDownloaded                    : True
+IsHidden                        : False
+IsInstalled                     : False
+IsMandatory                     : False
+IsUninstallable                 : False
+Languages                       : System.__ComObject
+LastDeploymentChangeTime        : 10/25/2022 12:00:00 AM
+MaxDownloadSize                 : 59979480
+MinDownloadSize                 : 0
+MoreInfoUrls                    : System.__ComObject
+MsrcSeverity                    :
+RecommendedCpuSpeed             : 0
+RecommendedHardDiskSpace        : 0
+RecommendedMemory               : 0
+ReleaseNotes                    :
+SecurityBulletinIDs             : System.__ComObject
+SupersededUpdateIDs             : System.__ComObject
+SupportUrl                      : http://support.microsoft.com
+Type                            : 1
+UninstallationNotes             : This software update can be removed by selecting View installed updates in the
+                                  Programs and Features Control Panel.
+UninstallationBehavior          : System.__ComObject
+UninstallationSteps             : System.__ComObject
+KBArticleIDs                    : System.__ComObject
+DeploymentAction                : 1
+DownloadPriority                : 2
+DownloadContents                : System.__ComObject
+RebootRequired                  : False
+IsPresent                       : False
+CveIDs                          : System.__ComObject
+BrowseOnly                      : False
+PerUser                         : False
+AutoSelection                   : 1
+AutoDownload                    : 2
 #>
 function Install-vtsWindowsUpdate {
     Install-PackageProvider -Name NuGet -Force
