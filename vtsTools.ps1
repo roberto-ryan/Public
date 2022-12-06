@@ -1012,7 +1012,6 @@ function Set-vtsDefaultPrinter {
             $wsh.SetDefaultPrinter($printerName)
         } else {
             Write-Host "exiting..."
-            exit
         }
     } else {
         Write-Host "There are no matching printers."
