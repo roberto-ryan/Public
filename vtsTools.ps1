@@ -1004,16 +1004,18 @@ function Set-vtsDefaultPrinter {
         $Name
     )
     $printerName = Get-printer "*$Name*" | Select-Object -ExpandProperty Name -First 1
-    if ($null -ne $printerName){
+    if ($null -ne $printerName) {
         $confirm = Read-Host -Prompt "Set $printerName as the default printer? (y/n)"
-        if ($confirm -eq "y"){
+        if ($confirm -eq "y") {
             Write-Host "Setting $printerName as the default printer. Estimated time: 42 seconds"
             $wsh = New-Object -ComObject WScript.Network
             $wsh.SetDefaultPrinter($printerName)
-        } else {
+        }
+        else {
             Write-Host "exiting..."
         }
-    } else {
+    }
+    else {
         Write-Host "There are no matching printers."
     }
 }
@@ -1022,10 +1024,20 @@ function Set-vtsDefaultPrinter {
 .DESCRIPTION
 Returns users toast notifications. Duplicates notifications are removed for brevity.
 .EXAMPLE
+Show notifications for all users
 PS> Show-vtsToastNotification
+.EXAMPLE
+Show notifications for a selected user
+PS> Show-vtsToastNotification -user john.doe
 #>
 function Show-vtsToastNotification {
-    $db = Get-Content "$env:LOCALAPPDATA\Microsoft\Windows\Notifications\wpndatabase.db-wal"
+    param(
+        $user = (Get-ChildItem C:\Users\ | Select-Object -ExpandProperty Name)
+    )
+
+    $db = foreach ($u in $user){
+        Get-Content "C:\Users\$u\AppData\Local\Microsoft\Windows\Notifications\wpndatabase.db-wal" 2>$null
+    }
 
     $tags = @(
         'text>'
