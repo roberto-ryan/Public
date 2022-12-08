@@ -1017,3 +1017,29 @@ function Set-vtsDefaultPrinter {
         Write-Host "There are no matching printers."
     }
 }
+
+<#
+.DESCRIPTION
+Returns users toast notifications. Duplicates notifications are removed for brevity.
+.EXAMPLE
+PS> Show-vtsToastNotification
+#>
+function Show-vtsToastNotification {
+    $db = Get-Content "$env:LOCALAPPDATA\Microsoft\Windows\Notifications\wpndatabase.db-wal"
+
+    $tags = @(
+        'text>'
+        'text id="1">'
+        'text id="2">'
+    )
+
+    $notification = foreach ($tag in $tags) {
+    ($db -split '<' |
+        Select-String $tag |
+        Select-Object -ExpandProperty Line) -replace "$tag", "" -replace "</text>", "" |
+        Select-String -NotMatch '/'
+    }
+
+    Write-Host "Duplicates removed for brevity." -ForegroundColor Yellow
+    $notification | Select-Object -Unique
+}
