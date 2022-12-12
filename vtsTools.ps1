@@ -1055,3 +1055,21 @@ function Show-vtsToastNotification {
     Write-Host "Duplicates removed for brevity." -ForegroundColor Yellow
     $notification | Select-Object -Unique
 }
+
+<#
+.DESCRIPTION
+Maps a remote drive.
+.EXAMPLE
+PS> New-vtsMappedDrive -Letter A -Path \\192.168.0.4\sharedfolder
+#>
+function New-vtsMappedDrive {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Letter,
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Path
+    )
+    New-PSDrive -Name "$Letter" -PSProvider FileSystem -Root "$Path" -Persist -Scope Global
+}
