@@ -1061,6 +1061,8 @@ function Show-vtsToastNotification {
 Maps a remote drive.
 .EXAMPLE
 PS> New-vtsMappedDrive -Letter A -Path \\192.168.0.4\sharedfolder
+.EXAMPLE
+PS> New-vtsMappedDrive -Letter A -Path "\\192.168.0.4\folder with spaces"
 #>
 function New-vtsMappedDrive {
     param(
