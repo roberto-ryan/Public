@@ -1084,4 +1084,7 @@ PS> Install-vtsPwsh
 #>
 function Install-vtsPwsh {
     msiexec.exe /i "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi" /qn
+    Write-Host "Installing PowerShell 7... Please wait" -ForegroundColor Cyan
+    While (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" 2>$null)){Start-Sleep 5}
+    & "C:\Program Files\PowerShell\7\pwsh.exe" 2>$null
 }
