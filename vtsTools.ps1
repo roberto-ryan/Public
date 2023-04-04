@@ -1075,3 +1075,13 @@ function New-vtsMappedDrive {
     )
     New-PSDrive -Name "$Letter" -PSProvider FileSystem -Root "$Path" -Persist -Scope Global
 }
+
+<#
+.DESCRIPTION
+Install PowerShell 7
+.EXAMPLE
+PS> Install-vtsPwsh
+#>
+function Install-vtsPwsh {
+    msiexec.exe /i "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi" /qn
+}
