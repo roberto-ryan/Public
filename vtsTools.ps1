@@ -1151,13 +1151,14 @@ function Trace-vtsSession {
     & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
         try {
             While ($true){
-                
+
             }
         }
         finally {
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
             Set-OpenAIKey -Key $OpenAIKey
-            gpt "Write a powershell script to get the current date and time."
+            $r = gpt "Write a powershell script to get the current date and time."
+            Write-Host "$r"
         }
     }
 }
