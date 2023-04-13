@@ -1150,6 +1150,7 @@ function Trace-vtsSession {
 
     & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
         try {
+            Write-Host "Recording session... Press Ctrl-C when finished."
             While ($true){
 
             }
