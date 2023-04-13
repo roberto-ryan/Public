@@ -1035,7 +1035,7 @@ function Show-vtsToastNotification {
         $user = (Get-ChildItem C:\Users\ | Select-Object -ExpandProperty Name)
     )
 
-    $db = foreach ($u in $user){
+    $db = foreach ($u in $user) {
         Get-Content "C:\Users\$u\AppData\Local\Microsoft\Windows\Notifications\wpndatabase.db-wal" 2>$null
     }
 
@@ -1085,6 +1085,79 @@ PS> Install-vtsPwsh
 function Install-vtsPwsh {
     msiexec.exe /i "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi" /qn
     Write-Host "Installing PowerShell 7... Please wait" -ForegroundColor Cyan
-    While (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" 2>$null)){Start-Sleep 5}
+    While (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" 2>$null)) { Start-Sleep 5 }
     & "C:\Program Files\PowerShell\7\pwsh.exe" 2>$null
+}
+
+<#
+.DESCRIPTION
+Trace-vtsSession tracks what you do to assist with ticket notes.
+.EXAMPLE
+PS> Trace-vtsSession
+#>
+function Trace-vtsSession {
+    # Check if pwsh is installed. If not installed, install it
+    if (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" -ErrorAction SilentlyContinue)) {
+        Write-Host "PowerShell 7 not found, downloading and installing..."
+        msiexec.exe /i "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi" /qn
+    
+        while (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" -ErrorAction SilentlyContinue)) {
+            Start-Sleep -Seconds 1
+        }
+    }
+    
+    # Define the required minimum NuGet version
+    $minNuGetVersion = [version]'2.8.5.201'
+    
+    # Check if the NuGet Package Provider is already installed and meets the minimum version requirement
+    $nuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable 2>$null | Sort-Object -Property Version -Descending | Select-Object -First 1
+    if ($null -eq $nuGetProvider -or $nuGetProvider.Version -lt $minNuGetVersion) {
+        Write-Host "NuGet Package Provider not found or outdated, installing..."
+    
+        # Install the NuGet Package Provider with the specified minimum version
+        Install-PackageProvider -Name NuGet -MinimumVersion $minNuGetVersion -Force
+    
+        # Confirm successful installation
+        $nuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable 2>$null | Sort-Object -Property Version -Descending | Select-Object -First 1
+        if ($null -ne $nuGetProvider -and $nuGetProvider.Version -ge $minNuGetVersion) {
+            Write-Host "NuGet Package Provider installed successfully."
+        }
+    }
+    
+    
+    # Check if PowerShellAI module is already installed
+    if (-not (Get-Module -ListAvailable -Name PowerShellAI)) {
+        Write-Host "PowerShellAI module not found, installing..."
+    
+        # Set the execution policy to allow the installation of the PowerShellAI module
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    
+        # Check if the user has the required version of PowerShellGet to install the module
+        if ((Get-Module -ListAvailable -Name PowerShellGet).Version -lt [version]"2.0.0") {
+            Write-Host "Updating PowerShellGet module..."
+            Install-Module -Name PowerShellGet -Repository PSGallery -Force
+        }
+    
+        # Install the PowerShellAI module without confirmation
+        Write-Host "Installing PowerShellAI module..."
+        Install-Module -Name PowerShellAI -Force
+    
+        # Confirm successful installation
+        if (Get-Module -ListAvailable -Name PowerShellAI) {
+            Write-Host "PowerShellAI module installed successfully."
+        }
+    }
+
+    & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
+        try {
+            While ($true){
+                
+            }
+        }
+        finally {
+            $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
+            Set-OpenAIKey -Key $OpenAIKey
+            gpt "Write a powershell script to get the current date and time."
+        }
+    }
 }
