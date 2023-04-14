@@ -1249,9 +1249,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             Don't include that the Problem Steps Recorder was used. `
             Don't include anything related to DesktopWindowXaml. `
             Don't include the word AI. `
-            Skip steps that don't make logical sense. `
-            Only speak in complete sentences. `
-            Do not include key presses like:  [Ctrl] [Alt] [Del] [Enter].
+            Only speak in complete sentences.
         
             $Result"
             
