@@ -1099,6 +1099,7 @@ function Trace-vtsSession {
     [CmdletBinding()]
     param (
         [Parameter()]
+        [securestring]
         $OpenAIKey
     )
     # Check if pwsh is installed. If not installed, install it
