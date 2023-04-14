@@ -11,6 +11,8 @@ function Trace-vtsSession {
         [string]
         $OpenAIKey
     )
+    
+    $dir = "C:\tmp\PSDocs"
 
     try {
 
@@ -28,10 +30,9 @@ function Trace-vtsSession {
         Write-Host $rec -ForegroundColor Red
         Write-Host "Press Ctrl-C when finished." -ForegroundColor Yellow
         While ($true) {
-            $dir = "C:\temp\PSDocs"
 
             # Define Funtions
-            function Start-KeyLogger($Path = "C:\temp\PSDocs\keylogger.txt") {
+            function Start-KeyLogger($Path = "$dir\keylogger.txt") {
                 # records all key presses until script is aborted
 
                 # Signatures for API Calls
@@ -111,8 +112,6 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
         }
 
-        $dir = "C:\temp\PSDocs"
-
         # Stop PSR
         psr.exe /stop
 
@@ -125,7 +124,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         Set-Content -Path $File -Value $CleanedContent -Encoding UTF8
 
         # Get PSR Results
-        Expand-Archive (Get-ChildItem C:\temp\PSDocs\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
+        Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)' #'^Step \d+: \(\u200E\d{1,2}/\u200E\d{1,2}/\u200E\d{4} \d{1,2}:\d{2}:\d{2} (AM|PM)\) '
@@ -169,17 +168,17 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
              
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-        $($response.choices.text) | Out-File "C:\temp\PSDocs\gpt_result.txt" -Force
+        $($response.choices.text) | Out-File "$dir\gpt_result.txt" -Force
 
         Start-sleep -Milliseconds 250
-        Write-Host "$(Get-Content "C:\temp\PSDocs\gpt_result.txt")`n`n" -ForegroundColor Yellow
+        Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
         
         #Cleanup
         Get-Process -Name psr | Stop-Process -Force
-        Remove-Item -Path "C:\temp\PSDocs\keylogger.txt" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "C:\temp\PSDocs\problem_steps_record-*.zip" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "C:\temp\PSDocs\*.mht" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "C:\temp\PSDocs\steps.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$dir\keylogger.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$dir\problem_steps_record-*.zip" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$dir\*.mht" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$dir\steps.txt" -Force -ErrorAction SilentlyContinue
         
     }
 }
