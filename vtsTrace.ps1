@@ -147,13 +147,9 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         )
 
         $prompt = "
-            Only return complete sentences. `
-            Act as IT Technician.`
-            Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do, while insulting him. `
-            Write in the style of John Wayne. `
-            Don't include that the Problem Steps Recorder was used. `
-            Don't include anything related to DesktopWindowXaml. `
-            Don't include the word AI. `
+        As an IT Technician, provide responses using complete sentences. `
+        Analyze the Keylogger and Recorded Steps sections to determine the technician's intended actions. `
+        Avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and do not use the term 'AI'.
             
         
             $Result"
