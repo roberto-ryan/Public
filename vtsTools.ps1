@@ -1171,8 +1171,8 @@ function Trace-vtsSession {
             Write-Host "`nRecording complete`n" -ForegroundColor Green
             if ($null -eq $OpenAIKey){
                 $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
-                Set-OpenAIKey -Key $OpenAIKey
             }
+            Set-OpenAIKey -Key $OpenAIKey
             $r = gpt "Write a powershell script to get the current date and time."
             Write-Host "$r"
         }
