@@ -1102,10 +1102,11 @@ function Trace-vtsSession {
         [string]
         $OpenAIKey
     )
+
     try {
 
-        Write-Host "`nPress Enter to begin" -ForegroundColor Green
         Read-Host ""
+        Write-Host "`nPress Enter to begin" -ForegroundColor Green
         
         $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
