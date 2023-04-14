@@ -158,7 +158,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $body = @{
             'prompt'            = $prompt;
             'temperature'       = 0;
-            'max_tokens'        = 1000;
+            'max_tokens'        = 4000;
             'top_p'             = 1.0;
             'frequency_penalty' = 0.0;
             'presence_penalty'  = 0.0;
