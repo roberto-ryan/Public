@@ -1209,7 +1209,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         }
         finally {
             Write-Host "`nRecording complete...`n" -ForegroundColor Green
-            Write-Host "Processing..." -ForegroundColor Green
+            Write-Host "Processing...`n`n" -ForegroundColor Green
             if ($null -eq $PassedOpenAIKey) {
                 $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
             }
@@ -1269,7 +1269,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             $($response.choices.text) | Out-File "C:\temp\PSDocs\gpt_result.txt" -Force
 
             Start-sleep -Milliseconds 250
-            Write-Host "$(Get-Content "C:\temp\PSDocs\gpt_result.txt")" -ForegroundColor Yellow
+            Write-Host "$(Get-Content "C:\temp\PSDocs\gpt_result.txt")`n`n" -ForegroundColor Yellow
         }
     } -Args $OpenAIKey
     
