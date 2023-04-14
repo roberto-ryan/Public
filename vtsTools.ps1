@@ -1151,6 +1151,7 @@ function Trace-vtsSession {
     & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
         try {
             Read-Host "Press Enter to begin"
+            Clear-Host
             $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
 ██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝
@@ -1158,6 +1159,7 @@ function Trace-vtsSession {
 ██╔══██╗██╔══╝  ██║     ██║   ██║██╔══██╗██║  ██║██║██║╚██╗██║██║   ██║
 ██║  ██║███████╗╚██████╗╚██████╔╝██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝██╗██╗██╗
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
+
 "@
             Write-Host $rec -ForegroundColor Red
             Write-Host "Press Ctrl-C when finished." -ForegroundColor Yellow
@@ -1166,7 +1168,7 @@ function Trace-vtsSession {
             }
         }
         finally {
-            Write-Host "Ended recording..." -ForegroundColor Green
+            Write-Host "`nRecording complete`n" -ForegroundColor Green
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
             Set-OpenAIKey -Key $OpenAIKey
             $r = gpt "Write a powershell script to get the current date and time."
