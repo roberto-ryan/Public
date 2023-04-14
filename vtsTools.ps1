@@ -1148,8 +1148,6 @@ function Trace-vtsSession {
         }
     }
 
-    Clear-Host
-    
     & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
         try {
             Read-Host "Press Enter to begin"
