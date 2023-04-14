@@ -173,5 +173,13 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
 
         Start-sleep -Milliseconds 250
         Write-Host "$(Get-Content "C:\temp\PSDocs\gpt_result.txt")`n`n" -ForegroundColor Yellow
+        
+        #Cleanup
+        Get-Process -Name psr | Stop-Process -Force
+        Remove-Item -Path "C:\temp\PSDocs\keylogger.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "C:\temp\PSDocs\problem_steps_record-*.zip" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "C:\temp\PSDocs\*.mht" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "C:\temp\PSDocs\steps.txt" -Force -ErrorAction SilentlyContinue
+        
     }
 }
