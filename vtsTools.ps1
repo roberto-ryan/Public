@@ -1099,7 +1099,7 @@ function Trace-vtsSession {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [securestring]
+        [string]
         $OpenAIKey
     )
     # Check if pwsh is installed. If not installed, install it
@@ -1109,48 +1109,6 @@ function Trace-vtsSession {
     
         while (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" -ErrorAction SilentlyContinue)) {
             Start-Sleep -Seconds 1
-        }
-    }
-    
-    # Define the required minimum NuGet version
-    $minNuGetVersion = [version]'2.8.5.201'
-    
-    # Check if the NuGet Package Provider is already installed and meets the minimum version requirement
-    $nuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable 2>$null | Sort-Object -Property Version -Descending | Select-Object -First 1
-    if ($null -eq $nuGetProvider -or $nuGetProvider.Version -lt $minNuGetVersion) {
-        Write-Host "NuGet Package Provider not found or outdated, installing..."
-    
-        # Install the NuGet Package Provider with the specified minimum version
-        Install-PackageProvider -Name NuGet -MinimumVersion $minNuGetVersion -Force
-    
-        # Confirm successful installation
-        $nuGetProvider = Get-PackageProvider -Name NuGet -ListAvailable 2>$null | Sort-Object -Property Version -Descending | Select-Object -First 1
-        if ($null -ne $nuGetProvider -and $nuGetProvider.Version -ge $minNuGetVersion) {
-            Write-Host "NuGet Package Provider installed successfully."
-        }
-    }
-    
-    
-    # Check if PowerShellAI module is already installed
-    if (-not (Get-Module -ListAvailable -Name PowerShellAI)) {
-        Write-Host "PowerShellAI module not found, installing..."
-    
-        # Set the execution policy to allow the installation of the PowerShellAI module
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-    
-        # Check if the user has the required version of PowerShellGet to install the module
-        if ((Get-Module -ListAvailable -Name PowerShellGet).Version -lt [version]"2.0.0") {
-            Write-Host "Updating PowerShellGet module..."
-            Install-Module -Name PowerShellGet -Repository PSGallery -Force
-        }
-    
-        # Install the PowerShellAI module without confirmation
-        Write-Host "Installing PowerShellAI module..."
-        Install-Module -Name PowerShellAI -Force
-    
-        # Confirm successful installation
-        if (Get-Module -ListAvailable -Name PowerShellAI) {
-            Write-Host "PowerShellAI module installed successfully."
         }
     }
 
@@ -1258,7 +1216,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             else {
                 $OpenAIKey = $PassedOpenAIKey
             }
-            Set-OpenAIKey -Key $OpenAIKey
+
             $dir = "C:\temp\PSDocs"
 
             # Stop PSR
@@ -1286,33 +1244,33 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
                 $KeyloggerResult
             )
 
-            #             #Create Instructions
-            #             $gpt = (gpt "Write instructions for an end user based on the following Keyloger and RecordedSteps sections. `
-            # Don't include that the Problem Steps Recorder was used. `
-            # Don't include anything related to DesktopWindowXaml. `
-            # Don't include the word AI. `
-            # Skip steps that don't make logical sense. `
-            # Only speak in complete sentences. `
-            # Guess what the steps are trying to accomplish, and expand on the instructions.
-
-            # $Result")
-
-            #Create Technician Notes
-            $gpt = (gpt "Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person. `
+            $prompt = "Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person. `
             Don't include that the Problem Steps Recorder was used. `
             Don't include anything related to DesktopWindowXaml. `
             Don't include the word AI. `
             Skip steps that don't make logical sense. `
             Only speak in complete sentences. `
             Embelish the output to make the IT Technician sound very skilled, and be specific.
-
-            $Result")
+        
+            $Result"
             
-            $gpt | Out-File "C:\temp\PSDocs\gpt_result.txt" -Force
+        
+            $body = @{
+                'prompt'            = $prompt;
+                'temperature'       = 0;
+                'max_tokens'        = 250;
+                'top_p'             = 1.0;
+                'frequency_penalty' = 0.0;
+                'presence_penalty'  = 0.0;
+                'stop'              = @('"""');
+            }
+                
+            $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body ($body | ConvertTo-Json) -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json"
+            $($response.choices.text) | Out-File "C:\temp\PSDocs\gpt_result.txt" -Force
 
             Start-sleep -Milliseconds 250
-
-            Get-Content "C:\temp\PSDocs\gpt_result.txt"
+            Write-Host "$(Get-Content "C:\temp\PSDocs\gpt_result.txt")" -ForegroundColor Yellow
         }
     } -Args $OpenAIKey
+    
 }
