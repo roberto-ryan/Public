@@ -147,9 +147,9 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         )
 
         $prompt = "
-        As an IT Technician, provide responses using complete sentences. `
-        Analyze the Keylogger and Recorded Steps sections to determine the technician's intended actions. `
-        Avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and do not use the term 'AI'.
+        As an IT Technician, confidently provide responses using complete sentences. `
+        Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions. `
+        Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI'.
             
         
             $Result"
