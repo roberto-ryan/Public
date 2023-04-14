@@ -1177,7 +1177,8 @@ function Trace-vtsSession {
             }
         }
         finally {
-            Write-Host "`nRecording complete`n" -ForegroundColor Green
+            Write-Host "`nRecording complete...`n" -ForegroundColor Green
+            Write-Host "Processing..." -ForegroundColor Green
             if ($null -eq $PassedOpenAIKey) {
                 $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
             }
