@@ -1118,7 +1118,7 @@ function Trace-vtsSession {
             $PassedOpenAIKey
         )
         try {
-            Read-Host "Press Enter to begin"
+            Read-Host "`nPress Enter to begin"
         
             $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
@@ -1251,7 +1251,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             Don't include the word AI. `
             Skip steps that don't make logical sense. `
             Only speak in complete sentences. `
-            Embelish the output to make the IT Technician sound very skilled, and be specific.
+            Do not include key presses like:  [Ctrl] [Alt] [Del] [Enter].
         
             $Result"
             
