@@ -1209,6 +1209,12 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
 
         Start-Sleep 3
 
+        # Remove invalid characters from keylogger file
+        $File = "$dir\keylogger.txt"
+        $Content = Get-Content -Path $File -Encoding UTF8 -Raw
+        $CleanedContent = [System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes($Content))
+        Set-Content -Path $File -Value $CleanedContent -Encoding UTF8
+
         # Get PSR Results
         Expand-Archive (Get-ChildItem C:\temp\PSDocs\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
