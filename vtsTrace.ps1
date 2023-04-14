@@ -10,12 +10,13 @@ function Trace-vtsSession {
         [Parameter(Mandatory = $true)]
         [string]
         $OpenAIKey
-    )
-    
-    
-    try {
-        $dir = "$env:LOCALAPPDATA\VTS\PSDOCS"
-
+        )
+        
+        
+        try {
+            $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
+            $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
+            
         Read-Host "`nPress Enter to begin"
         
         $rec = @"
@@ -96,7 +97,6 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             # Create $path directory if it doesn't exist
             if (-not (Test-Path $dir)) { mkdir $dir | Out-Null }
 
-            $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
 
             # Start PSR
             psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 /sc 1 #/maxsc 100
@@ -177,7 +177,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         
         #Cleanup
         Get-Process -Name psr | Stop-Process -Force
-        Remove-Item -Path "$dir\*" -recurse -Force -ErrorAction SilentlyContinue
+        #Remove-Item -Path "$dir\*" -recurse -Force -ErrorAction SilentlyContinue
         
     }
 }
