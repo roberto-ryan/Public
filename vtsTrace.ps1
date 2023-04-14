@@ -14,7 +14,7 @@ function Trace-vtsSession {
     
     
     try {
-        $dir = "C:\tmp\PSDocs"
+        $dir = "C:\Windows\temp\PSDocs"
 
         Read-Host "`nPress Enter to begin"
         
