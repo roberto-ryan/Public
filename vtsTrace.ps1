@@ -12,9 +12,9 @@ function Trace-vtsSession {
         $OpenAIKey
     )
     
-    $dir = "C:\tmp\PSDocs"
-
+    
     try {
+        $dir = "C:\tmp\PSDocs"
 
         Read-Host "`nPress Enter to begin"
         
@@ -157,7 +157,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $body = @{
             'prompt'            = $prompt;
             'temperature'       = 0;
-            'max_tokens'        = 4000;
+            'max_tokens'        = 500;
             'top_p'             = 1.0;
             'frequency_penalty' = 0.0;
             'presence_penalty'  = 0.0;
