@@ -1105,8 +1105,7 @@ function Trace-vtsSession {
 
     try {
 
-        Read-Host ""
-        Write-Host "`nPress Enter to begin" -ForegroundColor Green
+        Read-Host "`nPress Enter to begin"
         
         $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
@@ -1252,7 +1251,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
             'stop'              = @('"""');
         }
          
-         $JsonBody = $body | ConvertTo-Json -Compress
+        $JsonBody = $body | ConvertTo-Json -Compress
         $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
              
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
