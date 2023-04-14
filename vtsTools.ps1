@@ -1148,10 +1148,12 @@ function Trace-vtsSession {
         }
     }
 
+    Clear-Host
+    
     & "C:\Program Files\PowerShell\7\pwsh.exe" -Command { 
         try {
             Read-Host "Press Enter to begin"
-            Clear-Host
+        
             $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
 ██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝
@@ -1163,7 +1165,7 @@ function Trace-vtsSession {
 "@
             Write-Host $rec -ForegroundColor Red
             Write-Host "Press Ctrl-C when finished." -ForegroundColor Yellow
-            While ($true){
+            While ($true) {
 
             }
         }
