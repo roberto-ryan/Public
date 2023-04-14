@@ -171,7 +171,9 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $($response.choices.text) | Out-File "$dir\gpt_result.txt" -Force
 
         Start-sleep -Milliseconds 250
+        #Write final results to the shell
         Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
+        Start-sleep -Milliseconds 250
         
         #Cleanup
         Get-Process -Name psr | Stop-Process -Force
