@@ -1230,7 +1230,8 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
 
         $prompt = "
             Only return complete sentences. `
-            Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person. `
+            Act as IT Technician.`
+            Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person. `
             Don't include that the Problem Steps Recorder was used. `
             Don't include anything related to DesktopWindowXaml. `
             Don't include the word AI.
