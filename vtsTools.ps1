@@ -1104,7 +1104,8 @@ function Trace-vtsSession {
     )
     try {
 
-        Read-Host "`nPress Enter to begin"
+        Write-Host "`nPress Enter to begin" -ForegroundColor Green
+        Read-Host ""
         
         $rec = @"
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
@@ -1195,8 +1196,8 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         }
     }
     finally {
-        Write-Host "`nRecording complete...`n" -ForegroundColor Green
-        Write-Host "Processing...`n`n" -ForegroundColor Green
+        Write-Host "`nRecording complete...`n" -ForegroundColor Cyan
+        Write-Host "Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
         }
@@ -1243,7 +1244,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $body = @{
             'prompt'            = $prompt;
             'temperature'       = 0;
-            'max_tokens'        = 500;
+            'max_tokens'        = 250;
             'top_p'             = 1.0;
             'frequency_penalty' = 0.0;
             'presence_penalty'  = 0.0;
