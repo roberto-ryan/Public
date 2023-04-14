@@ -1098,10 +1098,11 @@ PS> Trace-vtsSession
 function Trace-vtsSession {
     [CmdletBinding()]
     param (
-        [Parameter()]
+        [Parameter(Mandatory=$true)]
         [string]
         $OpenAIKey
     )
+    
     # Check if pwsh is installed. If not installed, install it
     if (-not (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe" -ErrorAction SilentlyContinue)) {
         Write-Host "PowerShell 7 not found, downloading and installing..."
