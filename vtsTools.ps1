@@ -1188,5 +1188,5 @@ function Trace-vtsSession {
             $r = gpt "Write a powershell script to get the current date and time."
             Write-Host "$r"
         }
-    } -ArgumentList $OpenAIKey
+    } -Args $OpenAIKey
 }
