@@ -17,9 +17,10 @@ function Trace-vtsSession {
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
             
-        Read-Host "`nPress Enter to begin"
+        $issue = Read-Host "Enter a short description of the issue"
         
         $rec = @"
+
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
 ██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝
 ██████╔╝█████╗  ██║     ██║   ██║██████╔╝██║  ██║██║██╔██╗ ██║██║  ███╗
@@ -29,7 +30,7 @@ function Trace-vtsSession {
 
 "@
         Write-Host $rec -ForegroundColor Red
-        Write-Host "Press Ctrl-C when finished." -ForegroundColor Yellow
+        Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
         While ($true) {
 
             # Define Funtions
@@ -48,6 +49,7 @@ function Trace-vtsSession {
         }
     }
     finally {
+        $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
         Write-Host "`nRecording complete...`n" -ForegroundColor Cyan
         Write-Host "Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
@@ -109,6 +111,12 @@ function Trace-vtsSession {
 
         # Compile Results
         $Result = @"
+Issue Description:
+$issue
+
+Issue Resolution:
+$resolution
+
 RecordedSteps:
 $joinedSteps
             
@@ -121,10 +129,10 @@ $KeyloggerResult
         # $Result"
 
 
-        $prompt = "As an IT Technician, confidently provide responses using complete sentences.
-Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
-Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
-Speak in the first person, like a tech reporting their troubleshooting steps to a client.
+        $prompt = "As an IT Technician. Speak in past tense in the first person like you are having a conversation.
+Analyze the Issue Description, Issue Resolution, Keylogger and Recorded Steps sections and accurately determine your intended actions as the technician.
+Don't mention any keyboard shortcuts, and don't mention that Recorded Steps or Keylogger was used. Don't return any output related to 'DesktopWindowXamlSource'.
+
        
 $Result"
             
