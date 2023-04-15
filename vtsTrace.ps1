@@ -48,7 +48,6 @@ function Trace-vtsSession {
         }
     }
     finally {
-        $EndTimestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         Write-Host "`nRecording complete...`n" -ForegroundColor Cyan
         Write-Host "Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
@@ -105,23 +104,27 @@ function Trace-vtsSession {
         $StepCount = $PSRResult.Count - 2
 
         # Compile Results
-        $Result = @'
-Session Start: $timestamp
-Session End: $EndTimestamp
-
+        $Result = @"
 RecordedSteps:
 $PSRResult[0..$StepCount]
             
 Keylogger:
 $KeyloggerResult
-'@
+"@
 
-        $prompt = "As an IT Technician, confidently provide responses using complete sentences.
-Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
-Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
-Include the start and stop times in a [square bracket] at the end.
+        $prompt = "Act as a skilled IT Support Tech. Analyze the Keylogger: and RecordedSteps: sections to write a summary of what steps were taken.
        
-$Result"
+$Result
+
+`"`"`"
+"
+
+#         $prompt = "As an IT Technician, confidently provide responses using complete sentences.
+# Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
+# Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
+# Include the start and stop times in a [square bracket] at the end.
+       
+# $Result"
             
         
         $body = @{
