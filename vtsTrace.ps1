@@ -124,7 +124,7 @@ $KeyloggerResult
         $prompt = "As an IT Technician, confidently provide responses using complete sentences.
 Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
 Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
-Include the start and stop times in a [square bracket] at the end.
+Speak in the first person, like a tech reporting their troubleshooting steps to a client.
        
 $Result"
             
