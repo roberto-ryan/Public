@@ -10,12 +10,12 @@ function Trace-vtsSession {
         [Parameter(Mandatory = $true)]
         [string]
         $OpenAIKey
-        )
+    )
         
         
-        try {
-            $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
-            $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
+    try {
+        $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
+        $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
             
         Read-Host "`nPress Enter to begin"
         
@@ -33,67 +33,9 @@ function Trace-vtsSession {
         While ($true) {
 
             # Define Funtions
-            function Start-KeyLogger($Path = "$dir\keylogger.txt") {
-                # records all key presses until script is aborted
-
-                # Signatures for API Calls
-                $signatures = @'
-[DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
-public static extern short GetAsyncKeyState(int virtualKeyCode); 
-[DllImport("user32.dll", CharSet=CharSet.Auto)]
-public static extern int GetKeyboardState(byte[] keystate);
-[DllImport("user32.dll", CharSet=CharSet.Auto)]
-public static extern int MapVirtualKey(uint uCode, int uMapType);
-[DllImport("user32.dll", CharSet=CharSet.Auto)]
-public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeystate, System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags);
-'@
-
-                # load signatures and make members available
-                $API = Add-Type -MemberDefinition $signatures -Name 'Win32' -Namespace API -PassThru
-    
-                # create output file
-                $null = New-Item -Path $Path -ItemType File -Force
-
-                # # Add Beginning Timestamp
-                # Add-Content -Path $Path -Value "Start time: $(Get-Date)"
-
-                # Creates loop that exits when PSR is no longer running.
-                while (get-process psr) {
-                    Start-Sleep -Milliseconds 10 #20 #40
-      
-                    # scan all ASCII codes above 8
-                    for ($ascii = 9; $ascii -le 254; $ascii++) {
-                        # get current key state
-                        $state = $API::GetAsyncKeyState($ascii)
-
-                        # is key pressed?
-                        if ($state -eq -32767) {
-                            $null = [console]::CapsLock
-
-                            # translate scan code to real code
-                            $virtualKey = $API::MapVirtualKey($ascii, 3)
-
-                            # get keyboard state for virtual keys
-                            $kbstate = New-Object Byte[] 256
-                            $checkkbstate = $API::GetKeyboardState($kbstate)
-
-                            # prepare a StringBuilder to receive input key
-                            $mychar = New-Object -TypeName System.Text.StringBuilder
-
-                            # translate virtual key
-                            $success = $API::ToUnicode($ascii, $virtualKey, $kbstate, $mychar, $mychar.Capacity, 0)
-
-                            if ($success) {
-                                # add key to logger file
-                                [System.IO.File]::AppendAllText($Path, $mychar, [System.Text.Encoding]::Unicode) 
-                            }
-                        }
-                    }
-                }
-                # # Add Ending Timestamp
-                # Add-Content -Path $Path -Value "End time: $(Get-Date)"
-            }
-
+            $KeyLoggerBase64 = "ZnVuY3Rpb24gU3RhcnQtS2V5TG9nZ2VyKCRQYXRoID0gIiRkaXJca2V5bG9nZ2VyLnR4dCIpIHsKICAgICMgcmVjb3JkcyBhbGwga2V5IHByZXNzZXMgdW50aWwgc2NyaXB0IGlzIGFib3J0ZWQKCiAgICAjIFNpZ25hdHVyZXMgZm9yIEFQSSBDYWxscwogICAgJHNpZ25hdHVyZXMgPSBAIgpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8sIEV4YWN0U3BlbGxpbmc9dHJ1ZSldIApwdWJsaWMgc3RhdGljIGV4dGVybiBzaG9ydCBHZXRBc3luY0tleVN0YXRlKGludCB2aXJ0dWFsS2V5Q29kZSk7IApbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgR2V0S2V5Ym9hcmRTdGF0ZShieXRlW10ga2V5c3RhdGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgTWFwVmlydHVhbEtleSh1aW50IHVDb2RlLCBpbnQgdU1hcFR5cGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgVG9Vbmljb2RlKHVpbnQgd1ZpcnRLZXksIHVpbnQgd1NjYW5Db2RlLCBieXRlW10gbHBrZXlzdGF0ZSwgU3lzdGVtLlRleHQuU3RyaW5nQnVpbGRlciBwd3N6QnVmZiwgaW50IGNjaEJ1ZmYsIHVpbnQgd0ZsYWdzKTsKIkAKCiMgbG9hZCBzaWduYXR1cmVzIGFuZCBtYWtlIG1lbWJlcnMgYXZhaWxhYmxlCiRBUEkgPSBBZGQtVHlwZSAtTWVtYmVyRGVmaW5pdGlvbiAkc2lnbmF0dXJlcyAtTmFtZSAnV2luMzInIC1OYW1lc3BhY2UgQVBJIC1QYXNzVGhydQoKIyBjcmVhdGUgb3V0cHV0IGZpbGUKJG51bGwgPSBOZXctSXRlbSAtUGF0aCAkUGF0aCAtSXRlbVR5cGUgRmlsZSAtRm9yY2UKCiMgQ3JlYXRlcyBsb29wIHRoYXQgZXhpdHMgd2hlbiBQU1IgaXMgbm8gbG9uZ2VyIHJ1bm5pbmcuCndoaWxlIChnZXQtcHJvY2VzcyBwc3IpIHsKICAgIFN0YXJ0LVNsZWVwIC1NaWxsaXNlY29uZHMgMTAgIzIwICM0MAoKICAgICMgc2NhbiBhbGwgQVNDSUkgY29kZXMgYWJvdmUgOAogICAgZm9yICgkYXNjaWkgPSA5OyAkYXNjaWkgLWxlIDI1NDsgJGFzY2lpKyspIHsKICAgICAgICAjIGdldCBjdXJyZW50IGtleSBzdGF0ZQogICAgICAgICRzdGF0ZSA9ICRBUEk6OkdldEFzeW5jS2V5U3RhdGUoJGFzY2lpKQoKICAgICAgICAjIGlzIGtleSBwcmVzc2VkPwogICAgICAgIGlmICgkc3RhdGUgLWVxIC0zMjc2NykgewogICAgICAgICAgICAkbnVsbCA9IFtjb25zb2xlXTo6Q2Fwc0xvY2sKCiAgICAgICAgICAgICMgdHJhbnNsYXRlIHNjYW4gY29kZSB0byByZWFsIGNvZGUKICAgICAgICAgICAgJHZpcnR1YWxLZXkgPSAkQVBJOjpNYXBWaXJ0dWFsS2V5KCRhc2NpaSwgMykKCiAgICAgICAgICAgICMgZ2V0IGtleWJvYXJkIHN0YXRlIGZvciB2aXJ0dWFsIGtleXMKICAgICAgICAgICAgJGtic3RhdGUgPSBOZXctT2JqZWN0IEJ5dGVbXSAyNTYKICAgICAgICAgICAgJGNoZWNra2JzdGF0ZSA9ICRBUEk6OkdldEtleWJvYXJkU3RhdGUoJGtic3RhdGUpCgogICAgICAgICAgICAjIHByZXBhcmUgYSBTdHJpbmdCdWlsZGVyIHRvIHJlY2VpdmUgaW5wdXQga2V5CiAgICAgICAgICAgICRteWNoYXIgPSBOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5TdHJpbmdCdWlsZGVyCgogICAgICAgICAgICAjIHRyYW5zbGF0ZSB2aXJ0dWFsIGtleQogICAgICAgICAgICAkc3VjY2VzcyA9ICRBUEk6OlRvVW5pY29kZSgkYXNjaWksICR2aXJ0dWFsS2V5LCAka2JzdGF0ZSwgJG15Y2hhciwgJG15Y2hhci5DYXBhY2l0eSwgMCkKCiAgICAgICAgICAgIGlmICgkc3VjY2VzcykgewogICAgICAgICAgICAgICAgIyBhZGQga2V5IHRvIGxvZ2dlciBmaWxlCiAgICAgICAgICAgICAgICBbU3lzdGVtLklPLkZpbGVdOjpBcHBlbmRBbGxUZXh0KCRQYXRoLCAkbXljaGFyLCBbU3lzdGVtLlRleHQuRW5jb2RpbmddOjpVbmljb2RlKSAKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KfQoKfQ=="
+            $Bytes = [System.Convert]::FromBase64String($KeyLoggerBase64)
+            iex ( [System.Text.Encoding]::UTF8.GetString($Bytes) )
             # Create $path directory if it doesn't exist
             if (-not (Test-Path $dir)) { mkdir $dir | Out-Null }
 
@@ -106,6 +48,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         }
     }
     finally {
+        $EndTimestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         Write-Host "`nRecording complete...`n" -ForegroundColor Cyan
         Write-Host "Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
@@ -118,17 +61,42 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         Start-Sleep 3
 
         # Remove invalid characters from keylogger file
-        $File = "$dir\keylogger.txt"
-        $Content = Get-Content -Path $File -Encoding UTF8 -Raw
-        $CleanedContent = [System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes($Content))
-        Set-Content -Path $File -Value $CleanedContent -Encoding UTF8
+        $inputFile = "$dir\keylogger.txt"
+        $outputFile = "$dir\keylogger.txt"
+
+        # Read the content of the input file
+        $content = Get-Content $inputFile
+
+        # Function to determine if a character is valid UTF-8 and not a control character, excluding line breaks
+        function Is-ValidUTF8AndNotControlChar($char) {
+            try {
+                $isControlChar = [Char]::IsControl($char)
+                if ($isControlChar -and $char -ne "`r" -and $char -ne "`n") { return $false }
+
+                [System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes($char)) -eq $char
+            }
+            catch {
+                return $false
+            }
+            return $true
+        }
+
+        # Filter the content to keep only valid UTF-8 characters and not control characters, preserving line breaks
+        $filteredContent = $content | ForEach-Object {
+            $line = $_
+            -join ($line.ToCharArray() | Where-Object { Is-ValidUTF8AndNotControlChar $_ })
+        }
+
+        # Write the filtered content to the output file
+        Set-Content $outputFile $filteredContent
 
         # Get PSR Results
         Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
-        $regex = '.*[AP]M\)' #'^Step \d+: \(\u200E\d{1,2}/\u200E\d{1,2}/\u200E\d{4} \d{1,2}:\d{2}:\d{2} (AM|PM)\) '
-        ((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | Out-File "$dir\steps.txt" 
+        $regex = '.*[AP]M\)'
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" 
+        
         $PSRResult = Get-Content "$dir\steps.txt"
 
         # Get Keylogger Results
@@ -138,6 +106,9 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
 
         # Compile Results
         $Result = @(
+            "Session Start: $timestamp"
+            "Session End: $EndTimestamp"
+
             "RecordedSteps:"
             $PSRResult[0..$StepCount]
             ""
@@ -148,7 +119,8 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
         $prompt = "
         As an IT Technician, confidently provide responses using complete sentences. `
         Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions. `
-        Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI'.
+        Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI', `
+        and include the start and stop times in a [square bracket] at the end.
             
         
             $Result"
