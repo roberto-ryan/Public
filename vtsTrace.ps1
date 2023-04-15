@@ -116,17 +116,17 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "Act as a skilled IT Support Tech. Analyze the Keylogger: and RecordedSteps: sections to write a 100 word summary of what steps were taken.
-       
-$Result"
-
-
-        #         $prompt = "As an IT Technician, confidently provide responses using complete sentences.
-        # Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
-        # Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
-        # Include the start and stop times in a [square bracket] at the end.
+        #         $prompt = "Act as a skilled IT Support Tech. Analyze the Keylogger: and RecordedSteps: sections to write a 100 word summary of what steps were taken.
        
         # $Result"
+
+
+        $prompt = "As an IT Technician, confidently provide responses using complete sentences.
+Carefully analyze the Keylogger and Recorded Steps sections to accurately determine the technician's intended actions.
+Be sure to avoid mentioning the use of Problem Steps Recorder, any reference to DesktopWindowXaml, and refrain from using the term 'AI',
+Include the start and stop times in a [square bracket] at the end.
+       
+$Result"
             
         
         $body = @{
