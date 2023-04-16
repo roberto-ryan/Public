@@ -53,6 +53,7 @@ function Trace-vtsSession {
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
 
 "@
+        Clear-Host
         Write-Host $rec -ForegroundColor Red
         Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
         
@@ -76,7 +77,16 @@ function Trace-vtsSession {
     finally {
         $SessionEnd = Get-Date -Format 'h:mm:ss tt'
         $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
-        Write-Host "`nRecording complete. Processing...`n`n" -ForegroundColor Cyan
+        $processing = @'
+██████╗ ██████╗  ██████╗  ██████╗███████╗███████╗███████╗██╗███╗   ██╗ ██████╗          
+██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝          
+██████╔╝██████╔╝██║   ██║██║     █████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗         
+██╔═══╝ ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║         
+██║     ██║  ██║╚██████╔╝╚██████╗███████╗███████║███████║██║██║ ╚████║╚██████╔╝██╗██╗██╗
+╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
+'@
+        Clear-Host
+        Write-Host "$processing" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
         }
