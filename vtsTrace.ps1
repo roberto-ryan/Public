@@ -14,6 +14,7 @@ function Trace-vtsSession {
         
         
     try {
+        $SessionStart = Get-Date -Format 'h:mm:ss tt'
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
         $title = @'
@@ -73,6 +74,7 @@ function Trace-vtsSession {
         }
     }
     finally {
+        $SessionEnd = Get-Date -Format 'h:mm:ss tt'
         $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
         Write-Host "`nRecording complete. Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
@@ -134,6 +136,9 @@ function Trace-vtsSession {
 
         # Compile Results
         $Result = @"
+Start Time: $SessionStart
+End Time: $SessionEnd
+
 Issue Description:
 $issue
 
@@ -148,6 +153,8 @@ $KeyloggerResult
 "@
 
         $prompt = "Example Output:
+Session Time: 11:45AM - 12:00PM (~45 minutes)
+
 User Name: SB2\rober
 Computer Name: SB2
 
@@ -174,8 +181,10 @@ Additional Comments: None
 
 
 
+
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the Example Output: above as an example for filling out the #Form:. `
+Use Start Time: and End Time: to calculate the Session Time:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
 Don't include that the Problem Steps Recorder was used. `
@@ -189,6 +198,8 @@ $Result
 
 
 #Form:
+Session Time:
+
 User Name: $env:USERDOMAIN\$env:USERNAME
 Computer Name: $env:COMPUTERNAME
 
