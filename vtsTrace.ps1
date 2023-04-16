@@ -147,17 +147,15 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        #         $prompt = "Act as a skilled IT Support Tech. Analyze the Keylogger: and RecordedSteps: sections to write a 100 word summary of what steps were taken.
-       
-        # $Result"
+        $prompt = "Imagine you are an IT Technician reflecting on a past experience. Write in the first person and use the past tense as if you are engaging in a conversation. Evaluate the information provided in the Issue Description, Issue Resolution, and Recorded Steps sections to accurately describe the actions you took as the technician. Avoid mentioning any keyboard shortcuts, the use of Recorded Steps or Keylogger, and do not include any details related to 'DesktopWindowXamlSource'.
 
-
-        $prompt = "As an IT Technician. Speak in past tense in the first person like you are having a conversation.
-Analyze the Issue Description, Issue Resolution, Keylogger and Recorded Steps sections and accurately determine your intended actions as the technician.
-Don't mention any keyboard shortcuts, and don't mention that Recorded Steps or Keylogger was used. Don't return any output related to 'DesktopWindowXamlSource'.
-
-       
 $Result"
+
+#         $prompt = "As an IT Technician. Speak in past tense in the first person like you are having a conversation.
+# Analyze the Issue Description, Issue Resolution, Keylogger and Recorded Steps sections and accurately determine your intended actions as the technician.
+# Don't mention any keyboard shortcuts, and don't mention that Recorded Steps or Keylogger was used. Don't return any output related to 'DesktopWindowXamlSource'.
+       
+# $Result"
             
         
         $body = @{
