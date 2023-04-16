@@ -1,6 +1,6 @@
 <#
 .DESCRIPTION
-Trace-vtsSession tracks what you do to assist with ticket notes.
+Trace-vtsSession tracks what you do to assist with ticket notes and more.
 .EXAMPLE
 PS> Trace-vtsSession
 #>
