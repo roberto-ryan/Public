@@ -37,6 +37,7 @@ function Trace-vtsSession {
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠲⣖⣤⣶⣼⣿⣿⣿⣿⣿⣿⣷⣾⣿⡿⣿⠷⡊⠁⢠⣅⠀⠀⠀⢀⣴⣿⣎⠻⠋⠁  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠋⠉⠛⠙⠛⠛⠛⠛⠋⠋⠑⠉⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠻
 '@
+        Clear-Host
         Write-Host $title -ForegroundColor DarkGreen
     
         $issue = Read-Host "Enter a short description of the issue"
@@ -73,8 +74,7 @@ function Trace-vtsSession {
     }
     finally {
         $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
-        Write-Host "`nRecording complete...`n" -ForegroundColor Cyan
-        Write-Host "Processing...`n`n" -ForegroundColor Cyan
+        Write-Host "`nRecording complete. Processing...`n`n" -ForegroundColor Cyan
         if ($null -eq $OpenAIKey) {
             $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
         }
