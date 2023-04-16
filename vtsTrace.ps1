@@ -240,7 +240,7 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "#EXAMPLE OUTPUT1:
+        $prompt = "Example1 = (
 Issue Reported: Screen flickering
 
 Customer Actions Taken: None
@@ -272,9 +272,9 @@ At your earliest convenience, please test your system to confirm that the proble
 
 Respectfully,
 [Technician Name]
-#END EXAMPLE OUTPUT1
+)
 
-#EXAMPLE OUTPUT2:
+Example2 = (
 Issue Reported: Scanner not working
 
 Customer Actions Taken: None
@@ -299,9 +299,9 @@ I regret to inform you that we have been unable to resolve the issue with your s
 
 Respectfully,
 [Technician Name]
-#END EXAMPLE OUTPUT2
+)
 
-#EXAMPLE OUTPUT3:
+Example3 = (
 Issue Reported: Slow internet connection
 
 Customer Actions Taken: None
@@ -330,10 +330,10 @@ We are happy to let you know that we have successfully addressed the slow intern
 
 Respectfully,
 [Technician Name]
-#END EXAMPLE OUTPUT3
+)
 
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
-Use the EXAMPLE OUTPUT above as an example for filling out the #Form:. `
+Use the examples above as an example when filling out the #Form:. `
 Make sure to complete each section of #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
@@ -346,20 +346,15 @@ Embelish the output to make the IT Technician sound very skilled, and be specifi
 
 $Result
 
-
-#Form Start
+#Form:
 Reporting Issue:
-
 Customer Actions Taken:
-
 Troubleshooting Methods:
-
 Resolution:
-
 Comments & Misc. info:
-
 Message to End User:
-#Form End
+
+`"`"`"
 "
 
         
