@@ -162,7 +162,7 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "# START OF EXAMPLE OUTPUT:
+        $prompt = "#EXAMPLE OUTPUT:
 Session Time: 11:45AM - 12:00PM (~45 minutes)
 
 User Name: SB2\rober
@@ -189,18 +189,18 @@ Resolution: Updating the graphics driver resolved the issue.
 
 Additional Comments: None
 
+
 Message to End User: 
+
 [User Name],
 
 I am pleased to inform you that we have successfully resolved the issue you were experiencing by flushing the DNS.
-
 At your earliest convenience, please test your system to confirm that the problem has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
 
 Respectfully,
-
 [Technician Name]
 
-# END OF EXAMPLE OUTPUT
+#END EXAMPLE OUTPUT
 
 
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
@@ -226,15 +226,10 @@ User Name: $env:USERDOMAIN\$env:USERNAME
 Computer Name: $env:COMPUTERNAME
 
 Reporting Issue: 
-
 Customer Actions Taken:
-
 Troubleshooting Methods:
-
 Resolution:
-
 Comments & Misc. info:
-
 Message to End User:
 "
 
