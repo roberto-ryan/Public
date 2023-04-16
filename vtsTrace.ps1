@@ -14,6 +14,7 @@ function Trace-vtsSession {
         
         
     try {
+        $ErrorActionPreference = 'SilentlyContinue'
         $SessionStart = Get-Date -Format 'h:mm:ss tt'
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
@@ -60,6 +61,7 @@ function Trace-vtsSession {
         While ($true) {
 
             # Define Funtions
+
             $KeyLoggerBase64 = "ZnVuY3Rpb24gU3RhcnQtS2V5TG9nZ2VyKCRQYXRoID0gIiRkaXJca2V5bG9nZ2VyLnR4dCIpIHsKICAgICMgcmVjb3JkcyBhbGwga2V5IHByZXNzZXMgdW50aWwgc2NyaXB0IGlzIGFib3J0ZWQKCiAgICAjIFNpZ25hdHVyZXMgZm9yIEFQSSBDYWxscwogICAgJHNpZ25hdHVyZXMgPSBAIgpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8sIEV4YWN0U3BlbGxpbmc9dHJ1ZSldIApwdWJsaWMgc3RhdGljIGV4dGVybiBzaG9ydCBHZXRBc3luY0tleVN0YXRlKGludCB2aXJ0dWFsS2V5Q29kZSk7IApbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgR2V0S2V5Ym9hcmRTdGF0ZShieXRlW10ga2V5c3RhdGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgTWFwVmlydHVhbEtleSh1aW50IHVDb2RlLCBpbnQgdU1hcFR5cGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgVG9Vbmljb2RlKHVpbnQgd1ZpcnRLZXksIHVpbnQgd1NjYW5Db2RlLCBieXRlW10gbHBrZXlzdGF0ZSwgU3lzdGVtLlRleHQuU3RyaW5nQnVpbGRlciBwd3N6QnVmZiwgaW50IGNjaEJ1ZmYsIHVpbnQgd0ZsYWdzKTsKIkAKCiMgbG9hZCBzaWduYXR1cmVzIGFuZCBtYWtlIG1lbWJlcnMgYXZhaWxhYmxlCiRBUEkgPSBBZGQtVHlwZSAtTWVtYmVyRGVmaW5pdGlvbiAkc2lnbmF0dXJlcyAtTmFtZSAnV2luMzInIC1OYW1lc3BhY2UgQVBJIC1QYXNzVGhydQoKIyBjcmVhdGUgb3V0cHV0IGZpbGUKJG51bGwgPSBOZXctSXRlbSAtUGF0aCAkUGF0aCAtSXRlbVR5cGUgRmlsZSAtRm9yY2UKCiMgQ3JlYXRlcyBsb29wIHRoYXQgZXhpdHMgd2hlbiBQU1IgaXMgbm8gbG9uZ2VyIHJ1bm5pbmcuCndoaWxlIChnZXQtcHJvY2VzcyBwc3IpIHsKICAgIFN0YXJ0LVNsZWVwIC1NaWxsaXNlY29uZHMgMTAgIzIwICM0MAoKICAgICMgc2NhbiBhbGwgQVNDSUkgY29kZXMgYWJvdmUgOAogICAgZm9yICgkYXNjaWkgPSA5OyAkYXNjaWkgLWxlIDI1NDsgJGFzY2lpKyspIHsKICAgICAgICAjIGdldCBjdXJyZW50IGtleSBzdGF0ZQogICAgICAgICRzdGF0ZSA9ICRBUEk6OkdldEFzeW5jS2V5U3RhdGUoJGFzY2lpKQoKICAgICAgICAjIGlzIGtleSBwcmVzc2VkPwogICAgICAgIGlmICgkc3RhdGUgLWVxIC0zMjc2NykgewogICAgICAgICAgICAkbnVsbCA9IFtjb25zb2xlXTo6Q2Fwc0xvY2sKCiAgICAgICAgICAgICMgdHJhbnNsYXRlIHNjYW4gY29kZSB0byByZWFsIGNvZGUKICAgICAgICAgICAgJHZpcnR1YWxLZXkgPSAkQVBJOjpNYXBWaXJ0dWFsS2V5KCRhc2NpaSwgMykKCiAgICAgICAgICAgICMgZ2V0IGtleWJvYXJkIHN0YXRlIGZvciB2aXJ0dWFsIGtleXMKICAgICAgICAgICAgJGtic3RhdGUgPSBOZXctT2JqZWN0IEJ5dGVbXSAyNTYKICAgICAgICAgICAgJGNoZWNra2JzdGF0ZSA9ICRBUEk6OkdldEtleWJvYXJkU3RhdGUoJGtic3RhdGUpCgogICAgICAgICAgICAjIHByZXBhcmUgYSBTdHJpbmdCdWlsZGVyIHRvIHJlY2VpdmUgaW5wdXQga2V5CiAgICAgICAgICAgICRteWNoYXIgPSBOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5TdHJpbmdCdWlsZGVyCgogICAgICAgICAgICAjIHRyYW5zbGF0ZSB2aXJ0dWFsIGtleQogICAgICAgICAgICAkc3VjY2VzcyA9ICRBUEk6OlRvVW5pY29kZSgkYXNjaWksICR2aXJ0dWFsS2V5LCAka2JzdGF0ZSwgJG15Y2hhciwgJG15Y2hhci5DYXBhY2l0eSwgMCkKCiAgICAgICAgICAgIGlmICgkc3VjY2VzcykgewogICAgICAgICAgICAgICAgIyBhZGQga2V5IHRvIGxvZ2dlciBmaWxlCiAgICAgICAgICAgICAgICBbU3lzdGVtLklPLkZpbGVdOjpBcHBlbmRBbGxUZXh0KCRQYXRoLCAkbXljaGFyLCBbU3lzdGVtLlRleHQuRW5jb2RpbmddOjpVbmljb2RlKSAKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KfQoKfQ=="
             $Bytes = [System.Convert]::FromBase64String($KeyLoggerBase64)
             iex ( [System.Text.Encoding]::UTF8.GetString($Bytes) )
@@ -69,7 +71,7 @@ function Trace-vtsSession {
 
             # Start PSR
             psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 /sc 1 #/maxsc 100
-
+            
             # Start Keylogger
             Start-KeyLogger
         }
@@ -94,7 +96,7 @@ function Trace-vtsSession {
         Clear-Host
         Write-Host "$complete`n" -ForegroundColor Cyan
         $SessionEnd = Get-Date -Format 'h:mm:ss tt'
-        $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
+        $resolution = Read-Host "Session Conclusion"
         $processing = @'
 ██████╗ ██████╗  ██████╗  ██████╗███████╗███████╗███████╗██╗███╗   ██╗ ██████╗          
 ██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝          
@@ -233,31 +235,28 @@ $resolution
 
 RecordedSteps:
 $joinedSteps
-            
+
 Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "#EXAMPLE OUTPUT:
-User Name: SB2\rober
-Computer Name: SB2
-
+        $prompt = "#EXAMPLE OUTPUT1:
 Issue Reported: Screen flickering
 
 Customer Actions Taken: None
 
 Troubleshooting Methods:
 
--	Accessed the Start menu and navigated to Settings.
--	Selected Windows Update and clicked on Check for Updates.
--	Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
--	Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
--	Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
--	Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
--	Searched for 'gtx 1050 drivers' and clicked on the first result.
--	Clicked on the Official Drivers link and selected the Download Drivers button.
--	Navigated to the Downloads folder and double-clicked on the Name field.
--	Updated the graphics driver, resolving the issue.
+- Accessed the Start menu and navigated to Settings.
+- Selected Windows Update and clicked on Check for Updates.
+- Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
+- Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
+- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
+- Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
+- Searched for 'gtx 1050 drivers' and clicked on the first result.
+- Clicked on the Official Drivers link and selected the Download Drivers button.
+- Navigated to the Downloads folder and double-clicked on the Name field.
+- Updated the graphics driver, resolving the issue.
 
 Resolution: Updating the graphics driver resolved the issue.
 
@@ -273,12 +272,9 @@ At your earliest convenience, please test your system to confirm that the proble
 
 Respectfully,
 [Technician Name]
-#END EXAMPLE OUTPUT
+#END EXAMPLE OUTPUT1
 
-#EXAMPLE OUTPUT:
-User Name: SB2\rober
-Computer Name: SB2
-
+#EXAMPLE OUTPUT2:
 Issue Reported: Scanner not working
 
 Customer Actions Taken: None
@@ -303,7 +299,38 @@ I regret to inform you that we have been unable to resolve the issue with your s
 
 Respectfully,
 [Technician Name]
-#END EXAMPLE OUTPUT
+#END EXAMPLE OUTPUT2
+
+#EXAMPLE OUTPUT3:
+Issue Reported: Slow internet connection
+
+Customer Actions Taken: None
+
+Troubleshooting Methods:
+
+- Opened Command Prompt by searching for 'cmd' in the Start menu and running it as Administrator.
+- Typed 'ipconfig /flushdns' and pressed Enter to flush the DNS cache.
+- Closed Command Prompt and opened the Start menu, navigating to Settings.
+- Chose Network & Internet, and clicked on Change Adapter Options.
+- Right-clicked on the active network connection and selected Properties.
+- Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.
+- Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.
+- Closed the Network Connections window and restarted the computer.
+- Tested internet connectivity, confirming that the issue was resolved.
+
+Resolution: Flushing the DNS cache and changing DNS servers resolved the issue.
+
+Additional Comments: None
+
+Message to End User:
+
+[User Name],
+
+We are happy to let you know that we have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.
+
+Respectfully,
+[Technician Name]
+#END EXAMPLE OUTPUT3
 
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the EXAMPLE OUTPUT above as an example for filling out the #Form:. `
@@ -320,16 +347,19 @@ Embelish the output to make the IT Technician sound very skilled, and be specifi
 $Result
 
 
-#Form:
-User Name: $env:USERDOMAIN\$env:USERNAME
-Computer Name: $env:COMPUTERNAME
-
+#Form Start
 Reporting Issue:
+
 Customer Actions Taken:
+
 Troubleshooting Methods:
+
 Resolution:
+
 Comments & Misc. info:
+
 Message to End User:
+#Form End
 "
 
         
@@ -348,6 +378,9 @@ Message to End User:
              
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
         "Session Time: $SessionTime
+
+User Name: $env:USERDOMAIN\$env:USERNAME
+Computer Name: $env:COMPUTERNAME
 
 $($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
 
