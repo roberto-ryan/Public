@@ -248,16 +248,16 @@ Customer Actions Taken: None
 
 Troubleshooting Methods:
 
-1.	Accessed the Start menu and navigated to Settings.
-2.	Selected Windows Update and clicked on Check for Updates.
-3.	Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
-4.	Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-5.	Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-6.	Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
-7.	Searched for 'gtx 1050 drivers' and clicked on the first result.
-8.	Clicked on the Official Drivers link and selected the Download Drivers button.
-9.	Navigated to the Downloads folder and double-clicked on the Name field.
-10.	Updated the graphics driver, resolving the issue.
+-	Accessed the Start menu and navigated to Settings.
+-	Selected Windows Update and clicked on Check for Updates.
+-	Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
+-	Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
+-	Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
+-	Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
+-	Searched for 'gtx 1050 drivers' and clicked on the first result.
+-	Clicked on the Official Drivers link and selected the Download Drivers button.
+-	Navigated to the Downloads folder and double-clicked on the Name field.
+-	Updated the graphics driver, resolving the issue.
 
 Resolution: Updating the graphics driver resolved the issue.
 
@@ -284,12 +284,12 @@ Issue Reported: Scanner not working
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-1. Accessed the Start menu and navigated to Settings.
-2. Selected Devices and clicked on Printers & Scanners.
-3. Located the scanner in the list of devices and right-clicked on it, selecting Troubleshoot.
-4. Followed the on-screen instructions to troubleshoot the scanner.
-5. Unplugged the scanner from the computer and plugged it back in.
-6. Reinstalled the scanner driver.
+- Accessed the Start menu and navigated to Settings.
+- Selected Devices and clicked on Printers & Scanners.
+- Located the scanner in the list of devices and right-clicked on it, selecting Troubleshoot.
+- Followed the on-screen instructions to troubleshoot the scanner.
+- Unplugged the scanner from the computer and plugged it back in.
+- Reinstalled the scanner driver.
 
 Resolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.
 
