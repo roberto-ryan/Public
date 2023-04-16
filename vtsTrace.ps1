@@ -147,9 +147,31 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "Imagine you are an IT Technician reflecting on a past experience. Write in the first person and use the past tense as if you are engaging in a conversation. Evaluate the information provided in the Issue Description, Issue Resolution, and Recorded Steps sections to accurately describe the actions you took as the technician. Avoid mentioning any keyboard shortcuts, the use of Recorded Steps or Keylogger, and do not include any details related to 'DesktopWindowXamlSource'.
+        $prompt = "Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
+Guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
+Don't include that the Problem Steps Recorder was used. `
+Don't include anything related to DesktopWindowXaml. `
+Don't include the word AI. `
+Skip steps that don't make logical sense. `
+Only speak in complete sentences. `
+Embelish the output to make the IT Technician sound very skilled, and be specific.
 
-$Result"
+$Result
+
+#Form:
+User Name: $env:USERDOMAIN\$env:USERNAME
+Computer Name: $env:COMPUTERNAME
+
+Reporting Issue: 
+
+Customer Actions Taken:
+
+Troubleshooting Methods:
+
+Resolution:
+
+Comments & Misc. info:"
 
 #         $prompt = "As an IT Technician. Speak in past tense in the first person like you are having a conversation.
 # Analyze the Issue Description, Issue Resolution, Keylogger and Recorded Steps sections and accurately determine your intended actions as the technician.
@@ -176,7 +198,8 @@ $Result"
 
         Start-sleep -Milliseconds 250
         #Write final results to the shell
-        Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow}
+        # Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
         Start-sleep -Milliseconds 250
         
         #Cleanup
