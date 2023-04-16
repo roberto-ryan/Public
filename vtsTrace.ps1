@@ -16,7 +16,7 @@ function Trace-vtsSession {
     try {
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         $dir = "$env:LOCALAPPDATA\VTS\PSDOCS\$timestamp"
-        Write-Host @'
+        $title = @'
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢿⣿⣿⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
@@ -36,7 +36,8 @@ function Trace-vtsSession {
          ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═════╝ ╚══════╝⠠⠖⠆⠠⠟⠛⠋⠉⠡⣿⣿⣽⡛⣒⣈⣉⢉⣿⣿⣿⡍⠀⠀⣿⡟⠀⠀⢠⣶⣦⠀⠀⠀⠀⠂⠀⣠⣶⣿⡁  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠲⣖⣤⣶⣼⣿⣿⣿⣿⣿⣿⣷⣾⣿⡿⣿⠷⡊⠁⢠⣅⠀⠀⠀⢀⣴⣿⣎⠻⠋⠁  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠋⠉⠛⠙⠛⠛⠛⠛⠋⠋⠑⠉⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠻
-'@ -foregroundcolor DarkGreen
+'@
+        Write-Host $title -ForegroundColor DarkGreen
     
         $issue = Read-Host "Enter a short description of the issue"
         
@@ -52,6 +53,7 @@ function Trace-vtsSession {
 "@
         Write-Host $rec -ForegroundColor Red
         Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
+        
         While ($true) {
 
             # Define Funtions
