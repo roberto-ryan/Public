@@ -75,6 +75,24 @@ function Trace-vtsSession {
         }
     }
     finally {
+        $complete = @'
+██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗        
+██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝        
+██████╔╝█████╗  ██║     ██║   ██║██████╔╝██║  ██║██║██╔██╗ ██║██║  ███╗       
+██╔══██╗██╔══╝  ██║     ██║   ██║██╔══██╗██║  ██║██║██║╚██╗██║██║   ██║       
+██║  ██║███████╗╚██████╗╚██████╔╝██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝       
+╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝        
+                                                                              
+ ██████╗ ██████╗ ███╗   ███╗██████╗ ██╗     ███████╗████████╗███████╗         
+██╔════╝██╔═══██╗████╗ ████║██╔══██╗██║     ██╔════╝╚══██╔══╝██╔════╝         
+██║     ██║   ██║██╔████╔██║██████╔╝██║     █████╗     ██║   █████╗           
+██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝     ██║   ██╔══╝           
+╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ███████╗███████╗   ██║   ███████╗██╗██╗██╗
+ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝   ╚═╝   ╚══════╝╚═╝╚═╝╚═╝        
+
+'@
+        Clear-Host
+        Write-Host "$complete`n" -ForegroundColor Cyan
         $SessionEnd = Get-Date -Format 'h:mm:ss tt'
         $resolution = Read-Host "If issue is resolved, write a brief description of the fix"
         $processing = @'
@@ -144,11 +162,52 @@ function Trace-vtsSession {
         # Join steps with newline characters
         $joinedSteps = $steps -join "`n"
 
+
+        # Function to format the session duration
+        function Format-SessionDuration {
+            param (
+                [TimeSpan]$Duration
+            )
+
+            if ($Duration.TotalHours -ge 1) {
+                return "{0:D2}:{1:D2}:{2:D2} hours" -f $Duration.Hours, $Duration.Minutes, $Duration.Seconds
+            }
+            elseif ($Duration.TotalMinutes -ge 1) {
+                return "{0:D2}:{1:D2} minutes" -f $Duration.Minutes, $Duration.Seconds
+            }
+            else {
+                return "{0:D2} seconds" -f $Duration.Seconds
+            }
+        }
+
+        # Function to calculate the session time
+        function Get-SessionTime {
+            param (
+                [string]$StartTime,
+                [string]$EndTime
+            )
+
+            # Parse start and end times to DateTime objects
+            $StartDateTime = [DateTime]::ParseExact($StartTime, "h:mm:ss tt", [System.Globalization.CultureInfo]::InvariantCulture)
+            $EndDateTime = [DateTime]::ParseExact($EndTime, "h:mm:ss tt", [System.Globalization.CultureInfo]::InvariantCulture)
+
+            # Calculate the session duration
+            $SessionDuration = $EndDateTime - $StartDateTime
+
+            # Format the session duration
+            $FormattedDuration = Format-SessionDuration -Duration $SessionDuration
+
+            # Format the session time output
+            $SessionTimeOutput = "{0} - {1} ({2})" -f $StartTime, $EndTime, $FormattedDuration
+
+            return $SessionTimeOutput
+        }
+
+        # Calculate and display the session time
+        $SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
+
         # Compile Results
         $Result = @"
-Start Time: $SessionStart
-End Time: $SessionEnd
-
 Issue Description:
 $issue
 
@@ -163,8 +222,6 @@ $KeyloggerResult
 "@
 
         $prompt = "#EXAMPLE OUTPUT:
-Session Time: 11:45AM - 12:00PM (~45 minutes)
-
 User Name: SB2\rober
 Computer Name: SB2
 
@@ -206,7 +263,6 @@ Respectfully,
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the EXAMPLE OUTPUT above as an example for filling out the #Form:. `
 Make sure to complete each section of #Form:. `
-Use Start Time: and End Time: to calculate the Session Time:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
 Don't include that the Problem Steps Recorder was used. `
@@ -220,12 +276,10 @@ $Result
 
 
 #Form:
-Session Time:
-
 User Name: $env:USERDOMAIN\$env:USERNAME
 Computer Name: $env:COMPUTERNAME
 
-Reporting Issue: 
+Reporting Issue:
 Customer Actions Taken:
 Troubleshooting Methods:
 Resolution:
@@ -248,12 +302,14 @@ Message to End User:
         $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
              
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-        $($response.choices.text) | Out-File "$dir\gpt_result.txt" -Force
+        "Session Time: $SessionTime
+
+$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
 
         Start-sleep -Milliseconds 250
         #Write final results to the shell
         Clear-Host
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow}
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         # Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
         Start-sleep -Milliseconds 250
         
