@@ -256,9 +256,37 @@ At your earliest convenience, please test your system to confirm that the proble
 
 Respectfully,
 [Technician Name]
-
 #END EXAMPLE OUTPUT
 
+#EXAMPLE OUTPUT:
+User Name: SB2\rober
+Computer Name: SB2
+
+Issue Reported: Scanner not working
+
+Customer Actions Taken: None
+
+Troubleshooting Methods:
+1. Accessed the Start menu and navigated to Settings.
+2. Selected Devices and clicked on Printers & Scanners.
+3. Located the scanner in the list of devices and right-clicked on it, selecting Troubleshoot.
+4. Followed the on-screen instructions to troubleshoot the scanner.
+5. Unplugged the scanner from the computer and plugged it back in.
+6. Reinstalled the scanner driver.
+
+Resolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.
+
+Additional Comments: None
+
+Message to End User: 
+
+[User Name],
+
+I regret to inform you that we have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.
+
+Respectfully,
+[Technician Name]
+#END EXAMPLE OUTPUT
 
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the EXAMPLE OUTPUT above as an example for filling out the #Form:. `
