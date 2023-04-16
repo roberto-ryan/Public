@@ -147,7 +147,35 @@ Keylogger:
 $KeyloggerResult
 "@
 
-        $prompt = "Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+        $prompt = "Example Output:
+User Name: SB2\rober
+Computer Name: SB2
+
+Issue Reported: Screen flickering
+
+Customer Actions Taken: None
+
+Troubleshooting Methods:
+
+1.	Accessed the Start menu and navigated to Settings.
+2.	Selected Windows Update and clicked on Check for Updates.
+3.	Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
+4.	Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
+5.	Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
+6.	Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
+7.	Searched for 'gtx 1050 drivers' and clicked on the first result.
+8.	Clicked on the Official Drivers link and selected the Download Drivers button.
+9.	Navigated to the Downloads folder and double-clicked on the Name field.
+10.	Updated the graphics driver, resolving the issue.
+
+Resolution: Updating the graphics driver resolved the issue.
+
+Additional Comments: None
+
+
+
+Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+Use the Example Output: above as an example for filling out the #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
 Don't include that the Problem Steps Recorder was used. `
@@ -158,6 +186,7 @@ Only speak in complete sentences. `
 Embelish the output to make the IT Technician sound very skilled, and be specific.
 
 $Result
+
 
 #Form:
 User Name: $env:USERDOMAIN\$env:USERNAME
@@ -171,14 +200,9 @@ Troubleshooting Methods:
 
 Resolution:
 
-Comments & Misc. info:"
+Comments & Misc. info:
+"
 
-#         $prompt = "As an IT Technician. Speak in past tense in the first person like you are having a conversation.
-# Analyze the Issue Description, Issue Resolution, Keylogger and Recorded Steps sections and accurately determine your intended actions as the technician.
-# Don't mention any keyboard shortcuts, and don't mention that Recorded Steps or Keylogger was used. Don't return any output related to 'DesktopWindowXamlSource'.
-       
-# $Result"
-            
         
         $body = @{
             'prompt'            = $prompt;
@@ -198,6 +222,7 @@ Comments & Misc. info:"
 
         Start-sleep -Milliseconds 250
         #Write final results to the shell
+        Clear-Host
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow}
         # Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
         Start-sleep -Milliseconds 250
