@@ -246,7 +246,7 @@ Issue Reported: Screen flickering
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-
+- Called the user and established a remote session using Teamviewer.
 - Accessed the Start menu and navigated to Settings.
 - Selected Windows Update and clicked on Check for Updates.
 - Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
@@ -280,6 +280,7 @@ Issue Reported: Scanner not working
 Customer Actions Taken: None
 
 Troubleshooting Methods:
+- Called the user and established a remote session using Teamviewer.
 - Accessed the Start menu and navigated to Settings.
 - Selected Devices and clicked on Printers & Scanners.
 - Located the scanner in the list of devices and right-clicked on it, selecting Troubleshoot.
@@ -307,7 +308,7 @@ Issue Reported: Slow internet connection
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-
+- Called the user and established a remote session using Teamviewer.
 - Opened Command Prompt by searching for 'cmd' in the Start menu and running it as Administrator.
 - Typed 'ipconfig /flushdns' and pressed Enter to flush the DNS cache.
 - Closed Command Prompt and opened the Start menu, navigating to Settings.
