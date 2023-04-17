@@ -17,7 +17,7 @@ function Trace-vtsSession {
         $ErrorActionPreference = 'SilentlyContinue'
         $SessionStart = Get-Date -Format 'h:mm:ss tt'
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
-        $dir = "$env:temp\VTS\PSDOCS\$timestamp"
+        $dir = "$env:temp`VTS\PSDOCS\$timestamp"
         $title = @'
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
@@ -70,7 +70,7 @@ function Trace-vtsSession {
 
 
             # Start PSR
-            psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 /sc 1 #/maxsc 100
+            psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
             
             # Start Keylogger
             Start-KeyLogger
