@@ -17,7 +17,7 @@ function Trace-vtsSession {
         $ErrorActionPreference = 'SilentlyContinue'
         $SessionStart = Get-Date -Format 'h:mm:ss tt'
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
-        $dir = "$env:temp`VTS\PSDOCS\$timestamp"
+        $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
         $title = @'
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
