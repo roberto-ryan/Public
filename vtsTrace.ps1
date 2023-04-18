@@ -124,7 +124,7 @@ function Trace-vtsSession {
         $content = Get-Content $inputFile
 
         # Function to determine if a character is valid UTF-8 and not a control character, excluding line breaks
-        function Is-ValidUTF8AndNotControlChar($char) {
+        function Test-ValidUTF8AndNotControlChar($char) {
             try {
                 $isControlChar = [Char]::IsControl($char)
                 if ($isControlChar -and $char -ne "`r" -and $char -ne "`n") { return $false }
