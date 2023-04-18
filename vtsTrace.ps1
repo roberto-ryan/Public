@@ -395,5 +395,6 @@ $($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
         
         #Cleanup
         Get-Process -Name psr | Stop-Process -Force
+        Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
 }
