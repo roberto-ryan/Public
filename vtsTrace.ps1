@@ -160,6 +160,24 @@ function Trace-vtsSession {
         Sort-Object -Unique | 
         Set-Content "$dir\cleaned_steps.txt"
     }
+
+    function RemovePasswords {
+        # Remove-Passwords.ps1
+        $InputFile = "$dir\keylogger.txt"
+        $OutputFile = "$dir\keylog-cleaned.txt"
+    
+        # Define a regex pattern to detect common password patterns
+        $passwordPattern = "^(?:(?:(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]))|(?:(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[a-z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))).{8,32}"
+    
+        # Process input file
+        Get-Content -Path $InputFile | ForEach-Object {
+            $line = $_
+            $cleanLine = [regex]::Replace($line, $passwordPattern, '')
+            if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
+                $cleanLine
+            }
+        } | Set-Content -Path $OutputFile
+    }
     
     try {
         $SessionStart = Timestamp
@@ -179,29 +197,12 @@ function Trace-vtsSession {
         RemoveInvalidCharacters
         ParseSteps
         CleanupSteps
-
-        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
-
-        # Remove-Passwords.ps1
-        $InputFile = "$dir\keylogger.txt"
-        $OutputFile = "$dir\keylog-cleaned.txt"
-
-        # Define a regex pattern to detect common password patterns
-        $passwordPattern = "^(?:(?:(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]))|(?:(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[a-z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))).{8,32}"
-
-        # Process input file
-        Get-Content -Path $InputFile | ForEach-Object {
-            $line = $_
-            $cleanLine = [regex]::Replace($line, $passwordPattern, '')
-            if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
-                $cleanLine
-            }
-        } | Set-Content -Path $OutputFile
-
-
+        RemovePasswords
+        
         # Get Keylogger Results
         $KeyloggerResult = Get-Content "$dir\keylog-cleaned.txt"
-
+        
+        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
         $StepCount = $PSRResult.Count - 2
         $steps = $PSRResult[0..$StepCount]
 
