@@ -106,27 +106,13 @@ function Trace-vtsSession {
         Clear-Host
         Write-Host "$processing" -ForegroundColor Cyan
     }
-    
-    try {
-        $SessionStart = Timestamp
-        DisplayLogo
-        $issue = Read-Host "Summarize the issue and steps performed by the user."
-        DisplayRecording
-        CreateWorkingDirectory
-        StartStepsRecorder
-        Start-KeyLogger
-    }
-    finally {
-        DisplayRecordingComplete
-        $SessionEnd = Timestamp
-        $resolution = Read-Host "Session Conclusion"
-        DisplayProcessing
 
-        # Stop PSR
+    function StopStepsRecorder {
         psr.exe /stop
-
         Start-Sleep 3
+    }
 
+    function RemoveInvalidCharacters {
         # Remove invalid characters from keylogger file
         $inputFile = "$dir\keylogger.txt"
         $outputFile = "$dir\keylogger.txt"
@@ -156,7 +142,24 @@ function Trace-vtsSession {
 
         # Write the filtered content to the output file
         Set-Content $outputFile $filteredContent
-
+    }
+    
+    try {
+        $SessionStart = Timestamp
+        DisplayLogo
+        $issue = Read-Host "Summarize the issue and steps performed by the user."
+        DisplayRecording
+        CreateWorkingDirectory
+        StartStepsRecorder
+        Start-KeyLogger
+    }
+    finally {
+        DisplayRecordingComplete
+        $SessionEnd = Timestamp
+        $resolution = Read-Host "Session Conclusion"
+        DisplayProcessing
+        StopStepsRecorder
+        RemoveInvalidCharacters
         # Get PSR Results
         Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
