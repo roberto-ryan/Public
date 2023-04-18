@@ -178,38 +178,8 @@ function Trace-vtsSession {
             }
         } | Set-Content -Path $OutputFile
     }
-    
-    try {
-        $SessionStart = Timestamp
-        DisplayLogo
-        $issue = Read-Host "Summarize the issue and steps performed by the user."
-        DisplayRecording
-        CreateWorkingDirectory
-        StartStepsRecorder
-        Start-KeyLogger
-    }
-    finally {
-        DisplayRecordingComplete
-        $SessionEnd = Timestamp
-        $resolution = Read-Host "Session Conclusion"
-        DisplayProcessing
-        StopStepsRecorder
-        RemoveInvalidCharacters
-        ParseSteps
-        CleanupSteps
-        RemovePasswords
-        
-        # Get Keylogger Results
-        $KeyloggerResult = Get-Content "$dir\keylog-cleaned.txt"
-        
-        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
-        $StepCount = $PSRResult.Count - 2
-        $steps = $PSRResult[0..$StepCount]
 
-        # Join steps with newline characters
-        $joinedSteps = $steps -join "`n"
-
-
+    function CalculateSessionTime {
         # Function to format the session duration
         function Format-SessionDuration {
             param (
@@ -251,7 +221,41 @@ function Trace-vtsSession {
         }
 
         # Calculate and display the session time
-        $SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
+        $script:SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
+    }
+    
+    try {
+        $SessionStart = Timestamp
+        DisplayLogo
+        $issue = Read-Host "Summarize the issue and steps performed by the user."
+        DisplayRecording
+        CreateWorkingDirectory
+        StartStepsRecorder
+        Start-KeyLogger
+    }
+    finally {
+        DisplayRecordingComplete
+        $SessionEnd = Timestamp
+        $resolution = Read-Host "Session Conclusion"
+        DisplayProcessing
+        StopStepsRecorder
+        RemoveInvalidCharacters
+        ParseSteps
+        CleanupSteps
+        RemovePasswords
+        CalculateSessionTime
+
+        # Get Keylogger Results
+        $KeyloggerResult = Get-Content "$dir\keylog-cleaned.txt"
+        
+        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
+        $StepCount = $PSRResult.Count - 2
+        $steps = $PSRResult[0..$StepCount]
+
+        # Join steps with newline characters
+        $joinedSteps = $steps -join "`n"
+
+        
 
         # Compile Results
         $Result = @"
