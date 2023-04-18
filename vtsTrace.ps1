@@ -273,7 +273,7 @@ Message to End User:
 
 [User Name],
 
-I am pleased to inform you that we have successfully resolved the issue you were experiencing by flushing the DNS.
+We have successfully resolved the issue you were experiencing by flushing the DNS.
 At your earliest convenience, please test your system to confirm that the problem has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
 
 Respectfully,
@@ -302,7 +302,7 @@ Message to End User:
 
 [User Name],
 
-I regret to inform you that we have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.
+We have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.
 
 Respectfully,
 [Technician Name]
@@ -333,7 +333,7 @@ Message to End User:
 
 [User Name],
 
-We are happy to let you know that we have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.
+We have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.
 
 Respectfully,
 [Technician Name]
