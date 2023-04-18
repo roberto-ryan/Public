@@ -143,6 +143,15 @@ function Trace-vtsSession {
         # Write the filtered content to the output file
         Set-Content $outputFile $filteredContent
     }
+
+    function ParseSteps {
+        #Parse results
+        Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
+        Start-Sleep -Milliseconds 250
+        $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
+        $regex = '.*[AP]M\)'
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" 
+    }
     
     try {
         $SessionStart = Timestamp
@@ -160,14 +169,8 @@ function Trace-vtsSession {
         DisplayProcessing
         StopStepsRecorder
         RemoveInvalidCharacters
-        # Get PSR Results
-        Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
-        Start-Sleep -Milliseconds 250
-        $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
-        $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" 
-        
-        # Clean up garbage input from Steps Recorder"$dir\steps.txt"
+        ParseSteps
+        # Clean up unwanted input from Steps Recorder"$dir\steps.txt"
         Get-Content "$dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Sort-Object -Unique | 
