@@ -152,6 +152,14 @@ function Trace-vtsSession {
         $regex = '.*[AP]M\)'
         (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" 
     }
+
+    function CleanupSteps {
+        # Clean up unwanted input from Steps Recorder"$dir\steps.txt"
+        Get-Content "$dir\steps.txt" | 
+        Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
+        Sort-Object -Unique | 
+        Set-Content "$dir\cleaned_steps.txt"
+    }
     
     try {
         $SessionStart = Timestamp
@@ -170,11 +178,7 @@ function Trace-vtsSession {
         StopStepsRecorder
         RemoveInvalidCharacters
         ParseSteps
-        # Clean up unwanted input from Steps Recorder"$dir\steps.txt"
-        Get-Content "$dir\steps.txt" | 
-        Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
-        Sort-Object -Unique | 
-        Set-Content "$dir\cleaned_steps.txt"
+        CleanupSteps
 
         $PSRResult = Get-Content "$dir\cleaned_steps.txt"
 
