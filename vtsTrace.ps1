@@ -253,15 +253,11 @@ Customer Actions Taken: None
 
 Troubleshooting Methods:
 - Called the user and established a remote session using Teamviewer.
-- Accessed the Start menu and navigated to Settings.
-- Selected Windows Update and clicked on Check for Updates.
-- Closed the Settings window, right-clicked on the Start button, and chose Device Manager.
-- Located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
+- Checked for Windows Updates.
+- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
 - Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Closed the Settings window, right-clicked on the Microsoft Edge button, and selected New Window.
 - Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and selected the Download Drivers button.
-- Navigated to the Downloads folder and double-clicked on the Name field.
+- Clicked on the Official Drivers link and downloaded the driver.
 - Updated the graphics driver, resolving the issue.
 
 Resolution: Updating the graphics driver resolved the issue.
@@ -273,8 +269,8 @@ Message to End User:
 
 [User Name],
 
-We have successfully resolved the issue you were experiencing by flushing the DNS.
-At your earliest convenience, please test your system to confirm that the problem has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
+We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver.
+At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
 
 Respectfully,
 [Technician Name]
@@ -287,12 +283,10 @@ Customer Actions Taken: None
 
 Troubleshooting Methods:
 - Called the user and established a remote session using Teamviewer.
-- Accessed the Start menu and navigated to Settings.
-- Selected Devices and clicked on Printers & Scanners.
-- Located the scanner in the list of devices and right-clicked on it, selecting Troubleshoot.
-- Followed the on-screen instructions to troubleshoot the scanner.
-- Unplugged the scanner from the computer and plugged it back in.
-- Reinstalled the scanner driver.
+- Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.
+- Determined the scanner was not being recognized by the computer.
+- Had the user unplug the scanner from the computer and plug it back in.
+- Reinstalled the scanner driver and rebooted.
 
 Resolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.
 
