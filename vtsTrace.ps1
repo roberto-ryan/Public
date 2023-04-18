@@ -16,7 +16,7 @@ function Trace-vtsSession {
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
 
-    function Timestamp {Get-Date -Format 'h:mm:ss tt'}
+    function Timestamp { Get-Date -Format 'h:mm:ss tt' }
     function DisplayLogo {
         $title = @'
                                                         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  
@@ -93,6 +93,19 @@ function Trace-vtsSession {
         Clear-Host
         Write-Host "$complete`n" -ForegroundColor Cyan
     }
+
+    function DisplayProcessing {
+        $processing = @'
+██████╗ ██████╗  ██████╗  ██████╗███████╗███████╗███████╗██╗███╗   ██╗ ██████╗          
+██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝          
+██████╔╝██████╔╝██║   ██║██║     █████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗         
+██╔═══╝ ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║         
+██║     ██║  ██║╚██████╔╝╚██████╗███████╗███████║███████║██║██║ ╚████║╚██████╔╝██╗██╗██╗
+╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
+'@
+        Clear-Host
+        Write-Host "$processing" -ForegroundColor Cyan
+    }
     
     try {
         $SessionStart = Timestamp
@@ -107,19 +120,7 @@ function Trace-vtsSession {
         DisplayRecordingComplete
         $SessionEnd = Timestamp
         $resolution = Read-Host "Session Conclusion"
-        $processing = @'
-██████╗ ██████╗  ██████╗  ██████╗███████╗███████╗███████╗██╗███╗   ██╗ ██████╗          
-██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝          
-██████╔╝██████╔╝██║   ██║██║     █████╗  ███████╗███████╗██║██╔██╗ ██║██║  ███╗         
-██╔═══╝ ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║╚════██║██║██║╚██╗██║██║   ██║         
-██║     ██║  ██║╚██████╔╝╚██████╗███████╗███████║███████║██║██║ ╚████║╚██████╔╝██╗██╗██╗
-╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚══════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝╚═╝
-'@
-        Clear-Host
-        Write-Host "$processing" -ForegroundColor Cyan
-        if ($null -eq $OpenAIKey) {
-            $OpenAIKey = Read-Host -Prompt "Enter OpenAI API Key" -AsSecureString
-        }
+        DisplayProcessing
 
         # Stop PSR
         psr.exe /stop
