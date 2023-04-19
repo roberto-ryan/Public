@@ -375,6 +375,13 @@ Message to End User:
              
         $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
     }
+
+    function WriteResultsToFile {
+        "Session Time: $SessionTime`n" | Out-File "$dir\gpt_result.txt" -Force
+        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append
+    }
     
     try {
         $SessionStart = Timestamp
@@ -398,13 +405,8 @@ Message to End User:
         CalculateSessionTime
         GeneratePrompt
         APICall
-
-        "Session Time: $SessionTime
-
-User Name: $env:USERDOMAIN\$env:USERNAME
-Computer Name: $env:COMPUTERNAME
-
-$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
+        WriteResultsToFile
+        
 
         #Write final results to the shell
         Start-sleep -Milliseconds 250
