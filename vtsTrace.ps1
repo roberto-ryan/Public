@@ -185,6 +185,8 @@ function Trace-vtsSession {
                 $cleanLine
             }
         } | Set-Content -Path $OutputFile
+
+        $script:KeyloggerResult = Get-Content $OutputFile
     }
 
     function CalculateSessionTime {
@@ -253,29 +255,9 @@ function Trace-vtsSession {
         RemovePasswords
         CalculateSessionTime
 
-        # Get Keylogger Results
-        $KeyloggerResult = Get-Content "$dir\keylog-cleaned.txt"
-        
 
-
-        
-
-        # Compile Results
-        $Result = @"
-Issue Description:
-$issue
-
-Issue Resolution:
-$resolution
-
-RecordedSteps:
-$joinedSteps
-
-Keylogger:
-$KeyloggerResult
-"@
-
-        $prompt = "Example1 = (
+        $prompt = @"
+Example1 = (
 Issue Reported: Screen flickering
 
 Customer Actions Taken: None
@@ -374,7 +356,17 @@ Skip steps that don't make logical sense. `
 Only speak in complete sentences. `
 Embelish the output to make the IT Technician sound very skilled, and be specific.
 
-$Result
+Issue Description:
+$issue
+
+Issue Resolution:
+$resolution
+
+RecordedSteps:
+$joinedSteps
+
+Keylogger:
+$KeyloggerResult
 
 #Form:
 Reporting Issue:
@@ -385,9 +377,8 @@ Comments & Misc. info:
 Message to End User:
 
 `"`"`"
-"
+"@
 
-        
         $body = @{
             'prompt'            = $prompt;
             'temperature'       = 0;
