@@ -115,16 +115,16 @@ function Trace-vtsSession {
         # Remove invalid characters from keylogger file
         $inputFile = "$dir\keylogger.txt"
         $outputFile = "$dir\keylogger.txt"
-
+    
         # Read the content of the input file
         $content = Get-Content $inputFile
-
+    
         # Function to determine if a character is valid UTF-8 and not a control character, excluding line breaks
         function Is-ValidUTF8AndNotControlChar($char) {
             try {
                 $isControlChar = [Char]::IsControl($char)
                 if ($isControlChar -and $char -ne "`r" -and $char -ne "`n") { return $false }
-
+    
                 [System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes($char)) -eq $char
             }
             catch {
@@ -132,16 +132,16 @@ function Trace-vtsSession {
             }
             return $true
         }
-
+    
         # Filter the content to keep only valid UTF-8 characters and not control characters, preserving line breaks
         $filteredContent = $content | ForEach-Object {
-            $line = $_
+            $line = $_.TrimStart(' ')
             -join ($line.ToCharArray() | Where-Object { Is-ValidUTF8AndNotControlChar $_ })
         }
-
+    
         # Write the filtered content to the output file
         Set-Content $outputFile $filteredContent
-    }
+    }    
 
     function ParseSteps {
         #Parse results
