@@ -109,7 +109,6 @@ function Trace-vtsSession {
 
     function StopStepsRecorder {
         psr.exe /stop
-        Start-Sleep 3
     }
 
     function RemoveInvalidCharacters {
@@ -386,15 +385,15 @@ Message to End User:
         Start-KeyLogger
     }
     finally {
+        StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $SessionEnd = Timestamp
         $resolution = Read-Host "Session Conclusion"
         DisplayProcessingBanner
-        StopStepsRecorder
-        RemoveInvalidCharacters
         ParseSteps
         CleanupSteps
+        RemoveInvalidCharacters
         RemovePasswords
+        $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
         APICall
