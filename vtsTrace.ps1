@@ -382,6 +382,19 @@ Message to End User:
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
         "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append
     }
+
+    function WriteResultsToHost {
+        #Write final results to the shell
+        Start-sleep -Milliseconds 250
+        Clear-Host
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    }
+
+    function Cleanup {
+        Start-sleep -Milliseconds 250
+        Get-Process -Name psr | Stop-Process -Force
+        Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+    }
     
     try {
         $SessionStart = Timestamp
@@ -406,17 +419,7 @@ Message to End User:
         GeneratePrompt
         APICall
         WriteResultsToFile
-        
-
-        #Write final results to the shell
-        Start-sleep -Milliseconds 250
-        Clear-Host
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-
-        
-        #Cleanup
-        Start-sleep -Milliseconds 250
-        Get-Process -Name psr | Stop-Process -Force
-        Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+        WriteResultsToHost
+        Cleanup
     }
 }
