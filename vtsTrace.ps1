@@ -159,6 +159,14 @@ function Trace-vtsSession {
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Sort-Object -Unique | 
         Set-Content "$dir\cleaned_steps.txt"
+
+        #Remove last step as it's alway irrelevant
+        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
+        $StepCount = $PSRResult.Count - 2
+        $steps = $PSRResult[0..$StepCount]
+
+        # Join steps with newline characters to remove blank lines
+        $script:joinedSteps = $steps -join "`n"
     }
 
     function RemovePasswords {
@@ -248,12 +256,7 @@ function Trace-vtsSession {
         # Get Keylogger Results
         $KeyloggerResult = Get-Content "$dir\keylog-cleaned.txt"
         
-        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
-        $StepCount = $PSRResult.Count - 2
-        $steps = $PSRResult[0..$StepCount]
 
-        # Join steps with newline characters
-        $joinedSteps = $steps -join "`n"
 
         
 
