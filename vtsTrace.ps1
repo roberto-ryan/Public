@@ -43,7 +43,7 @@ function Trace-vtsSession {
         Write-Host $title -ForegroundColor DarkGreen 
     }
     
-    function DisplayRecording {
+    function DisplayRecordingBanner {
         $rec = @"
 
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗
@@ -73,7 +73,7 @@ function Trace-vtsSession {
     Invoke-Expression ( [System.Text.Encoding]::UTF8.GetString($Bytes) )
     #}
 
-    function DisplayRecordingComplete {
+    function DisplayRecordingCompleteBanner {
         $complete = @'
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗        
 ██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝        
@@ -94,7 +94,7 @@ function Trace-vtsSession {
         Write-Host "$complete`n" -ForegroundColor Cyan
     }
 
-    function DisplayProcessing {
+    function DisplayProcessingBanner {
         $processing = @'
 ██████╗ ██████╗  ██████╗  ██████╗███████╗███████╗███████╗██╗███╗   ██╗ ██████╗          
 ██╔══██╗██╔══██╗██╔═══██╗██╔════╝██╔════╝██╔════╝██╔════╝██║████╗  ██║██╔════╝          
@@ -238,16 +238,16 @@ function Trace-vtsSession {
         $SessionStart = Timestamp
         DisplayLogo
         $issue = Read-Host "Summarize the issue and steps performed by the user."
-        DisplayRecording
+        DisplayRecordingBanner
         CreateWorkingDirectory
         StartStepsRecorder
         Start-KeyLogger
     }
     finally {
-        DisplayRecordingComplete
+        DisplayRecordingCompleteBanner
         $SessionEnd = Timestamp
         $resolution = Read-Host "Session Conclusion"
-        DisplayProcessing
+        DisplayProcessingBanner
         StopStepsRecorder
         RemoveInvalidCharacters
         ParseSteps
