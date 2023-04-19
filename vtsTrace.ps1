@@ -233,30 +233,9 @@ function Trace-vtsSession {
         # Calculate and display the session time
         $script:SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
     }
-    
-    try {
-        $SessionStart = Timestamp
-        DisplayLogo
-        $issue = Read-Host "Summarize the issue and steps performed by the user."
-        DisplayRecordingBanner
-        CreateWorkingDirectory
-        StartStepsRecorder
-        Start-KeyLogger
-    }
-    finally {
-        DisplayRecordingCompleteBanner
-        $SessionEnd = Timestamp
-        $resolution = Read-Host "Session Conclusion"
-        DisplayProcessingBanner
-        StopStepsRecorder
-        RemoveInvalidCharacters
-        ParseSteps
-        CleanupSteps
-        RemovePasswords
-        CalculateSessionTime
 
-
-        $prompt = @"
+    function GeneratePrompt {
+        $script:prompt = @"
 Example1 = (
 Issue Reported: Screen flickering
 
@@ -378,7 +357,9 @@ Message to End User:
 
 `"`"`"
 "@
+    }
 
+    function APICall {
         $body = @{
             'prompt'            = $prompt;
             'temperature'       = 0;
@@ -392,7 +373,32 @@ Message to End User:
         $JsonBody = $body | ConvertTo-Json -Compress
         $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
              
-        $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
+        $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
+    }
+    
+    try {
+        $SessionStart = Timestamp
+        DisplayLogo
+        $issue = Read-Host "Summarize the issue and steps performed by the user."
+        DisplayRecordingBanner
+        CreateWorkingDirectory
+        StartStepsRecorder
+        Start-KeyLogger
+    }
+    finally {
+        DisplayRecordingCompleteBanner
+        $SessionEnd = Timestamp
+        $resolution = Read-Host "Session Conclusion"
+        DisplayProcessingBanner
+        StopStepsRecorder
+        RemoveInvalidCharacters
+        ParseSteps
+        CleanupSteps
+        RemovePasswords
+        CalculateSessionTime
+        GeneratePrompt
+        APICall
+
         "Session Time: $SessionTime
 
 User Name: $env:USERDOMAIN\$env:USERNAME
