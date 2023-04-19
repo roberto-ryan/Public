@@ -324,6 +324,7 @@ Respectfully,
 
 Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
+If Keylogger and RecorderSteps sections are blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
 Make sure to complete each section of #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Make an educated guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
@@ -405,14 +406,14 @@ Computer Name: $env:COMPUTERNAME
 
 $($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
 
-        Start-sleep -Milliseconds 250
         #Write final results to the shell
+        Start-sleep -Milliseconds 250
         Clear-Host
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        # Write-Host "$(Get-Content "$dir\gpt_result.txt")`n`n" -ForegroundColor Yellow
-        Start-sleep -Milliseconds 250
+
         
         #Cleanup
+        Start-sleep -Milliseconds 250
         Get-Process -Name psr | Stop-Process -Force
         Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
