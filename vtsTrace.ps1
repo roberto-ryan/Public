@@ -17,9 +17,9 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
 
     function EnsureUserIsNotSystem {
-        $identity = $env:USERNAME
-        if ($identity -eq "SYSTEM") {
-            Write-Error "This script needs to be run as the logged-in user, not as SYSTEM."
+        $identity = whoami.exe
+        if ($identity -eq "nt authority\system") {
+            Write-Host "This script needs to be run as the logged-in user, not as SYSTEM." -ForegroundColor Red
         }
     }
 
