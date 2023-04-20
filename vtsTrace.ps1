@@ -17,11 +17,9 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
 
     function EnsureUserIsNotSystem {
-        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-        $principal = New-Object System.Security.Principal.WindowsPrincipal($identity)
-        if ($principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::System)) {
+        $identity = $env:USERNAME
+        if ($identity -eq "SYSTEM") {
             Write-Error "This script needs to be run as the logged-in user, not as SYSTEM."
-            exit 1
         }
     }
 
@@ -407,7 +405,7 @@ Message to End User:
     }
     
     EnsureUserIsNotSystem
-    
+
     try {
         $SessionStart = Timestamp
         DisplayLogo
