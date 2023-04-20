@@ -185,7 +185,7 @@ function Trace-vtsSession {
             }
         } | Set-Content -Path $OutputFile
 
-        $script:KeyloggerResult = Get-Content $OutputFile
+        $script:KeyloggerResult = (Get-Content $OutputFile) -join [Environment]::NewLine
     }
 
     function CalculateSessionTime {
@@ -357,6 +357,7 @@ Message to End User:
 
 `"`"`"
 "@
+$prompt | Out-File "$dir\prompt.txt"
     }
 
     function APICall {
