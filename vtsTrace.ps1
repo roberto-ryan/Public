@@ -266,8 +266,7 @@ Message to End User:
 
 [User Name],
 
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver.
-At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
+We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
 
 Respectfully,
 [Technician Name]
