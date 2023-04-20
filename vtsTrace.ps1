@@ -249,6 +249,7 @@ Issue Reported: Screen flickering
 Customer Actions Taken: None
 
 Troubleshooting Methods:
+- Called the user and established a remote session using Teamviewer.
 - Checked for Windows Updates.
 - Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
 - Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
@@ -277,6 +278,7 @@ Issue Reported: Scanner not working
 Customer Actions Taken: None
 
 Troubleshooting Methods:
+- Called the user and established a remote session using Teamviewer.
 - Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.
 - Determined the scanner was not being recognized by the computer.
 - Had the user unplug the scanner from the computer and plug it back in.
@@ -302,6 +304,7 @@ Issue Reported: Slow internet connection
 Customer Actions Taken: None
 
 Troubleshooting Methods:
+- Called the user and established a remote session using Teamviewer.
 - Opened Command Prompt by searching for 'cmd' in the Start menu and running it as Administrator.
 - Typed 'ipconfig /flushdns' and pressed Enter to flush the DNS cache.
 - Closed Command Prompt and opened the Start menu, navigating to Settings.
