@@ -16,6 +16,15 @@ function Trace-vtsSession {
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
 
+    function EnsureUserIsNotSystem {
+        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+        $principal = New-Object System.Security.Principal.WindowsPrincipal($identity)
+        if ($principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::System)) {
+            Write-Error "This script needs to be run as the logged-in user, not as SYSTEM."
+            exit 1
+        }
+    }
+
     function Timestamp { Get-Date -Format 'h:mm:ss tt' }
     function DisplayLogo {
         $title = @'
@@ -357,7 +366,7 @@ Message to End User:
 
 `"`"`"
 "@
-$prompt | Out-File "$dir\prompt.txt"
+        $prompt | Out-File "$dir\prompt.txt"
     }
 
     function APICall {
@@ -398,6 +407,7 @@ $prompt | Out-File "$dir\prompt.txt"
     }
     
     try {
+        EnsureUserIsNotSystem
         $SessionStart = Timestamp
         DisplayLogo
         $issue = Read-Host "Summarize the issue and steps performed by the user."
