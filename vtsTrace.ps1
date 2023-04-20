@@ -406,8 +406,9 @@ Message to End User:
         Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
     
+    EnsureUserIsNotSystem
+    
     try {
-        EnsureUserIsNotSystem
         $SessionStart = Timestamp
         DisplayLogo
         $issue = Read-Host "Summarize the issue and steps performed by the user."
