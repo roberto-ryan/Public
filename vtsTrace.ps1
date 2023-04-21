@@ -49,6 +49,7 @@ function Trace-vtsSession {
 '@
         Clear-Host
         Write-Host $title -ForegroundColor DarkGreen 
+        Write-Host "Enter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
     }
     
     function DisplayRecordingBanner {
@@ -64,7 +65,7 @@ function Trace-vtsSession {
 "@
         Clear-Host
         Write-Host $rec -ForegroundColor Red
-        Write-Host "Press Ctrl-C when finished.`n" -ForegroundColor Yellow
+        Write-Host "$resume`Press Ctrl-C when finished.`n" -ForegroundColor Yellow
     }
     
     function StartStepsRecorder {
@@ -145,7 +146,7 @@ function Trace-vtsSession {
         $content | ForEach-Object {
             $line = $_.TrimStart(' ')
             -join ($line.ToCharArray() | Where-Object { Is-ValidUTF8AndNotControlChar $_ })
-        } | out-file $outputFile
+        } | out-file $outputFile -Encoding utf8
     }    
 
     function ParseSteps {
@@ -154,7 +155,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" 
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -162,7 +163,7 @@ function Trace-vtsSession {
         Get-Content "$dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Sort-Object -Unique | 
-        Out-File "$dir\cleaned_steps.txt" -Append
+        Out-File "$dir\cleaned_steps.txt" -Append -Encoding utf8
 
         #Remove last step as it's alway irrelevant
         $PSRResult = Get-Content "$dir\cleaned_steps.txt"
@@ -188,7 +189,7 @@ function Trace-vtsSession {
             if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
                 $cleanLine
             }
-        } | Out-File $OutputFile -Append #Set-Content -Path $OutputFile
+        } | Out-File $OutputFile -Append -Encoding utf8
 
         $script:KeyloggerResult = (Get-Content $OutputFile) -join [Environment]::NewLine
     }
@@ -341,10 +342,10 @@ Only speak in complete sentences. `
 Embelish the output to make the IT Technician sound very skilled, and be specific.
 
 Issue Description:
-$issue
+$(Get-Content "$dir\issue.txt")
 
 Issue Resolution:
-$resolution
+$(Get-Content "$dir\resolution.txt")
 
 RecordedSteps:
 $joinedSteps
@@ -362,7 +363,7 @@ Message to End User:
 
 `"`"`"
 "@
-        $prompt | Out-File "$dir\prompt.txt"
+        $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
     }
 
     function APICall {
@@ -383,10 +384,10 @@ Message to End User:
     }
 
     function WriteResultsToFile {
-        "Session Time: $SessionTime`n" | Out-File "$dir\gpt_result.txt" -Force
+        "Session Time: $SessionTime`n" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
         "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append -Encoding utf8
     }
 
     function WriteResultsToHost {
@@ -408,8 +409,20 @@ Message to End User:
         $SessionStart = Timestamp
         DisplayLogo
         $issue = Read-Host "Summarize the issue and steps performed by the user."
+
+        if ($issue -ne 'r' -and $issue -ne 'resume') {
+            CreateWorkingDirectory
+            $issue | Out-File -FilePath "$dir\issue.txt" -Force -Encoding utf8
+        }
+        else {
+            $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
+                Sort-Object Name |
+                Select-Object -ExpandProperty FullName -last 1)
+            $issue = Get-Content "$dir\issue.txt"
+            $resume = "Resuming Last Session. "
+        }
+
         DisplayRecordingBanner
-        CreateWorkingDirectory
         StartStepsRecorder
         Start-KeyLogger
     }
@@ -417,6 +430,7 @@ Message to End User:
         StopStepsRecorder
         DisplayRecordingCompleteBanner
         $resolution = Read-Host "Session Conclusion"
+        Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
