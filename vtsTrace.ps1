@@ -446,7 +446,7 @@ Message to End User:
     }
 }
 
-function GPT {
+function GPTFollowUp {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
