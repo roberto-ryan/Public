@@ -11,7 +11,14 @@ function GPTFollowUp {
     $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
         Sort-Object Name |
         Select-Object -ExpandProperty FullName -last 1)
-    
+        
+    function WriteResultsToHost {
+        #Write final results to the shell
+        Clear-Host
+            (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    }
+
+
     $alterations = Read-Host "GPT3.5>>>"
 
     $prompt = ("$(Get-Content $dir\gpt_result.txt )`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.")
@@ -30,7 +37,8 @@ function GPTFollowUp {
         }
         
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body ($body | ConvertTo-Json) -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json"
-        $($response.choices.text)
+        $($response.choices.text) | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
+        WriteResultsToHost
         Write-Host "
         
 ///////" -ForegroundColor Green
