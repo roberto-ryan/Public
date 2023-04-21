@@ -142,13 +142,10 @@ function Trace-vtsSession {
         }
     
         # Filter the content to keep only valid UTF-8 characters and not control characters, preserving line breaks
-        $filteredContent = $content | ForEach-Object {
+        $content | ForEach-Object {
             $line = $_.TrimStart(' ')
             -join ($line.ToCharArray() | Where-Object { Is-ValidUTF8AndNotControlChar $_ })
-        }
-    
-        # Write the filtered content to the output file
-        Set-Content $outputFile $filteredContent
+        } | out-file $outputFile
     }    
 
     function ParseSteps {
@@ -165,7 +162,7 @@ function Trace-vtsSession {
         Get-Content "$dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Sort-Object -Unique | 
-        Set-Content "$dir\cleaned_steps.txt"
+        Out-File "$dir\cleaned_steps.txt" -Append
 
         #Remove last step as it's alway irrelevant
         $PSRResult = Get-Content "$dir\cleaned_steps.txt"
@@ -191,7 +188,7 @@ function Trace-vtsSession {
             if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
                 $cleanLine
             }
-        } | Set-Content -Path $OutputFile
+        } | Out-File $OutputFile -Append #Set-Content -Path $OutputFile
 
         $script:KeyloggerResult = (Get-Content $OutputFile) -join [Environment]::NewLine
     }
