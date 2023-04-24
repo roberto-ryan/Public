@@ -26,7 +26,9 @@ $(Get-Content $dir\gpt_result.txt -Raw -Encoding utf8)`n`n`n`n Rewrite the IT ti
         
         $alterations = Read-Host "GPT3.5>>>"
         switch ($alterations) {
-            steps { Get-Content $dir\cleaned_steps.txt }
+            steps { "`n"
+            Get-Content $dir\cleaned_steps.txt 
+        "`n"}
             Default {
                 $prompt = @"
         $(Get-Content $dir\gpt_result2.txt -Raw -Encoding utf8)`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.
