@@ -18,14 +18,11 @@ function GPTFollowUp {
         Clear-Host
             (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
     }
-
-
-    $alterations = Read-Host "GPT3.5>>>"
-
-    $prompt = ("$(Get-Content $dir\gpt_result.txt )`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.")
-
+    
     While ($true) {
-
+        
+        $alterations = Read-Host "GPT3.5>>>"
+        $prompt = ("$(Get-Content $dir\gpt_result.txt )`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.")
     
         $body = @{
             'prompt'            = $prompt;
@@ -43,10 +40,5 @@ function GPTFollowUp {
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
         "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
         WriteResultsToHost
-        Write-Host "
-        
-///////" -ForegroundColor Green
-        $prompt = ("Prompt:" + $prompt + " " + "Response:" + $response.choices.text)
-        $prompt = ($prompt + " " + $(Read-Host "GPT3.5>>>"))
     }
 }
