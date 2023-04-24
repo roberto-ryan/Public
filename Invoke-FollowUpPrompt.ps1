@@ -21,7 +21,7 @@ function GPTFollowUp {
         
         $alterations = Read-Host "GPT3.5>>>"
         $prompt = @"
-$(Get-Content $dir\gpt_result.txt -Raw)`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.
+$(Get-Content $dir\gpt_result.txt -Raw -Encoding utf8)`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.
 "@
     
         $body = @{
