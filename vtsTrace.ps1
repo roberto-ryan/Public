@@ -385,8 +385,8 @@ Message to End User:
 
     function WriteResultsToFile {
         "Session Time: $SessionTime`n" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
-        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
-        "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8 -Append
+        "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8 -Append
         "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append -Encoding utf8
     }
 
