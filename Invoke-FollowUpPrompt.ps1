@@ -20,7 +20,9 @@ function GPTFollowUp {
     While ($true) {
         
         $alterations = Read-Host "GPT3.5>>>"
-        $prompt = ("$(Get-Content $dir\gpt_result.txt )`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.")
+        $prompt = @"
+$(Get-Content $dir\gpt_result.txt )`n`n`n`n Rewrite the IT ticket above taking into account the following considerations: $alterations.
+"@
     
         $body = @{
             'prompt'            = $prompt;
