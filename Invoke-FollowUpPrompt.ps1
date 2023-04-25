@@ -109,7 +109,7 @@ Respectfully,
 )
 
 
-Rewrite the form below to take into account the additional information: $alterations.
+Rewrite the form below. Keep all information the same, but take into account the additional information: $alterations.
 
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
 
