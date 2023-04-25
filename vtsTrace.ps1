@@ -271,7 +271,7 @@ Respectfully,
 [Technician Name]
 )
 
-Act as IT Technician. Based on the following RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+Act as IT Technician. Based on the following RecordedSteps section, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
 Use the RecordedSteps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
