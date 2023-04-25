@@ -285,17 +285,21 @@ Skip steps that don't make logical sense. `
 Only speak in complete sentences. `
 Embelish the output to make the IT Technician sound very skilled, and be specific.
 
-
 RecordedSteps:
 $joinedSteps
 
 
 #Form:
 Reporting Issue: $(Get-Content "$dir\issue.txt")
+
 Customer Actions Taken:
+
 Troubleshooting Methods:
+
 Resolution: $(Get-Content "$dir\resolution.txt")
+
 Comments & Misc. info:
+
 Message to End User:
 
 `"`"`"
