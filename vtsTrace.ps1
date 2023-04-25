@@ -271,7 +271,7 @@ Respectfully,
 [Technician Name]
 )
 
-Act as IT Technician. Based on the following Recorded Steps, Reported Issues, and Resolution, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
 Use the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
@@ -285,21 +285,23 @@ Skip steps that don't make logical sense. `
 Only speak in complete sentences. `
 Embelish the output to make the IT Technician sound very skilled, and be specific.
 
+#INPUT = (
 Recorded Steps:
 $joinedSteps
 
+Issue:
+$(Get-Content "$dir\issue.txt")
+
+Resolution:
+$(Get-Content "$dir\resolution.txt")
+)
 
 #Form:
-Reported Issue: $(Get-Content "$dir\issue.txt")
-
+Reported Issue:
 Customer Actions Taken:
-
 Troubleshooting Methods:
-
-Resolution: $(Get-Content "$dir\resolution.txt")
-
+Resolution:
 Comments & Misc. info:
-
 Message to End User:
 
 `"`"`"
