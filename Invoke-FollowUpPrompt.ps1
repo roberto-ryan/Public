@@ -111,7 +111,7 @@ Respectfully,
 
 Rewrite the form below to match the style of the examples above but take into account the following considerations: $alterations.
 
-$(Get-Content $dir\gpt_result.txt -Raw -Encoding utf8)
+$(Get-Content $dir\gpt_result.txt -Encoding utf8)
 "@
     
         $body = @{
