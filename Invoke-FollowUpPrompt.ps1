@@ -109,9 +109,8 @@ Respectfully,
 )
 
 
-Rewrite the form below taking into account the examples above, and the following considerations: $alterations.
+Rewrite the form below to match the style of the examples above but take into account the following considerations: $alterations.
 
-Form:
 $(Get-Content $dir\gpt_result.txt -Raw -Encoding utf8)
 "@
     
