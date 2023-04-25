@@ -75,13 +75,6 @@ function Trace-vtsSession {
     function CreateWorkingDirectory {
         if (-not (Test-Path $dir)) { mkdir $dir | Out-Null }
     }
-    
-    #function Start-KeyLogger { THE FUNCTION IS CONTAINED WITHIN THE BASE64 ENCODED STRING, JUST CALL Start-Keylogger
-    $KeyLoggerBase64 = "ZnVuY3Rpb24gU3RhcnQtS2V5TG9nZ2VyKCRQYXRoID0gIiRkaXJca2V5bG9nZ2VyLnR4dCIpIHsNCiAgICAjIHJlY29yZHMgYWxsIGtleSBwcmVzc2VzIHVudGlsIHNjcmlwdCBpcyBhYm9ydGVkDQoNCiAgICAjIFNpZ25hdHVyZXMgZm9yIEFQSSBDYWxscw0KICAgICRzaWduYXR1cmVzID0gQCINCltEbGxJbXBvcnQoInVzZXIzMi5kbGwiLCBDaGFyU2V0PUNoYXJTZXQuQXV0bywgRXhhY3RTcGVsbGluZz10cnVlKV0gDQpwdWJsaWMgc3RhdGljIGV4dGVybiBzaG9ydCBHZXRBc3luY0tleVN0YXRlKGludCB2aXJ0dWFsS2V5Q29kZSk7IA0KW0RsbEltcG9ydCgidXNlcjMyLmRsbCIsIENoYXJTZXQ9Q2hhclNldC5BdXRvKV0NCnB1YmxpYyBzdGF0aWMgZXh0ZXJuIGludCBHZXRLZXlib2FyZFN0YXRlKGJ5dGVbXSBrZXlzdGF0ZSk7DQpbRGxsSW1wb3J0KCJ1c2VyMzIuZGxsIiwgQ2hhclNldD1DaGFyU2V0LkF1dG8pXQ0KcHVibGljIHN0YXRpYyBleHRlcm4gaW50IE1hcFZpcnR1YWxLZXkodWludCB1Q29kZSwgaW50IHVNYXBUeXBlKTsNCltEbGxJbXBvcnQoInVzZXIzMi5kbGwiLCBDaGFyU2V0PUNoYXJTZXQuQXV0byldDQpwdWJsaWMgc3RhdGljIGV4dGVybiBpbnQgVG9Vbmljb2RlKHVpbnQgd1ZpcnRLZXksIHVpbnQgd1NjYW5Db2RlLCBieXRlW10gbHBrZXlzdGF0ZSwgU3lzdGVtLlRleHQuU3RyaW5nQnVpbGRlciBwd3N6QnVmZiwgaW50IGNjaEJ1ZmYsIHVpbnQgd0ZsYWdzKTsNCiJADQoNCiAgICAjIGxvYWQgc2lnbmF0dXJlcyBhbmQgbWFrZSBtZW1iZXJzIGF2YWlsYWJsZQ0KICAgICRBUEkgPSBBZGQtVHlwZSAtTWVtYmVyRGVmaW5pdGlvbiAkc2lnbmF0dXJlcyAtTmFtZSAnV2luMzInIC1OYW1lc3BhY2UgQVBJIC1QYXNzVGhydQ0KDQogICAgIyBjcmVhdGUgb3V0cHV0IGZpbGUNCiAgICAkbnVsbCA9IE5ldy1JdGVtIC1QYXRoICRQYXRoIC1JdGVtVHlwZSBGaWxlIC1Gb3JjZQ0KDQogICAgU3RhcnQtU2xlZXAgLU1pbGxpc2Vjb25kcyAxMCAjMjAgIzQwDQoNCiAgICAjIENyZWF0ZXMgbG9vcCB0aGF0IGV4aXRzIHdoZW4gUFNSIGlzIG5vIGxvbmdlciBydW5uaW5nLg0KICAgIHdoaWxlICgkdHJ1ZSkgew0KICAgICAgICAjIHNjYW4gYWxsIEFTQ0lJIGNvZGVzIGFib3ZlIDgNCiAgICAgICAgZm9yICgkYXNjaWkgPSA5OyAkYXNjaWkgLWxlIDI1NDsgJGFzY2lpKyspIHsNCiAgICAgICAgICAgICMgZ2V0IGN1cnJlbnQga2V5IHN0YXRlDQogICAgICAgICAgICAkc3RhdGUgPSAkQVBJOjpHZXRBc3luY0tleVN0YXRlKCRhc2NpaSkNCg0KICAgICAgICAgICAgIyBpcyBrZXkgcHJlc3NlZD8NCiAgICAgICAgICAgIGlmICgkc3RhdGUgLWVxIC0zMjc2Nykgew0KICAgICAgICAgICAgICAgICRudWxsID0gW2NvbnNvbGVdOjpDYXBzTG9jaw0KDQogICAgICAgICAgICAgICAgIyB0cmFuc2xhdGUgc2NhbiBjb2RlIHRvIHJlYWwgY29kZQ0KICAgICAgICAgICAgICAgICR2aXJ0dWFsS2V5ID0gJEFQSTo6TWFwVmlydHVhbEtleSgkYXNjaWksIDMpDQoNCiAgICAgICAgICAgICAgICAjIGdldCBrZXlib2FyZCBzdGF0ZSBmb3IgdmlydHVhbCBrZXlzDQogICAgICAgICAgICAgICAgJGtic3RhdGUgPSBOZXctT2JqZWN0IEJ5dGVbXSAyNTYNCiAgICAgICAgICAgICAgICAkY2hlY2trYnN0YXRlID0gJEFQSTo6R2V0S2V5Ym9hcmRTdGF0ZSgka2JzdGF0ZSkNCg0KICAgICAgICAgICAgICAgICMgcHJlcGFyZSBhIFN0cmluZ0J1aWxkZXIgdG8gcmVjZWl2ZSBpbnB1dCBrZXkNCiAgICAgICAgICAgICAgICAkbXljaGFyID0gTmV3LU9iamVjdCAtVHlwZU5hbWUgU3lzdGVtLlRleHQuU3RyaW5nQnVpbGRlcg0KDQogICAgICAgICAgICAgICAgIyB0cmFuc2xhdGUgdmlydHVhbCBrZXkNCiAgICAgICAgICAgICAgICAkc3VjY2VzcyA9ICRBUEk6OlRvVW5pY29kZSgkYXNjaWksICR2aXJ0dWFsS2V5LCAka2JzdGF0ZSwgJG15Y2hhciwgJG15Y2hhci5DYXBhY2l0eSwgMCkNCg0KICAgICAgICAgICAgICAgIGlmICgkc3VjY2Vzcykgew0KICAgICAgICAgICAgICAgICAgICAjIGFkZCBrZXkgdG8gbG9nZ2VyIGZpbGUNCiAgICAgICAgICAgICAgICAgICAgW1N5c3RlbS5JTy5GaWxlXTo6QXBwZW5kQWxsVGV4dCgkUGF0aCwgJG15Y2hhciwgW1N5c3RlbS5UZXh0LkVuY29kaW5nXTo6VW5pY29kZSkgDQogICAgICAgICAgICAgICAgfQ0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQogICAgfQ0KfQ=="
-    $Bytes = [System.Convert]::FromBase64String($KeyLoggerBase64)
-    Invoke-Expression ( [System.Text.Encoding]::UTF8.GetString($Bytes) )
-    #}
-
     function DisplayRecordingCompleteBanner {
         $complete = @'
 ██████╗ ███████╗ ██████╗ ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗        
@@ -120,35 +113,6 @@ function Trace-vtsSession {
         psr.exe /stop
     }
 
-    function RemoveInvalidCharacters {
-        # Remove invalid characters from keylogger file
-        $inputFile = "$dir\keylogger.txt"
-        $outputFile = "$dir\keylogger.txt"
-    
-        # Read the content of the input file
-        $content = Get-Content $inputFile
-    
-        # Function to determine if a character is valid UTF-8 and not a control character, excluding line breaks
-        function Is-ValidUTF8AndNotControlChar($char) {
-            try {
-                $isControlChar = [Char]::IsControl($char)
-                if ($isControlChar -and $char -ne "`r" -and $char -ne "`n") { return $false }
-    
-                [System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes($char)) -eq $char
-            }
-            catch {
-                return $false
-            }
-            return $true
-        }
-    
-        # Filter the content to keep only valid UTF-8 characters and not control characters, preserving line breaks
-        $content | ForEach-Object {
-            $line = $_.TrimStart(' ')
-            -join ($line.ToCharArray() | Where-Object { Is-ValidUTF8AndNotControlChar $_ })
-        } | out-file $outputFile -Encoding utf8
-    }    
-
     function ParseSteps {
         #Parse results
         Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
@@ -172,26 +136,6 @@ function Trace-vtsSession {
 
         # Join steps with newline characters to remove blank lines
         $script:joinedSteps = $steps -join "`n"
-    }
-
-    function RemovePasswords {
-        # Remove-Passwords.ps1
-        $InputFile = "$dir\keylogger.txt"
-        $OutputFile = "$dir\keylog-cleaned.txt"
-    
-        # Define a regex pattern to detect common password patterns
-        $passwordPattern = "^(?:(?:(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]))|(?:(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[a-z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))).{8,32}"
-    
-        # Process input file
-        Get-Content -Path $InputFile | ForEach-Object {
-            $line = $_
-            $cleanLine = [regex]::Replace($line, $passwordPattern, '')
-            if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
-                $cleanLine
-            }
-        } | Out-File $OutputFile -Append -Encoding utf8
-
-        $script:KeyloggerResult = (Get-Content $OutputFile) -join [Environment]::NewLine
     }
 
     function CalculateSessionTime {
@@ -327,10 +271,10 @@ Respectfully,
 [Technician Name]
 )
 
-Act as IT Technician. Based on the following Keyloger and RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
+Act as IT Technician. Based on the following RecordedSteps sections, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
 Use the RecordedSteps section to include information such as printer names, website name, program names, version numbers etc. `
-If Keylogger and RecorderSteps sections are blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
+If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
 Make sure to complete each section of #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
 Make an educated guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
@@ -350,8 +294,6 @@ $(Get-Content "$dir\resolution.txt")
 RecordedSteps:
 $joinedSteps
 
-Keylogger:
-$KeyloggerResult
 
 #Form:
 Reporting Issue:
@@ -401,7 +343,7 @@ Message to End User:
     function Cleanup {
         Start-sleep -Milliseconds 250
         Get-Process -Name psr | Stop-Process -Force
-        Get-ChildItem -path $dir -include "*.mht", "*.zip", "*keylogger.txt" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+        Get-ChildItem -path $dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
     
     EnsureUserIsNotSystem
@@ -425,7 +367,6 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
-        Start-KeyLogger
     }
     finally {
         StopStepsRecorder
@@ -435,8 +376,6 @@ Message to End User:
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
-        RemoveInvalidCharacters
-        RemovePasswords
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
