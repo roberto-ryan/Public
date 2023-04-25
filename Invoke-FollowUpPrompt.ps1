@@ -15,7 +15,7 @@ function GPTFollowUp {
     function WriteResultsToHost {
         Clear-Host
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        (Get-Content "$dir\gpt_result2.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
     }
     
     While ($true) {
@@ -130,7 +130,7 @@ $(Get-Content $dir\gpt_result.txt -Encoding utf8)
         $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
 
         $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-        "$($response.choices.text)" | Out-File "$dir\gpt_result2.txt" -Force -Encoding utf8
+        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
         WriteResultsToHost
     }
 }
