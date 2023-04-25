@@ -367,6 +367,7 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
+        While (1){start-sleep -Milliseconds 250}
     }
     finally {
         StopStepsRecorder
