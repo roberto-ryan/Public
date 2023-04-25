@@ -22,6 +22,8 @@ function GPTFollowUp {
         
         $alterations = Read-Host "GPT3.5>>>"
         $prompt = @"
+Here are 3 examples of the output I am looking for:
+
 Example1 = (
 Issue Reported: Screen flickering
 
@@ -109,7 +111,9 @@ Respectfully,
 )
 
 
-Rewrite the form below. Keep all information the same, but take into account the additional information: $alterations.
+Rewrite the form below. Keep all information the same, but take into account the additional information: 
+$alterations.
+
 
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
 
