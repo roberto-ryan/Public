@@ -17,11 +17,20 @@ function GPTFollowUp {
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
     }
-    
-    While ($true) {
+
+    $alterations = Read-Host "GPT3.5>>>"
+
+    switch ($alterations) {
+        steps {
+            "`n"
+            Get-Content $dir\cleaned_steps.txt 
+            "`n"
+        }
+        Default {
+            While ($true) {
         
-        $alterations = Read-Host "GPT3.5>>>"
-        $prompt = @"
+                $alterations = Read-Host "GPT3.5>>>"
+                $prompt = @"
 Here are 3 examples of the output I am looking for:
 
 Example1 = (
@@ -120,21 +129,23 @@ $(Get-Content $dir\gpt_result.txt -Encoding utf8)
 `"`"`"
 "@
     
-        $body = @{
-            'prompt'            = $prompt;
-            'temperature'       = 0;
-            'max_tokens'        = 500;
-            'top_p'             = 1.0;
-            'frequency_penalty' = 0.0;
-            'presence_penalty'  = 0.0;
-            'stop'              = @('"""');
-        }
+                $body = @{
+                    'prompt'            = $prompt;
+                    'temperature'       = 0;
+                    'max_tokens'        = 500;
+                    'top_p'             = 1.0;
+                    'frequency_penalty' = 0.0;
+                    'presence_penalty'  = 0.0;
+                    'stop'              = @('"""');
+                }
         
-        $JsonBody = $body | ConvertTo-Json -Compress
-        $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
+                $JsonBody = $body | ConvertTo-Json -Compress
+                $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
 
-        $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
-        WriteResultsToHost
+                $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
+                "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
+                WriteResultsToHost
+            }
+        }
     }
 }
