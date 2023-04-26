@@ -18,18 +18,16 @@ function GPTFollowUp {
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
     }
 
-    $alterations = Read-Host "GPT3.5>>>"
-
-    switch ($alterations) {
-        steps {
-            "`n"
-            Get-Content $dir\cleaned_steps.txt 
-            "`n"
-        }
-        Default {
-            While ($true) {
+    While ($true) {
+        $alterations = Read-Host "GPT3.5>>>"
         
-                $alterations = Read-Host "GPT3.5>>>"
+        switch ($alterations) {
+            steps {
+                "`n"
+                Get-Content $dir\cleaned_steps.txt 
+                "`n"
+            }
+            Default {
                 $prompt = @"
 Here are 3 examples of the output I am looking for:
 
