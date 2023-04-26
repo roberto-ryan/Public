@@ -126,7 +126,7 @@ function Trace-vtsSession {
         # Clean up unwanted input from Steps Recorder"$dir\steps.txt"
         Get-Content "$dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
-        Sort-Object -Unique | 
+        Select-Object -Unique | 
         Out-File "$dir\cleaned_steps.txt" -Append -Encoding utf8
 
         #Remove last step as it's alway irrelevant
