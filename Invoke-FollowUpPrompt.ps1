@@ -118,7 +118,7 @@ Respectfully,
 )
 
 
-Rewrite the form below. Keep all information the same, but take into account this additional information: 
+Rewrite the form taking into account the new information: 
 $alterations.
 
 
