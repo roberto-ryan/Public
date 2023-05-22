@@ -32,7 +32,7 @@ function GPTFollowUp {
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
 
 
-Rewrite the ticket notes taking into account the following: 
+Rewrite the ticket notes while keeping the format the exact same, taking into account the following: 
 $alterations.
 
 `"`"`"
