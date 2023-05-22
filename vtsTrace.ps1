@@ -191,7 +191,6 @@ Issue Reported: Screen flickering
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-- Called the user and established a remote session using Teamviewer.
 - Checked for Windows Updates.
 - Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
 - Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
@@ -220,7 +219,6 @@ Issue Reported: Scanner not working
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-- Called the user and established a remote session using Teamviewer.
 - Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.
 - Determined the scanner was not being recognized by the computer.
 - Had the user unplug the scanner from the computer and plug it back in.
@@ -246,15 +244,11 @@ Issue Reported: Slow internet connection
 Customer Actions Taken: None
 
 Troubleshooting Methods:
-- Called the user and established a remote session using Teamviewer.
-- Opened Command Prompt by searching for 'cmd' in the Start menu and running it as Administrator.
-- Typed 'ipconfig /flushdns' and pressed Enter to flush the DNS cache.
-- Closed Command Prompt and opened the Start menu, navigating to Settings.
-- Chose Network & Internet, and clicked on Change Adapter Options.
+- Opened Command Prompt and enterted 'ipconfig /flushdns' to flush the DNS cache.
+- Closed Command Prompt and opened the Start menu, navigating to Settings, chose Network & Internet, and clicked on Change Adapter Options.
 - Right-clicked on the active network connection and selected Properties.
 - Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.
 - Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.
-- Closed the Network Connections window and restarted the computer.
 - Tested internet connectivity, confirming that the issue was resolved.
 
 Resolution: Flushing the DNS cache and changing DNS servers resolved the issue.
