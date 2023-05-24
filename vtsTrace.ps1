@@ -15,6 +15,7 @@ function Trace-vtsSession {
     $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
+    $script:clipboard = @()
 
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
@@ -267,6 +268,7 @@ Respectfully,
 
 Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
+The Clipboard contains copied strings that are useful for providing more detail. `
 Be as concise as possible when filling out the Troubleshooting Methods. `
 Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
@@ -279,6 +281,9 @@ Don't include the word AI.
 #INPUT = (
 Recorded Steps:
 $joinedSteps
+
+Clipboard:
+$clipboard
 
 Issue:
 $(Get-Content "$dir\issue.txt")
@@ -337,6 +342,11 @@ Message to End User:
         Get-Process -Name psr | Stop-Process -Force
         Get-ChildItem -path $dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
+
+    function GetClipboard {
+        $script:clipboard += Get-Clipboard
+        $script:clipboard = $script:clipboard | Select-Object -Unique
+    }
     
     EnsureUserIsNotSystem
     
@@ -359,7 +369,7 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
-        While (1){start-sleep -Milliseconds 250}
+        While (1){GetClipboard ; start-sleep -Milliseconds 250}
     }
     finally {
         StopStepsRecorder
