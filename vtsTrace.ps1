@@ -283,7 +283,7 @@ Recorded Steps:
 $joinedSteps
 
 Clipboard:
-$clipboard
+$($clipboard | Select-Object -unique)
 
 Issue:
 $(Get-Content "$dir\issue.txt")
