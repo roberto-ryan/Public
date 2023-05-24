@@ -283,7 +283,7 @@ Recorded Steps:
 $joinedSteps
 
 Clipboard:
-$(($clipboard | Select-Object -unique).trimstart())
+$(($clipboard | Select-Object -unique))
 
 Issue:
 $(Get-Content "$dir\issue.txt")
@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        if ("" -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n")}
+        if ("" -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
     }
     
     EnsureUserIsNotSystem
