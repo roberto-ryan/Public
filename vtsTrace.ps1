@@ -15,7 +15,7 @@ function Trace-vtsSession {
     $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
-    $script:clipboard = @{}
+    $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        ($script:clipboard).add("$(Get-Clipboard)","")
+        ($script:clipboard).add("$(Get-Clipboard)")
     }
     
     EnsureUserIsNotSystem
