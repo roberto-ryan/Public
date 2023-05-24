@@ -268,17 +268,13 @@ Respectfully,
 Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
 Be as concise as possible when filling out the Troubleshooting Methods. `
-Use the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
+Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
 Make sure to complete each section of #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
-Make an educated guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
 Don't include that the Problem Steps Recorder was used. `
 Don't include anything related to DesktopWindowXaml. `
-Don't include the word AI. `
-Skip steps that don't make logical sense. `
-Only speak in complete sentences. `
-Embelish the output to make the IT Technician sound very skilled, and be specific.
+Don't include the word AI.
 
 #INPUT = (
 Recorded Steps:
