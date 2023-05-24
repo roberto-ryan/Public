@@ -369,7 +369,10 @@ Message to End User:
         DisplayRecordingBanner
         StartStepsRecorder
         set-clipboard ""
-        While (1) { GetClipboard ; start-sleep -Milliseconds 250 }
+        While (1) {
+            start-sleep -Milliseconds 250
+            GetClipboard
+        }
     }
     finally {
         StopStepsRecorder
