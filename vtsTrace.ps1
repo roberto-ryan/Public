@@ -283,7 +283,7 @@ Recorded Steps:
 $joinedSteps
 
 Clipboard:
-$($clipboard | Select-Object -unique | ForEach-Object (Write-Host "$_`n"))
+$($clipboard | Select-Object -unique)
 
 Issue:
 $(Get-Content "$dir\issue.txt")
@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        ($script:clipboard).add("$(Get-Clipboard)")
+        ($script:clipboard).add("$(Get-Clipboard)`n")
     }
     
     EnsureUserIsNotSystem
