@@ -344,8 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        $script:clipboard += Get-Clipboard
-        $script:clipboard = $script:clipboard | Select-Object -Unique
+        $script:clipboard += "$(Get-Clipboard)`n"
     }
     
     EnsureUserIsNotSystem
@@ -369,7 +368,8 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
-        While (1){GetClipboard ; start-sleep -Milliseconds 250}
+        set-clipboard ""
+        While (1) { GetClipboard ; start-sleep -Milliseconds 250 }
     }
     finally {
         StopStepsRecorder
