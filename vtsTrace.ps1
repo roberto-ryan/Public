@@ -345,7 +345,6 @@ Message to End User:
 
     function GetClipboard {
         ($script:clipboard).add("$(Get-Clipboard)","")
-        $script:clipboard = $script:clipboard | Select-Object -Unique
     }
     
     EnsureUserIsNotSystem
