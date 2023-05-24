@@ -13,6 +13,7 @@ function GPTFollowUp {
         Select-Object -ExpandProperty FullName -last 1)
         
     function WriteResultsToHost {
+        Write-Host "#################### START ####################" -ForegroundColor Green
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         Write-Host "#################### BREAK ####################" -ForegroundColor Green
