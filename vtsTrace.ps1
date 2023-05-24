@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        if ($null -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n")}
+        if ("" -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n")}
     }
     
     EnsureUserIsNotSystem
