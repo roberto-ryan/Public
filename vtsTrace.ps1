@@ -283,7 +283,7 @@ Recorded Steps:
 $joinedSteps
 
 Clipboard:
-$($clipboard | Select-Object -unique)
+$($clipboard | Select-Object -unique | ForEach-Object (Write-Host "$_`n"))
 
 Issue:
 $(Get-Content "$dir\issue.txt")
