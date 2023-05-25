@@ -280,10 +280,10 @@ Don't include the word AI.
 
 #INPUT = (
 Recorded Steps:
-$joinedSteps
+$(($script:joinedSteps| Select-Object -Last 30))
 
 Clipboard:
-$(($clipboard | Select-Object -unique))
+$(($script:clipboard | Select-Object -unique))
 
 Issue:
 $(Get-Content "$dir\issue.txt")
