@@ -136,7 +136,7 @@ function Trace-vtsSession {
         $steps = $PSRResult[0..$StepCount]
 
         # Join steps with newline characters to remove blank lines
-        $script:joinedSteps = $steps -join "`n" | Select-Object -last 3
+        $script:joinedSteps = ($steps | Select-Object -last 3) -join "`n"
     }
 
     function CalculateSessionTime {
