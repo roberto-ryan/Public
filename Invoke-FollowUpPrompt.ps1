@@ -20,15 +20,15 @@ function GPTFollowUp {
     }
 
     While ($true) {
-        $alterations = Read-Host "Type 'Steps' or 'Clipboard' to review recorded actions or copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`nGPT3.5>>>"
+        $alterations = Read-Host "Type 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`nGPT3.5>>>"
         
         switch ($alterations) {
-            steps {
+            s {
                 "`n"
                 Get-Content $dir\cleaned_steps.txt 
                 "`n"
             }
-            clipboard {
+            c {
                 "`n"
                 Get-Content $dir\clipboard.txt 
                 "`n"
