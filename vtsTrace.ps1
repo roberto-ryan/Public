@@ -136,7 +136,7 @@ function Trace-vtsSession {
         $steps = $PSRResult[0..$StepCount]
 
         # Join steps with newline characters to remove blank lines
-        $script:joinedSteps = $steps -join "`n" | Select-Object -last 30
+        $script:joinedSteps = $steps -join "`n" | Select-Object -last 3
     }
 
     function CalculateSessionTime {
@@ -268,7 +268,7 @@ Respectfully,
 
 Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
-The Clipboard contains copied strings that are useful for providing more detail. `
+MISC contains copied strings that are useful for providing more detail for filling out the #Form. `
 Be as concise as possible when filling out the Troubleshooting Methods. `
 Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
@@ -282,7 +282,7 @@ Don't include the word AI.
 Recorded Steps:
 $($script:joinedSteps)
 
-Clipboard:
+MISC:
 $(($script:clipboard | Select-Object -unique))
 
 Issue:
