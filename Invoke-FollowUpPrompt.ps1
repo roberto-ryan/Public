@@ -20,7 +20,7 @@ function GPTFollowUp {
     }
 
     While ($true) {
-        $alterations = Read-Host "GPT3.5>>>"
+        $alterations = Read-Host "Type 'Steps' or 'Clipboard' to review recorded actions or copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`nGPT3.5>>>"
         
         switch ($alterations) {
             steps {
