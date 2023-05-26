@@ -136,7 +136,7 @@ function Trace-vtsSession {
         $steps = $PSRResult[0..$StepCount]
 
         # Join steps with newline characters to remove blank lines
-        $script:joinedSteps = $steps -join "`n"
+        $script:joinedSteps = $steps -join "`n" | Select-Object -last 30
     }
 
     function CalculateSessionTime {
@@ -280,7 +280,7 @@ Don't include the word AI.
 
 #INPUT = (
 Recorded Steps:
-$(($script:joinedSteps| Select-Object -Last 30))
+$($script:joinedSteps)
 
 Clipboard:
 $(($script:clipboard | Select-Object -unique))
