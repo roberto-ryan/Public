@@ -36,31 +36,31 @@ function GPTFollowUp {
             Default {
                 $prompt = @"
 Example1 = (
-    Issue Reported: Screen flickering
-    
-    Customer Actions Taken: None
-    
-    Troubleshooting Methods:
-    - Checked for Windows Updates.
-    - Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-    - Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-    - Searched for 'gtx 1050 drivers' and clicked on the first result.
-    - Clicked on the Official Drivers link and downloaded the driver.
-    - Updated the graphics driver, resolving the issue.
-    
-    Resolution: Updating the graphics driver resolved the issue.
-    
-    Additional Comments: None
-    
-    
-    Message to End User: 
-    
-    [User Name],
-    
-    We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-    
-    Respectfully,
-    [Technician Name]
+Issue Reported: Screen flickering
+
+Customer Actions Taken: None
+
+Troubleshooting Methods:
+- Checked for Windows Updates.
+- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
+- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
+- Searched for 'gtx 1050 drivers' and clicked on the first result.
+- Clicked on the Official Drivers link and downloaded the driver.
+- Updated the graphics driver, resolving the issue.
+
+Resolution: Updating the graphics driver resolved the issue.
+
+Additional Comments: None
+
+
+Message to End User: 
+
+[User Name],
+
+We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
+
+Respectfully,
+[Technician Name]
 )
 
 Always mainting the formatting of the example above.
