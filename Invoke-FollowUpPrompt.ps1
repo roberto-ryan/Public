@@ -20,7 +20,9 @@ function GPTFollowUp {
     }
 
     While ($true) {
+        Write-Host "----------------------------------------------------------------" -foregroundcolor RED
         $alterations = Read-Host "Type 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`nGPT3.5>>>"
+        Write-Host "----------------------------------------------------------------" -foregroundcolor RED
         
         switch ($alterations) {
             s {
