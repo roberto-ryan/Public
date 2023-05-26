@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        if ("" -ne $(Get-Clipboard -ErrorAction SilentlyContinue)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
+        if (" " -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
     }
     
     EnsureUserIsNotSystem
@@ -368,7 +368,7 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
-        set-clipboard ""
+        set-clipboard " "
         While ($true) {
             start-sleep -Milliseconds 250
             GetClipboard
