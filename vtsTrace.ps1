@@ -283,7 +283,7 @@ Recorded Steps:
 $($script:joinedSteps)
 
 MISC:
-$(($script:clipboard | Select-Object -unique))
+$(Get-Content "$dir\clipboard.txt")
 
 Issue:
 $(Get-Content "$dir\issue.txt")

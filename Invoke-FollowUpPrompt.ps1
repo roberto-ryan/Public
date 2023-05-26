@@ -39,6 +39,21 @@ $(Get-Content $dir\gpt_result.txt -Encoding utf8)
 
 
 Rewrite the ticket notes taking into account the following: 
+
+#INPUT = (
+Recorded Steps:
+$($script:joinedSteps)
+
+MISC:
+$(Get-Content "$dir\clipboard.txt")
+
+Issue:
+$(Get-Content "$dir\issue.txt")
+
+Resolution:
+$(Get-Content "$dir\resolution.txt")
+)
+
 $alterations.
 
 `"`"`"
