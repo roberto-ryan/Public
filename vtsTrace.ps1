@@ -344,7 +344,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        if ("" -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
+        if ("" -ne $(Get-Clipboard -ErrorAction SilentlyContinue)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
     }
     
     EnsureUserIsNotSystem
@@ -369,7 +369,7 @@ Message to End User:
         DisplayRecordingBanner
         StartStepsRecorder
         set-clipboard ""
-        While (1) {
+        While ($true) {
             start-sleep -Milliseconds 250
             GetClipboard
         }
@@ -382,7 +382,7 @@ Message to End User:
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
-        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8 -Append
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
