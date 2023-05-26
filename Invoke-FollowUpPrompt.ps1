@@ -28,6 +28,11 @@ function GPTFollowUp {
                 Get-Content $dir\cleaned_steps.txt 
                 "`n"
             }
+            clipboard {
+                "`n"
+                Get-Content $dir\clipboard.txt 
+                "`n"
+            }
             Default {
                 $prompt = @"
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)

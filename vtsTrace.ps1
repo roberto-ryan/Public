@@ -332,7 +332,7 @@ Message to End User:
     function WriteResultsToHost {
         #Write final results to the shell
         Start-sleep -Milliseconds 250
-        Clear-Host
+        #Clear-Host
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
     }
@@ -382,6 +382,7 @@ Message to End User:
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
