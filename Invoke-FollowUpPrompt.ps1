@@ -65,8 +65,9 @@ Example1 = (
 
 Always mainting the formatting of the example above.
 
+#TicketNotes = (
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
-
+)
 
 #INPUT = (
 Recorded Steps:
@@ -82,7 +83,7 @@ Resolution:
 $(Get-Content "$dir\resolution.txt")
 )
 
-Rewrite the ticket notes taking into account the following: 
+Rewrite the #TicketNotes taking into account the following: 
     
 $alterations.
 
