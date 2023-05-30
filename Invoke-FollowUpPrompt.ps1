@@ -14,8 +14,8 @@ function GPTFollowUp {
         
     function WriteResultsToHost {
         Write-Host "\\\\\\\\\\\" -ForegroundColor Green
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "\\\\\\\\\\\" -ForegroundColor Green
     }
 
@@ -25,14 +25,18 @@ function GPTFollowUp {
 
         switch ($alterations) {
             s {
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
                 "`n"
                 Get-Content $dir\cleaned_steps.txt 
                 "`n"
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             c {
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
                 "`n"
                 Get-Content $dir\clipboard.txt 
                 "`n"
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             Default {
                 $prompt = @"
