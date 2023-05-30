@@ -122,8 +122,9 @@ Respectfully,
 
 Always mainting the formatting of the example above.
 
-Ticket Notes:
-$($response.choices.text)
+Ticket Notes = (
+    $($response.choices.text)
+)
 
 
 #INPUT = (
