@@ -89,6 +89,9 @@ $alterations.
                 Get-Content $dir\clipboard.txt 
                 Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
+            $null {
+                break
+            }
             Default {
                 if ($null -ne $response.choices.text) {
                     $prompt = @"
