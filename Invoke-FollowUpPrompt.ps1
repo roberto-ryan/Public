@@ -141,7 +141,7 @@ Resolution:
 $(Get-Content "$dir\resolution.txt")
 )
 
-Rewrite the Ticket Notes, taking into account the following: 
+Rewrite the Ticket Notes, taking into account the #INPUT as well as the following: 
 
 $alterations.
 
