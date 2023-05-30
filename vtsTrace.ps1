@@ -66,6 +66,7 @@ function Trace-vtsSession {
 "@
         Clear-Host
         Write-Host $rec -ForegroundColor Red
+        Write-Host "Tip: Any text copied to the logged-in user's clipboard during this session will be used to improve these notes.`n" -ForegroundColor Cyan
         Write-Host "$resume`Press Ctrl-C when finished.`n" -ForegroundColor Yellow
     }
     
