@@ -91,7 +91,7 @@ $alterations.
             }
             Default {
                 if ($null -ne $response.choices.text) {
-                    $prompt += $response.choices.text
+                    $prompt += "`n$($response.choices.text)"
                 }
                 $body = @{
                     'prompt'            = $prompt;
