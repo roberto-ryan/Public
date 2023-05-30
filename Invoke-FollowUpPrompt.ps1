@@ -13,15 +13,15 @@ function GPTFollowUp {
         Select-Object -ExpandProperty FullName -last 1)
         
     function WriteResultsToHost {
-        Write-Host "############################# START #############################" -ForegroundColor Green
+        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        Write-Host "############################# BREAK #############################" -ForegroundColor Green
+        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
     }
 
     While ($true) {
-        Write-Host "-----------------------------------------------------------------" -foregroundcolor RED
-        $alterations = Read-Host "Type 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`nGPT3.5>>>"
+        Write-Host "Type 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Cyan
+        $alterations = Read-Host "GPT3.5>>>"
 
         switch ($alterations) {
             s {
