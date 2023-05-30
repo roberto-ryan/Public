@@ -387,6 +387,7 @@ Message to End User:
         CalculateSessionTime
         GeneratePrompt
         APICall
+        Clear-Host
         WriteResultsToFile
         WriteResultsToHost
         Cleanup
