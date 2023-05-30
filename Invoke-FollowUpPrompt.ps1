@@ -18,24 +18,8 @@ function GPTFollowUp {
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "\\\\\\\\\\\" -ForegroundColor Green
     }
-
-    While ($true) {
-        Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
-        $alterations = Read-Host "GPT3.5>>>"
-
-        switch ($alterations) {
-            s {
-                Write-Host "\\\\\\\\\\\ STEPS" -ForegroundColor Green
-                Get-Content $dir\cleaned_steps.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
-            }
-            c {
-                Write-Host "\\\\\\\\\\\ CLIPBOARD" -ForegroundColor Green
-                Get-Content $dir\clipboard.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
-            }
-            Default {
-                $prompt = @"
+    
+    $prompt = @"
 Example1 = (
 Issue Reported: Screen flickering
 
@@ -85,12 +69,30 @@ $(Get-Content "$dir\resolution.txt")
 )
 
 Rewrite the Ticket Notes, taking into account the following: 
-    
+
 $alterations.
 
 `"`"`"
 "@
-    
+    While ($true) {
+        Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
+        $alterations = Read-Host "GPT3.5>>>"
+
+        switch ($alterations) {
+            s {
+                Write-Host "\\\\\\\\\\\ STEPS" -ForegroundColor Green
+                Get-Content $dir\cleaned_steps.txt 
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+            }
+            c {
+                Write-Host "\\\\\\\\\\\ CLIPBOARD" -ForegroundColor Green
+                Get-Content $dir\clipboard.txt 
+                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+            }
+            Default {
+                if ($null -ne $response.choices.text) {
+                    $prompt += $response.choices.text
+                }
                 $body = @{
                     'prompt'            = $prompt;
                     'temperature'       = 0;
