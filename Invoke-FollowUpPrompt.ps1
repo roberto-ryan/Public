@@ -26,16 +26,12 @@ function GPTFollowUp {
         switch ($alterations) {
             s {
                 Write-Host "\\\\\\\\\\\ STEPS" -ForegroundColor Green
-                "`n"
                 Get-Content $dir\cleaned_steps.txt 
-                "`n"
                 Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             c {
                 Write-Host "\\\\\\\\\\\ CLIPBOARD" -ForegroundColor Green
-                "`n"
                 Get-Content $dir\clipboard.txt 
-                "`n"
                 Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             Default {
