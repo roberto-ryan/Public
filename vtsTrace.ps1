@@ -326,7 +326,7 @@ Message to End User:
         "Session Time: $SessionTime`n" | Out-File "$dir\result_header.txt" -Force -Encoding utf8
         "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
