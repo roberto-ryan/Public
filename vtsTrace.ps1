@@ -333,8 +333,8 @@ Message to End User:
         #Write final results to the shell
         Start-sleep -Milliseconds 250
         #Clear-Host
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
     }
 
     function Cleanup {
