@@ -213,11 +213,11 @@ $(Get-Content "$dir\resolution.txt")
             "model"             = "gpt-3.5-turbo"
             "messages"          = @( @{
                     "role"    = "system"
-                    "content" = "You are a helpful assistant that helps create ticket notes for IT support."
+                    "content" = "You are a helpful IT technician that creates ticket notes for IT support."
                 },
                 @{
                     "role"    = "system"
-                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
+                    "content" = "You always respond as an IT technician in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
                 },
                 @{
                     "role"    = "system"
