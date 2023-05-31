@@ -15,6 +15,7 @@ function Trace-vtsSession {
     $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
+    $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
@@ -65,6 +66,7 @@ function Trace-vtsSession {
 "@
         Clear-Host
         Write-Host $rec -ForegroundColor Red
+        Write-Host "Tip: Any text copied to the logged-in user's clipboard during this session will be used to improve these notes.`n`n" -ForegroundColor Cyan
         Write-Host "$resume`Press Ctrl-C when finished.`n" -ForegroundColor Yellow
     }
     
@@ -135,7 +137,7 @@ function Trace-vtsSession {
         $steps = $PSRResult[0..$StepCount]
 
         # Join steps with newline characters to remove blank lines
-        $script:joinedSteps = $steps -join "`n"
+        $script:joinedSteps = ($steps | Select-Object -last 30) -join "`n"
     }
 
     function CalculateSessionTime {
@@ -267,21 +269,22 @@ Respectfully,
 
 Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
 Use the examples above as an example when filling out the #Form:. `
-Use the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
+MISC contains copied strings that are useful for providing more detail for filling out the #Form. `
+Be as concise as possible when filling out the Troubleshooting Methods. `
+Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
 If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
 Make sure to complete each section of #Form:. `
 Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
-Make an educated guess what the tech was trying to accomplish to fill out the Troubleshooting Methods section step by step. `
 Don't include that the Problem Steps Recorder was used. `
 Don't include anything related to DesktopWindowXaml. `
-Don't include the word AI. `
-Skip steps that don't make logical sense. `
-Only speak in complete sentences. `
-Embelish the output to make the IT Technician sound very skilled, and be specific.
+Don't include the word AI.
 
 #INPUT = (
 Recorded Steps:
-$joinedSteps
+$($script:joinedSteps)
+
+MISC:
+$(Get-Content "$dir\clipboard.txt")
 
 Issue:
 $(Get-Content "$dir\issue.txt")
@@ -324,21 +327,25 @@ Message to End User:
         "Session Time: $SessionTime`n" | Out-File "$dir\result_header.txt" -Force -Encoding utf8
         "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Append
+        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
         #Write final results to the shell
         Start-sleep -Milliseconds 250
-        Clear-Host
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+        #Clear-Host
+        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
     }
 
     function Cleanup {
         Start-sleep -Milliseconds 250
         Get-Process -Name psr | Stop-Process -Force
         Get-ChildItem -path $dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+    }
+
+    function GetClipboard {
+        if (" " -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
     }
     
     EnsureUserIsNotSystem
@@ -362,7 +369,11 @@ Message to End User:
 
         DisplayRecordingBanner
         StartStepsRecorder
-        While (1){start-sleep -Milliseconds 250}
+        set-clipboard " "
+        While ($true) {
+            start-sleep -Milliseconds 250
+            GetClipboard
+        }
     }
     finally {
         StopStepsRecorder
@@ -372,10 +383,12 @@ Message to End User:
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8 -Append
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
         APICall
+        Clear-Host
         WriteResultsToFile
         WriteResultsToHost
         Cleanup
