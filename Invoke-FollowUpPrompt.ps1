@@ -6,7 +6,7 @@ function GPTFollowUp {
         $OpenAIKey
     )
 
-    $ErrorActionPreference = 'SilentlyContinue'
+    $ErrorActionPreference = 'Continue'
 
     $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
         Sort-Object Name |
