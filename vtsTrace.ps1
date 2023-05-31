@@ -192,7 +192,7 @@ Create ticket notes based on the following recorded information:
 Recorded Steps:
 $($script:joinedSteps)
 
-MISC:
+Clipped:
 $(Get-Content "$dir\clipboard.txt")
 
 Issue:
@@ -213,7 +213,7 @@ $(Get-Content "$dir\resolution.txt")
             "model"             = "gpt-3.5-turbo"
             "messages"          = @( @{
                     "role"    = "system"
-                    "content" = "You are a helpful IT technician that creates ticket notes for IT support."
+                    "content" = "You are a helpful IT technician that creates comprehensive ticket notes for IT support issues."
                 },
                 @{
                     "role"    = "system"
@@ -221,7 +221,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Always use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc.\n\nMISC contains copied strings that are useful for providing more detail. If Recorded Steps and MISC sections are blank, then generate the notes from the Issue and Resolution sections entirely."
+                    "content" = "Always use the data in Recorded Steps to include information such as printer names, website name, program names, version numbers etc. in the Troubleshooting Methods.\n\nClipped contains copied strings that are useful for providing more detail. If Recorded Steps and Clipped sections are blank, then generate the notes from the Issue and Resolution sections entirely."
                 },
                 @{
                     "role"    = "system"
