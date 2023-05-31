@@ -221,7 +221,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. MISC contains copied strings that are useful for providing more detail. If Recorded Steps and MISC sections are blank, then generate the notes from the Issue and Resolution sections entirely."
+                    "content" = "Always use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc.\n\nMISC contains copied strings that are useful for providing more detail. If Recorded Steps and MISC sections are blank, then generate the notes from the Issue and Resolution sections entirely."
                 },
                 @{
                     "role"    = "system"
