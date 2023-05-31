@@ -12,7 +12,7 @@ function Trace-vtsSession {
         $OpenAIKey
     )
         
-    $ErrorActionPreference = 'Stop'
+    $ErrorActionPreference = 'Continue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
