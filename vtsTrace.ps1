@@ -224,6 +224,10 @@ $(Get-Content "$dir\resolution.txt")
                     "content" = "Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc."
                 },
                 @{
+                    "role"    = "system"
+                    "content" = "The Troubleshooting Steps should be written in an easy to understand bulleted list, and should sound like it was written by a human."
+                },
+                @{
                     "role"    = "user"
                     "content" = "Here's an example of the output I want:\n\nIssue Reported: Screen flickering\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Checked for Windows Updates.\n- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.\n- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.\n- Searched for 'gtx 1050 drivers' and clicked on the first result.\n- Clicked on the Official Drivers link and downloaded the driver.\n- Updated the graphics driver, resolving the issue.\n\nResolution: Updating the graphics driver resolved the issue.\n\nAdditional Comments: None\n\n\nMessage to End User: \n\n[User Name],\n\nWe have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.\n\nRespectfully,\n[Technician Name]"
                 },
