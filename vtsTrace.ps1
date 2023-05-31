@@ -205,21 +205,6 @@ $(Get-Content "$dir\resolution.txt")
     }
 
     function APICall {
-        # $body = @{
-        #     'prompt'            = $prompt;
-        #     'temperature'       = 0;
-        # 'max_tokens'        = 500;
-        # 'top_p'             = 1.0;
-        # 'frequency_penalty' = 0.0;
-        # 'presence_penalty'  = 0.0;
-        # 'stop'              = @('"""');
-        # }
-         
-        # $JsonBody = $body | ConvertTo-Json -Compress
-        # $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
-             
-        # $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-   
         $Headers = @{
             "Content-Type"  = "application/json"
             "Authorization" = "Bearer $OpenAIKey"
@@ -266,7 +251,13 @@ $(Get-Content "$dir\resolution.txt")
             'stop'              = @('"""');
         } | ConvertTo-Json
         
-        $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+        try {
+            
+            $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+        }
+        catch {
+            Write-Error "$($_.Exception.Message)"
+        }
     }
 
     function WriteResultsToFile {
