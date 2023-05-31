@@ -196,10 +196,10 @@ Clipped:
 $(Get-Content "$dir\clipboard.txt" -ErrorAction "SilentlyContinue")
 
 Issue:
-$(Get-Content "$dir\issue.txt" -ErrorAction "SilentlyContinue)
+$(Get-Content "$dir\issue.txt" -ErrorAction "SilentlyContinue")
 
 Resolution:
-$(Get-Content "$dir\resolution.txt" -ErrorAction "SilentlyContinue)
+$(Get-Content "$dir\resolution.txt" -ErrorAction "SilentlyContinue")
 "@ | ConvertTo-Json
         $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
     }
