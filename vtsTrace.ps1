@@ -208,11 +208,11 @@ $(Get-Content "$dir\resolution.txt")
         # $body = @{
         #     'prompt'            = $prompt;
         #     'temperature'       = 0;
-        #     'max_tokens'        = 500;
-        #     'top_p'             = 1.0;
-        #     'frequency_penalty' = 0.0;
-        #     'presence_penalty'  = 0.0;
-        #     'stop'              = @('"""');
+        # 'max_tokens'        = 500;
+        # 'top_p'             = 1.0;
+        # 'frequency_penalty' = 0.0;
+        # 'presence_penalty'  = 0.0;
+        # 'stop'              = @('"""');
         # }
          
         # $JsonBody = $body | ConvertTo-Json -Compress
@@ -225,8 +225,8 @@ $(Get-Content "$dir\resolution.txt")
             "Authorization" = "Bearer $OpenAIKey"
         }
         $Body = @{
-            "model"       = "gpt-3.5-turbo"
-            "messages"    = @( @{
+            "model"             = "gpt-3.5-turbo"
+            "messages"          = @( @{
                     "role"    = "system"
                     "content" = "You are a helpful assistant that helps create ticket notes for IT support."
                 },
@@ -250,7 +250,12 @@ $(Get-Content "$dir\resolution.txt")
                     "role"    = "user"
                     "content" = "$script:prompt"
                 })
-            "temperature" = 0
+            "temperature"       = 0
+            'max_tokens'        = 500;
+            'top_p'             = 1.0;
+            'frequency_penalty' = 0.0;
+            'presence_penalty'  = 0.0;
+            'stop'              = @('"""');
         } | ConvertTo-Json
         
         $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
