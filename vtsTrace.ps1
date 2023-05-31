@@ -225,7 +225,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "The Troubleshooting Steps should be written in an easy to understand bulleted list, and should sound like it was written by a human."
+                    "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description."
                 },
                 @{
                     "role"    = "user"
