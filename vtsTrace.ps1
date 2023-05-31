@@ -221,11 +221,7 @@ $(Get-Content "$dir\resolution.txt"  -ea 'SilentlyContinue')
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Always use the data in Recorded Steps to include information such as printer names, website name, program names, version numbers etc. in the Troubleshooting Methods.\n\nClipped contains copied strings that are useful for providing more detail. If Recorded Steps and Clipped sections are blank, then generate the notes from the Issue and Resolution sections entirely."
-                },
-                @{
-                    "role"    = "system"
-                    "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description.\n\nThe Troubleshooting Methods section is for steps performed by (you) the technician only."
+                    "content" = "You use the data in Recorded Steps to include information such as printer names, website name, program names, version numbers etc. in the Troubleshooting Methods.\n\nClipped contains copied strings that are useful for providing more detail. If Recorded Steps and Clipped sections are blank, then generate the notes from the Issue and Resolution sections entirely.\n\nDon't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description.\n\nThe Troubleshooting Methods section is for steps performed by (you) the technician only."
                 },
                 @{
                     "role"    = "user"
