@@ -193,13 +193,13 @@ Recorded Steps:
 $($script:joinedSteps)
 
 Clipped:
-$(Get-Content "$dir\clipboard.txt")
+$(Get-Content "$dir\clipboard.txt" -ErrorAction "SilentlyContinue")
 
 Issue:
-$(Get-Content "$dir\issue.txt")
+$(Get-Content "$dir\issue.txt" -ErrorAction "SilentlyContinue)
 
 Resolution:
-$(Get-Content "$dir\resolution.txt")
+$(Get-Content "$dir\resolution.txt" -ErrorAction "SilentlyContinue)
 "@ | ConvertTo-Json
         $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
     }
