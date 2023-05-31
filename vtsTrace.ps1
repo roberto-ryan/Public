@@ -12,7 +12,7 @@ function Trace-vtsSession {
         $OpenAIKey
     )
         
-    $ErrorActionPreference = 'SilentlyContinue'
+    $ErrorActionPreference = 'Continue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
@@ -249,6 +249,10 @@ $(Get-Content "$dir\resolution.txt")
                 @{
                     "role"    = "user"
                     "content" = "$script:prompt"
+                },
+                @{
+                    "role"    = "assistant"
+                    "content" = ""
                 })
             "temperature"       = 0
             'max_tokens'        = 500;
@@ -265,7 +269,7 @@ $(Get-Content "$dir\resolution.txt")
         "Session Time: $SessionTime`n" | Out-File "$dir\result_header.txt" -Force -Encoding utf8
         "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
+        "$($script:response.choices.message.content)" | Out-File "$dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
