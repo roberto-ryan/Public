@@ -21,23 +21,6 @@ function GPTFollowUp {
     
     $ticket = "Here is the ticket that needs correcting:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Csv
 
-
-    $additionalInfo = @"
-Here is additional information regarding the ticket:
-
-Recorded Steps:
-$($script:joinedSteps)
-
-MISC:
-$(Get-Content "$dir\clipboard.txt")
-"@ | ConvertTo-Json
-
-    $rewriteInstructions = @"
-Rewrite the ticket notes above, taking into account the following: 
-
-$alterations.
-"@ | ConvertTo-Json
-
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
         $alterations = Read-Host "GPT3.5>>>"
@@ -81,14 +64,6 @@ $alterations.
                         },
                         @{
                             "role"    = "system"
-                            "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc., in the Troubleshooting Methods section."
-                        },
-                        @{
-                            "role"    = "system"
-                            "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
-                        },
-                        @{
-                            "role"    = "system"
                             "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description."
                         },
                         @{
@@ -98,10 +73,6 @@ $alterations.
                         @{
                             "role"    = "user"
                             "content" = "$ticket"
-                        },
-                        @{
-                            "role"    = "user"
-                            "content" = "$additionalInfo"
                         },
                         @{
                             "role"    = "user"
@@ -125,7 +96,7 @@ $alterations.
                 catch {
                     Write-Error "$($_.Exception.Message)"
                 }
-                "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
+                "$($response.choices.message.content)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
                 WriteResultsToHost
             }
         }
