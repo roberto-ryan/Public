@@ -256,7 +256,6 @@ $(Get-Content "$dir\resolution.txt")
                     "content" = ""
                 })
             "temperature"       = 0
-            'max_tokens'        = 3500
             'top_p'             = 1.0
             'frequency_penalty' = 0.0
             'presence_penalty'  = 0.0
