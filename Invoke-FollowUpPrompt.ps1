@@ -16,64 +16,26 @@ function GPTFollowUp {
         Write-Host "\\\\\\\\\\\" -ForegroundColor Green
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
-        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+        Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $prompt = @"
-Example1 = (
-Issue Reported: Screen flickering
-
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Checked for Windows Updates.
-- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and downloaded the driver.
-- Updated the graphics driver, resolving the issue.
-
-Resolution: Updating the graphics driver resolved the issue.
-
-Additional Comments: None
+    $ticket = $(Get-Content $dir\gpt_result.txt -Encoding utf8) | ConvertTo-Csv
 
 
-Message to End User: 
-
-[User Name],
-
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-
-Respectfully,
-[Technician Name]
-)
-
-Always mainting the formatting of the example above.
-
-Ticket Notes:
-$(Get-Content $dir\gpt_result.txt -Encoding utf8)
-
-
-#INPUT = (
+    $additionalInfo = @"
 Recorded Steps:
 $($script:joinedSteps)
 
 MISC:
 $(Get-Content "$dir\clipboard.txt")
+"@ | ConvertTo-Json
 
-Issue:
-$(Get-Content "$dir\issue.txt")
-
-Resolution:
-$(Get-Content "$dir\resolution.txt")
-)
-
-Rewrite the Ticket Notes, taking into account the following: 
+    $rewriteInstructions = @"
+Rewrite the ticket notes above, taking into account the following: 
 
 $alterations.
+"@ | ConvertTo-Json
 
-`"`"`"
-"@
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
         $alterations = Read-Host "GPT3.5>>>"
@@ -92,77 +54,83 @@ $alterations.
             }
             Default {
                 if ($null -ne $response.choices.text) {
-                    $prompt = @"
-Example1 = (
-Issue Reported: Screen flickering
-
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Checked for Windows Updates.
-- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and downloaded the driver.
-- Updated the graphics driver, resolving the issue.
-
-Resolution: Updating the graphics driver resolved the issue.
-
-Additional Comments: None
+                    $ticket = $($response.choices.text) | ConvertTo-Csv
 
 
-Message to End User: 
-
-[User Name],
-
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-
-Respectfully,
-[Technician Name]
-)
-
-Always mainting the formatting of the example above.
-
-Ticket = (
-$($response.choices.text)
-)
-
-
-#INPUT = (
-Recorded Steps:
-$($script:joinedSteps)
-
-MISC:
-$(Get-Content "$dir\clipboard.txt")
-
-Issue:
-$(Get-Content "$dir\issue.txt")
-
-Resolution:
-$(Get-Content "$dir\resolution.txt")
-)
-
-Rewrite the Ticket, taking into account the following: 
-
-$alterations.
-
-`"`"`"
-"@
+                    $additionalInfo = @"
+                Recorded Steps:
+                $($script:joinedSteps)
+                
+                MISC:
+                $(Get-Content "$dir\clipboard.txt")
+"@ | ConvertTo-Json
+                
+                    $rewriteInstructions = @"
+                Rewrite the ticket notes above, taking into account the following: 
+                
+                $alterations.
+"@ | ConvertTo-Json
                 }
-                $body = @{
-                    'prompt'            = $prompt;
-                    'temperature'       = 0;
-                    'max_tokens'        = 500;
-                    'top_p'             = 1.0;
-                    'frequency_penalty' = 0.0;
-                    'presence_penalty'  = 0.0;
-                    'stop'              = @('"""');
+                $Headers = @{
+                    "Content-Type"  = "application/json"
+                    "Authorization" = "Bearer $OpenAIKey"
                 }
-        
-                $JsonBody = $body | ConvertTo-Json -Compress
-                $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
-
-                $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
+                $Body = @{
+                    "model"             = "gpt-3.5-turbo"
+                    "messages"          = @( @{
+                            "role"    = "system"
+                            "content" = "You are a helpful IT technician that corrects ticket notes for IT support issues."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc., in the Troubleshooting Methods section."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "The Troubleshooting Methods section is for steps performed by (you) the technician only."
+                        },
+                        @{
+                            "role"    = "user"
+                            "content" = "Here is the ticket that needs correcting: $ticket"
+                        },
+                        @{
+                            "role"    = "user"
+                            "content" = "Here is additional information regarding the ticket: $additionalInfo"
+                        },
+                        @{
+                            "role"    = "user"
+                            "content" = "$rewriteInstructions"
+                        },
+                        @{
+                            "role"    = "assistant"
+                            "content" = ""
+                        })
+                    "temperature"       = 0
+                    'top_p'             = 1.0
+                    'frequency_penalty' = 0.0
+                    'presence_penalty'  = 0.0
+                    'stop'              = @('"""')
+                } | ConvertTo-Json
+                
+                try {
+                    
+                    $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+                }
+                catch {
+                    Write-Error "$($_.Exception.Message)"
+                }
                 "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
                 WriteResultsToHost
             }
