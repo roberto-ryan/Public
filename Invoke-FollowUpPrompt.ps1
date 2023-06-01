@@ -66,7 +66,7 @@ $alterations.
                         },
                         @{
                             "role"    = "system"
-                            "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description."
+                            "content" = "Keep the ticket notes unchanged except for the changes that are specifically requested."
                         },
                         @{
                             "role"    = "system"
