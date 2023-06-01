@@ -12,7 +12,7 @@ function Trace-vtsSession {
         $OpenAIKey
     )
         
-    $ErrorActionPreference = 'Continue'
+    $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
@@ -121,7 +121,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -193,13 +193,13 @@ Recorded Steps:
 $($script:joinedSteps)
 
 Clipped:
-$(Get-Content "$dir\clipboard.txt" -ea 'SilentlyContinue')
+$(Get-Content "$dir\clipboard.txt")
 
 Issue:
-$(Get-Content "$dir\issue.txt"  -ea 'SilentlyContinue')
+$(Get-Content "$dir\issue.txt")
 
 Resolution:
-$(Get-Content "$dir\resolution.txt"  -ea 'SilentlyContinue')
+$(Get-Content "$dir\resolution.txt")
 "@ | ConvertTo-Json
         $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
     }
