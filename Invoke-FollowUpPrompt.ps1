@@ -19,10 +19,12 @@ function GPTFollowUp {
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $ticket = $(Get-Content $dir\gpt_result.txt -Encoding utf8) | ConvertTo-Csv
+    $ticket = "Here is the ticket that needs correcting:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Csv
 
 
     $additionalInfo = @"
+Here is additional information regarding the ticket:
+
 Recorded Steps:
 $($script:joinedSteps)
 
@@ -54,22 +56,14 @@ $alterations.
             }
             Default {
                 if ($null -ne $response.choices.text) {
-                    $ticket = $($response.choices.text) | ConvertTo-Csv
-
-
-                    $additionalInfo = @"
-                Recorded Steps:
-                $($script:joinedSteps)
-                
-                MISC:
-                $(Get-Content "$dir\clipboard.txt")
-"@ | ConvertTo-Json
+                    $ticket = "Here is the ticket that needs correcting:`n`n$($response.choices.text)" | ConvertTo-Csv
                 
                     $rewriteInstructions = @"
-                Rewrite the ticket notes above, taking into account the following: 
-                
-                $alterations.
+Rewrite the ticket notes above, taking into account the following: 
+
+$alterations.
 "@ | ConvertTo-Json
+
                 }
                 $Headers = @{
                     "Content-Type"  = "application/json"
@@ -103,11 +97,11 @@ $alterations.
                         },
                         @{
                             "role"    = "user"
-                            "content" = "Here is the ticket that needs correcting: $ticket"
+                            "content" = "$ticket"
                         },
                         @{
                             "role"    = "user"
-                            "content" = "Here is additional information regarding the ticket: $additionalInfo"
+                            "content" = "$additionalInfo"
                         },
                         @{
                             "role"    = "user"
