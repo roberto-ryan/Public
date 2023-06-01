@@ -19,7 +19,7 @@ function GPTFollowUp {
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $ticket = "Here is the ticket that needs correcting:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Csv
+    $ticket = "Here is the ticket that needs correcting:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Json
 
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
