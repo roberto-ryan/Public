@@ -39,7 +39,7 @@ function GPTFollowUp {
             }
             Default {
                 if ($null -ne $response.choices.text) {
-                    $ticket = "Here is the ticket that needs correcting:`n`n$($response.choices.text)" | ConvertTo-Csv
+                    $ticket = "Here is the ticket that needs correcting:`n`n$($response.choices.text)" | ConvertTo-Json
                 
                     $rewriteInstructions = @"
 Rewrite the ticket notes above, taking into account the following: 
