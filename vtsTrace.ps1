@@ -225,7 +225,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the Clipped section to add more detail to the notes if possible."
+                    "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
                 },
                 @{
                     "role"    = "system"
