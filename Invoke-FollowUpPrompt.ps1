@@ -77,10 +77,6 @@ $alterations.
                             "content" = "$ticket"
                         },
                         @{
-                            "role"    = "user"
-                            "content" = "$rewriteInstructions"
-                        },
-                        @{
                             "role"    = "assistant"
                             "content" = ""
                         })
