@@ -285,7 +285,7 @@ $(Get-Content "$dir\resolution.txt")
         #Clear-Host
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
-        Write-Host "Tokens Used: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens)" -ForegroundColor Gray
+        Write-Host "`nTokens Used: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
 
     function Cleanup {
