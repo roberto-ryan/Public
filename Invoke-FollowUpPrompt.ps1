@@ -80,14 +80,12 @@ $alterations.
 
         switch ($alterations) {
             s {
-                Write-Host "\\\\\\\\\\\ STEPS" -ForegroundColor Green
+                Write-Host "\\\\\\\\ STEPS >" -ForegroundColor Green
                 Get-Content $dir\cleaned_steps.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             c {
-                Write-Host "\\\\\\\\\\\ CLIPBOARD" -ForegroundColor Green
+                Write-Host "\\\\\\\\ CLIPBOARD >" -ForegroundColor Green
                 Get-Content $dir\clipboard.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
             }
             $null {
 
