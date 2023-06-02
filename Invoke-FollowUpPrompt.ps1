@@ -37,8 +37,15 @@ function GPTFollowUp {
 
             }
             Default {
-                $ticket = @"
-$(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
+                if ($null -ne $script:response.choices.message.content) {
+                    $ticket = $script:response.choices.message.content
+                }
+                else {
+                    $ticket = $(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
+                }
+
+                $prompt = @"
+$ticket
                 
 Rewrite the ticket notes above taking into account the following new information: 
 
@@ -65,7 +72,7 @@ $alterations.
                         },
                         @{
                             "role"    = "user"
-                            "content" = "$ticket"
+                            "content" = "$prompt"
                         },
                         @{
                             "role"    = "assistant"
@@ -86,6 +93,7 @@ $alterations.
                     Write-Error "$($_.Exception.Message)"
                 }
                 "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
+                Start-sleep -Milliseconds 250
                 WriteResultsToHost
             }
         }
