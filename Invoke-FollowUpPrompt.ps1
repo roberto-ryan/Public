@@ -47,7 +47,7 @@ function GPTFollowUp {
                 $prompt = @"
 $ticket
                 
-Rewrite the ticket notes above taking into account the following new information: 
+Adjust the ticket notes above taking into account the following: 
 
 $alterations.
 "@ | ConvertTo-Json
@@ -68,7 +68,7 @@ $alterations.
                         },
                         @{
                             "role"    = "system"
-                            "content" = "Keep the ticket notes unchanged except for changes that are requested by the user."
+                            "content" = "Only add or subtract from the ticket notes based on the information provided by the user."
                         },
                         @{
                             "role"    = "user"

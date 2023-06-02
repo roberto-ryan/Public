@@ -233,7 +233,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "The Troubleshooting Methods section is for steps performed by (you) the technician only."
+                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only."
                 },
                 @{
                     "role"    = "user"
