@@ -43,7 +43,7 @@ $(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
 Rewrite the ticket notes above taking into account the following new information: 
 
 $alterations.
-"@ | ConvertTo-Json
+"@ #| ConvertTo-Json
 
                 $Headers = @{
                     "Content-Type"  = "application/json"
