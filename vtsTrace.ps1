@@ -54,7 +54,7 @@ function Trace-vtsSession {
         Write-Host "This tool? It's an assistant, not your magical unicorn."
         Write-Host "It helps jot down ticket notes, but isn't blessed with divine perfection."
         Write-Host "Found an error in the notes? Congrats, you've got a job - to correct it."
-        Write-Host "Usage of this tool implies you're savvy enough to understand this pact."
+        Write-Host "Usage of this tool confirms you agree to this pact."
 
         Write-Host "`nFor optimal results, run this tool on the computer where the work is being performed."
         Write-Host "`nEnter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
