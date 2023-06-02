@@ -19,7 +19,6 @@ function GPTFollowUp {
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $ticket = "Please update these ticket notes taking into account the following:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Json
 
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
@@ -40,8 +39,6 @@ function GPTFollowUp {
             Default {
                 if ($null -ne $response.choices.text) {
                     $ticket = @"
-Here is the ticket that needs correcting:
-
 $($response.choices.text)
                 
 Rewrite the ticket notes above, taking into account the following: 
@@ -49,6 +46,8 @@ Rewrite the ticket notes above, taking into account the following:
 $alterations.
 "@ | ConvertTo-Json
 
+                } else {
+                    $ticket = "$(Get-Content $dir\gpt_result.txt -Encoding utf8)`n`nPlease update the ticket notes above taking into account the following:`n`n$alterations" | ConvertTo-Json
                 }
                 $Headers = @{
                     "Content-Type"  = "application/json"
