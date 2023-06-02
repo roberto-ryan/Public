@@ -37,17 +37,17 @@ function GPTFollowUp {
 
             }
             Default {
-                if ($null -ne $response.choices.message.content) {
-                    $ticket = @"
-$($response.choices.message.content)
+#                 if ($null -ne $response.choices.message.content) {
+#                     $ticket = @"
+# $($response.choices.message.content)
                 
-Update the ticket notes above, taking into account the following: 
+# Update the ticket notes above, taking into account the following: 
 
-$alterations.
-"@ | ConvertTo-Json
+# $alterations.
+# "@ | ConvertTo-Json
 
-                }
-                else {
+#                 }
+#                 else {
                     $ticket = @"
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
                 
@@ -55,7 +55,7 @@ Update the ticket notes above, taking into account the following:
 
 $alterations.
 "@ | ConvertTo-Json
-                }
+                # }
                 $Headers = @{
                     "Content-Type"  = "application/json"
                     "Authorization" = "Bearer $OpenAIKey"
