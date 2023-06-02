@@ -50,7 +50,13 @@ function Trace-vtsSession {
 '@
         Clear-Host
         Write-Host $title -ForegroundColor DarkGreen
-        Write-Host "Oh look, another tech genius expecting AI to do all the work.`nThis tool? It's an assistant, not your magical unicorn.`nIt helps jot down ticket notes, but isn't blessed with divine perfection.`nFound an error in the notes? Congrats, you've got a job - to correct it.`nUsage of this tool implies you're savvy enough to understand this pact."
+        Write-Host "Oh look, another tech genius expecting AI to do all the work."
+        Write-Host "This tool? It's an assistant, not your magical unicorn."
+        Write-Host "It helps jot down ticket notes, but isn't blessed with divine perfection."
+        Write-Host "Found an error in the notes? Congrats, you've got a job - to correct it."
+        Write-Host "Usage of this tool implies you're savvy enough to understand this pact."
+
+        Write-Host "`nFor optimal results, run this tool on the computer where the work is being performed."
         Write-Host "`nEnter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
     }
     
@@ -307,7 +313,7 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        $issue = Read-Host "Summarize the issue and steps performed by the user."
+        $issue = Read-Host "Enter Ticket Description"
 
         if ($issue -ne 'r' -and $issue -ne 'resume') {
             CreateWorkingDirectory
@@ -332,7 +338,7 @@ $(Get-Content "$dir\resolution.txt")
     finally {
         StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $resolution = Read-Host "Session Conclusion"
+        $resolution = Read-Host "Enter Session Conclusion"
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
