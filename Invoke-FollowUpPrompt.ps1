@@ -46,8 +46,15 @@ Rewrite the ticket notes above, taking into account the following:
 $alterations.
 "@ | ConvertTo-Json
 
-                } else {
-                    $ticket = "$(Get-Content $dir\gpt_result.txt -Encoding utf8)`n`nPlease update the ticket notes above taking into account the following:`n`n$alterations" | ConvertTo-Json
+                }
+                else {
+                    $ticket = @"
+$(Get-Content $dir\gpt_result.txt -Encoding utf8)
+                
+Rewrite the ticket notes above, taking into account the following: 
+
+$alterations.
+"@ | ConvertTo-Json
                 }
                 $Headers = @{
                     "Content-Type"  = "application/json"
