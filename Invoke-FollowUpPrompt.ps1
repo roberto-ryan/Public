@@ -8,15 +8,15 @@ function GPTFollowUp {
 
     $ErrorActionPreference = 'Continue'
 
-    $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
+    $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
         Sort-Object Name |
         Select-Object -ExpandProperty FullName -last 1)
         
     function WriteResultsToHost {
         Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" -ForegroundColor Green
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
-        Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
+        (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+        Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
 
@@ -27,18 +27,18 @@ function GPTFollowUp {
         switch ($alterations) {
             s {
                 Write-Host "\\\\\\\\ STEPS >" -ForegroundColor Green
-                Get-Content $dir\cleaned_steps.txt 
+                Get-Content $script:dir\cleaned_steps.txt 
             }
             c {
                 Write-Host "\\\\\\\\ CLIPBOARD >" -ForegroundColor Green
-                Get-Content $dir\clipboard.txt 
+                Get-Content $script:dir\clipboard.txt 
             }
             $null {
 
             }
             Default {
                     $ticket = @"
-$(Get-Content $dir\gpt_result.txt -Encoding utf8)
+$(Get-Content $script:dir\gpt_result.txt -Encoding utf8)
                 
 Update the ticket notes above, taking into account the following: 
 
@@ -85,7 +85,7 @@ $alterations.
                 catch {
                     Write-Error "$($_.Exception.Message)"
                 }
-                "$($response.choices.message.content)" | Out-File "$dir\gpt_result.txt" -Force -Encoding utf8
+                "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
                 WriteResultsToHost
             }
         }
