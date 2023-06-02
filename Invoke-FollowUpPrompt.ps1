@@ -40,7 +40,7 @@ function GPTFollowUp {
                     $ticket = @"
 $(Get-Content $script:dir\gpt_result.txt -Encoding utf8)
                 
-Update the ticket notes above, taking into account the following: 
+Rewrite the ticket notes above taking into account the following new information: 
 
 $alterations.
 "@ | ConvertTo-Json
