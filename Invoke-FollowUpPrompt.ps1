@@ -22,7 +22,7 @@ function GPTFollowUp {
 
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
-        $alterations = Read-Host "GPT3.5>>>"
+        $alterations = Read-Host "GPT-3.5-Turbo>>>"
 
         switch ($alterations) {
             s {
@@ -37,11 +37,11 @@ function GPTFollowUp {
 
             }
             Default {
-                if ($null -ne $response.choices.text) {
+                if ($null -ne $response.choices.message.content) {
                     $ticket = @"
-$($response.choices.text)
+$($response.choices.message.content)
                 
-Rewrite the ticket notes above, taking into account the following: 
+Update the ticket notes above, taking into account the following: 
 
 $alterations.
 "@ | ConvertTo-Json
@@ -51,7 +51,7 @@ $alterations.
                     $ticket = @"
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
                 
-Rewrite the ticket notes above, taking into account the following: 
+Update the ticket notes above, taking into account the following: 
 
 $alterations.
 "@ | ConvertTo-Json
