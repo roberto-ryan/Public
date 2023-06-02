@@ -37,17 +37,6 @@ function GPTFollowUp {
 
             }
             Default {
-#                 if ($null -ne $response.choices.message.content) {
-#                     $ticket = @"
-# $($response.choices.message.content)
-                
-# Update the ticket notes above, taking into account the following: 
-
-# $alterations.
-# "@ | ConvertTo-Json
-
-#                 }
-#                 else {
                     $ticket = @"
 $(Get-Content $dir\gpt_result.txt -Encoding utf8)
                 
