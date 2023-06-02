@@ -83,6 +83,10 @@ $alterations.
                             "content" = "The Message to End User email is intended for the end user. All other sections are internal notes for technician review only."
                         },
                         @{
+                            "role"    = "system"
+                            "content" = "Format your response properly. Do not return messages in JSON format."
+                        },
+                        @{
                             "role"    = "user"
                             "content" = "$prompt"
                         },
