@@ -11,6 +11,14 @@ function GPTFollowUp {
     $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
         Sort-Object Name |
         Select-Object -ExpandProperty FullName -last 1)
+     
+    function EnsureUserIsNotSystem {
+        $identity = whoami.exe
+        if ($identity -eq "nt authority\system") {
+            Write-Host "This script needs to be run as the logged-in user, not as SYSTEM." -ForegroundColor Red
+            break
+        }
+    }
         
     function WriteResultsToHost {
         Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" -ForegroundColor Green
@@ -19,6 +27,7 @@ function GPTFollowUp {
         Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
+    EnsureUserIsNotSystem
 
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
