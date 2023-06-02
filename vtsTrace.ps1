@@ -50,8 +50,8 @@ function Trace-vtsSession {
 '@
         Clear-Host
         Write-Host $title -ForegroundColor DarkGreen
-        Write-Host "Oh look, another tech genius expecting AI to do all the work. This tool? It's an assistant, not your magical unicorn. It helps jot down ticket notes, but isn't blessed with divine perfection. Found an error in the notes? Congrats, you've got a job - to correct it. Usage of this tool implies you're savvy enough to understand this pact."
-        Write-Host "Enter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
+        Write-Host "Oh look, another tech genius expecting AI to do all the work. This tool? It's an assistant, not your magical unicorn.`nIt helps jot down ticket notes, but isn't blessed with divine perfection. Found an error in the notes? Congrats, you've got a job - to correct it. Usage of this tool implies you're savvy enough to understand this pact."
+        Write-Host "`nEnter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
     }
     
     function DisplayRecordingBanner {
