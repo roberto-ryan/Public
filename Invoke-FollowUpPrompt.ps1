@@ -20,11 +20,11 @@ function GPTFollowUp {
     }
         
     function WriteResultsToHost {
-        Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" -ForegroundColor Green
+        Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ BEGIN >>" -ForegroundColor Green
         (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
         (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
-        Write-Host "///////////////////////////////////////////////////////////////" -ForegroundColor Red
+        Write-Host "/////////////////////////////////////////////////////////////// END >>" -ForegroundColor Red
     }
     
     EnsureUserIsNotSystem
