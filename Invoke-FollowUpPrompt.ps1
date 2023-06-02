@@ -71,6 +71,10 @@ $alterations.
                             "content" = "Only add or subtract from the ticket notes based on the information provided by the user."
                         },
                         @{
+                            "role"    = "system"
+                            "content" = "The Message to End User email is intended for the end user. All other sections are internal notes for technician review only."
+                        },
+                        @{
                             "role"    = "user"
                             "content" = "$prompt"
                         },
