@@ -229,7 +229,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description."
+                    "content" = "Don't fill out the Customer Actions Taken section."
                 },
                 @{
                     "role"    = "system"
