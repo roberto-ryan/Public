@@ -50,11 +50,11 @@ function Trace-vtsSession {
 '@
         Clear-Host
         Write-Host $title -ForegroundColor DarkGreen
-        Write-Host "Oh look, another tech genius expecting AI to do all the work."
+        Write-Host "`"Oh look, another tech genius expecting AI to do all the work."
         Write-Host "This tool? It's an assistant, not your magical unicorn."
         Write-Host "It helps jot down ticket notes, but isn't blessed with divine perfection."
         Write-Host "Found an error in the notes? Congrats, you've got a job - to correct it."
-        Write-Host "Usage of this tool confirms you agree to this pact."
+        Write-Host "Usage of this tool confirms you agree to this pact.`" -ChatGPT"
 
         Write-Host "`nFor optimal results, run this tool on the computer where the work is being performed."
         Write-Host "`nEnter 'r' to resume last session.`n" -ForegroundColor Yellow
