@@ -15,7 +15,6 @@ function GPTFollowUp {
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
         if ($identity -eq "nt authority\system") {
-            Write-Host "This script needs to be run as the logged-in user, not as SYSTEM." -ForegroundColor Red
             break
         }
     }
