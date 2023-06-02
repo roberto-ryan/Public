@@ -43,7 +43,7 @@ $(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
 Rewrite the ticket notes above taking into account the following new information: 
 
 $alterations.
-"@ #| ConvertTo-Json
+"@ | ConvertTo-Json
 
                 $Headers = @{
                     "Content-Type"  = "application/json"
@@ -53,7 +53,7 @@ $alterations.
                     "model"             = "gpt-3.5-turbo"
                     "messages"          = @( @{
                             "role"    = "system"
-                            "content" = "You are a helpful assistant that is very thorough and accurate."
+                            "content" = "You are a helpful assistant that rewrites IT Support ticket notes using updated information."
                         },
                         @{
                             "role"    = "system"
@@ -61,7 +61,7 @@ $alterations.
                         },
                         @{
                             "role"    = "system"
-                            "content" = "Keep the ticket notes unchanged except for the changes that are specifically requested."
+                            "content" = "Keep the ticket notes unchanged except for changes that are requested by the user."
                         },
                         @{
                             "role"    = "user"
@@ -85,7 +85,7 @@ $alterations.
                 catch {
                     Write-Error "$($_.Exception.Message)"
                 }
-                "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
+                "$($script:response.choices.message.content)" | ConvertFrom-Json | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
                 WriteResultsToHost
             }
         }
