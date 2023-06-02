@@ -13,7 +13,7 @@ function GPTFollowUp {
         Select-Object -ExpandProperty FullName -last 1)
         
     function WriteResultsToHost {
-        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+        Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" -ForegroundColor Green
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
