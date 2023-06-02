@@ -20,7 +20,7 @@ function Trace-vtsSession {
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
         if ($identity -eq "nt authority\system") {
-            Write-Host "This script needs to be run as the logged-in user, not as SYSTEM." -ForegroundColor Red
+            Write-Host "`n`nThis script needs to be run as the logged-in user, not as SYSTEM.`n`n" -ForegroundColor Red
             break
         }
     }
@@ -121,7 +121,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -187,103 +187,12 @@ function Trace-vtsSession {
 
     function GeneratePrompt {
         $script:prompt = @"
-Example1 = (
-Issue Reported: Screen flickering
+Create ticket notes based on the following information:
 
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Checked for Windows Updates.
-- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and downloaded the driver.
-- Updated the graphics driver, resolving the issue.
-
-Resolution: Updating the graphics driver resolved the issue.
-
-Additional Comments: None
-
-
-Message to End User: 
-
-[User Name],
-
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-
-Respectfully,
-[Technician Name]
-)
-
-Example2 = (
-Issue Reported: Scanner not working
-
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.
-- Determined the scanner was not being recognized by the computer.
-- Had the user unplug the scanner from the computer and plug it back in.
-- Reinstalled the scanner driver and rebooted.
-
-Resolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.
-
-Additional Comments: None
-
-Message to End User: 
-
-[User Name],
-
-We have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.
-
-Respectfully,
-[Technician Name]
-)
-
-Example3 = (
-Issue Reported: Slow internet connection
-
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Opened Command Prompt and enterted 'ipconfig /flushdns' to flush the DNS cache.
-- Closed Command Prompt and opened the Start menu, navigating to Settings, chose Network & Internet, and clicked on Change Adapter Options.
-- Right-clicked on the active network connection and selected Properties.
-- Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.
-- Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.
-- Tested internet connectivity, confirming that the issue was resolved.
-
-Resolution: Flushing the DNS cache and changing DNS servers resolved the issue.
-
-Additional Comments: None
-
-Message to End User:
-
-[User Name],
-
-We have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.
-
-Respectfully,
-[Technician Name]
-)
-
-Act as IT Technician. Using the following #INPUT, intrepret what the tech was trying to do while speaking in first person to fill out the #Form: sections. `
-Use the examples above as an example when filling out the #Form:. `
-MISC contains copied strings that are useful for providing more detail for filling out the #Form. `
-Be as concise as possible when filling out the Troubleshooting Methods. `
-Use the single-quoted strings in the Recorded Steps section to include information such as printer names, website name, program names, version numbers etc. `
-If RecorderSteps section is blank, use only the Issue Description and Issue Resolution fields to complete the #Form:. `
-Make sure to complete each section of #Form:. `
-Don't fill out the Customer Actions Taken section unless explicity told what the customer tried in the Issue Description. `
-Don't include that the Problem Steps Recorder was used. `
-Don't include anything related to DesktopWindowXaml. `
-Don't include the word AI.
-
-#INPUT = (
 Recorded Steps:
 $($script:joinedSteps)
 
-MISC:
+Clipped:
 $(Get-Content "$dir\clipboard.txt")
 
 Issue:
@@ -291,43 +200,82 @@ $(Get-Content "$dir\issue.txt")
 
 Resolution:
 $(Get-Content "$dir\resolution.txt")
-)
-
-#Form:
-Reported Issue:
-Customer Actions Taken:
-Troubleshooting Methods:
-Resolution:
-Comments & Misc. info:
-Message to End User:
-
-`"`"`"
-"@
+"@ | ConvertTo-Json
         $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
     }
 
     function APICall {
-        $body = @{
-            'prompt'            = $prompt;
-            'temperature'       = 0;
-            'max_tokens'        = 500;
-            'top_p'             = 1.0;
-            'frequency_penalty' = 0.0;
-            'presence_penalty'  = 0.0;
-            'stop'              = @('"""');
+        $Headers = @{
+            "Content-Type"  = "application/json"
+            "Authorization" = "Bearer $OpenAIKey"
         }
-         
-        $JsonBody = $body | ConvertTo-Json -Compress
-        $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
-             
-        $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
+        $Body = @{
+            "model"             = "gpt-3.5-turbo"
+            "messages"          = @( @{
+                    "role"    = "system"
+                    "content" = "You are a helpful IT technician that creates comprehensive ticket notes for IT support issues."
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc., in the Troubleshooting Methods section."
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "Don't fill out the Customer Actions Taken section."
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only."
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Here's an example of the output I want:\n\nIssue Reported: Screen flickering\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Checked for Windows Updates.\n- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.\n- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.\n- Searched for 'gtx 1050 drivers' and clicked on the first result.\n- Clicked on the Official Drivers link and downloaded the driver.\n- Updated the graphics driver, resolving the issue.\n\nResolution: Updating the graphics driver resolved the issue.\n\nAdditional Comments: None\n\n\nMessage to End User: \n\n[User Name],\n\nWe have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.\n\nRespectfully,\n[Technician Name]"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Scanner not working\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.\n- Determined the scanner was not being recognized by the computer.\n- Had the user unplug the scanner from the computer and plug it back in.\n- Reinstalled the scanner driver and rebooted.\n\nResolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.\n\nAdditional Comments: None\n\nMessage to End User: \n\n[User Name],\n\nWe have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.\n\nRespectfully,\n[Technician Name]"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Slow internet connection\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Opened Command Prompt and enterted 'ipconfig /flushdns' to flush the DNS cache.\n- Closed Command Prompt and opened the Start menu, navigating to Settings, chose Network & Internet, and clicked on Change Adapter Options.\n- Right-clicked on the active network connection and selected Properties.\n- Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.\n- Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.\n- Tested internet connectivity, confirming that the issue was resolved.\n\nResolution: Flushing the DNS cache and changing DNS servers resolved the issue.\n\nAdditional Comments: None\n\nMessage to End User:\n\n[User Name],\n\nWe have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.\n\nRespectfully,\n[Technician Name]"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "$script:prompt"
+                },
+                @{
+                    "role"    = "assistant"
+                    "content" = ""
+                })
+            "temperature"       = 0
+            'top_p'             = 1.0
+            'frequency_penalty' = 0.0
+            'presence_penalty'  = 0.0
+            'stop'              = @('"""')
+        } | ConvertTo-Json
+        
+        try {
+            
+            $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+        }
+        catch {
+            Write-Error "$($_.Exception.Message)"
+        }
     }
 
     function WriteResultsToFile {
         "Session Time: $SessionTime`n" | Out-File "$dir\result_header.txt" -Force -Encoding utf8
         "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
         "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($response.choices.text)" | Out-File "$dir\gpt_result.txt" -Force
+        "$($script:response.choices.message.content)" | Out-File "$dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
@@ -336,6 +284,7 @@ Message to End User:
         #Clear-Host
         (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
         (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+        Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
 
     function Cleanup {
@@ -345,7 +294,7 @@ Message to End User:
     }
 
     function GetClipboard {
-        if (" " -ne $(Get-Clipboard)){($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null}
+        if (" " -ne $(Get-Clipboard)) { ($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null }
     }
     
     EnsureUserIsNotSystem
