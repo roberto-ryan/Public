@@ -19,7 +19,7 @@ function GPTFollowUp {
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $ticket = "Here is the ticket that needs correcting:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Json
+    $ticket = "Please update these ticket notes taking into account the following:`n`n$(Get-Content $dir\gpt_result.txt -Encoding utf8)" | ConvertTo-Json
 
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
@@ -58,7 +58,7 @@ $alterations.
                     "model"             = "gpt-3.5-turbo"
                     "messages"          = @( @{
                             "role"    = "system"
-                            "content" = "You are a helpful IT technician that corrects ticket notes for IT support issues."
+                            "content" = "You are a helpful assistant that is very thorough and accurate."
                         },
                         @{
                             "role"    = "system"
@@ -67,10 +67,6 @@ $alterations.
                         @{
                             "role"    = "system"
                             "content" = "Keep the ticket notes unchanged except for the changes that are specifically requested."
-                        },
-                        @{
-                            "role"    = "system"
-                            "content" = "The Troubleshooting Methods section is for steps performed by (you) the technician only."
                         },
                         @{
                             "role"    = "user"
