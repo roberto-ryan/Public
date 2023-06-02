@@ -121,7 +121,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' -replace 'User ','' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
