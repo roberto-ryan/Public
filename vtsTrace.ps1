@@ -20,7 +20,7 @@ function Trace-vtsSession {
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
         if ($identity -eq "nt authority\system") {
-            Write-Host "This script needs to be run as the logged-in user, not as SYSTEM." -ForegroundColor Red
+            Write-Host "`n`nThis script needs to be run as the logged-in user, not as SYSTEM.`n`n" -ForegroundColor Red
             break
         }
     }
