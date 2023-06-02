@@ -85,7 +85,7 @@ $alterations.
                 catch {
                     Write-Error "$($_.Exception.Message)"
                 }
-                "$($script:response.choices.message.content)" | ConvertFrom-Json | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
+                "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
                 WriteResultsToHost
             }
         }
