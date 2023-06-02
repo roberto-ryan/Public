@@ -57,7 +57,7 @@ function Trace-vtsSession {
         Write-Host "Usage of this tool confirms you agree to this pact."
 
         Write-Host "`nFor optimal results, run this tool on the computer where the work is being performed."
-        Write-Host "`nEnter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
+        Write-Host "`nEnter 'r' to resume last session.`n" -ForegroundColor Yellow
     }
     
     function DisplayRecordingBanner {
@@ -315,7 +315,7 @@ $(Get-Content "$dir\resolution.txt")
         DisplayLogo
         $issue = Read-Host "Enter Ticket Description"
 
-        if ($issue -ne 'r' -and $issue -ne 'resume') {
+        if ($issue -ne 'r') {
             CreateWorkingDirectory
             $issue | Out-File -FilePath "$dir\issue.txt" -Force -Encoding utf8
         }
