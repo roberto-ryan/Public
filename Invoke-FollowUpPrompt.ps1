@@ -6,166 +6,110 @@ function GPTFollowUp {
         $OpenAIKey
     )
 
-    $ErrorActionPreference = 'SilentlyContinue'
+    $ErrorActionPreference = 'Continue'
 
-    $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
+    $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
         Sort-Object Name |
         Select-Object -ExpandProperty FullName -last 1)
+     
+    function EnsureUserIsNotSystem {
+        $identity = whoami.exe
+        if ($identity -eq "nt authority\system") {
+            break
+        }
+    }
         
     function WriteResultsToHost {
-        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
-        Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+        Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" -ForegroundColor Green
+        (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+        Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
     
-    $prompt = @"
-Example1 = (
-Issue Reported: Screen flickering
+    EnsureUserIsNotSystem
 
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Checked for Windows Updates.
-- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and downloaded the driver.
-- Updated the graphics driver, resolving the issue.
-
-Resolution: Updating the graphics driver resolved the issue.
-
-Additional Comments: None
-
-
-Message to End User: 
-
-[User Name],
-
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-
-Respectfully,
-[Technician Name]
-)
-
-Always mainting the formatting of the example above.
-
-Ticket Notes:
-$(Get-Content $dir\gpt_result.txt -Encoding utf8)
-
-
-#INPUT = (
-Recorded Steps:
-$($script:joinedSteps)
-
-MISC:
-$(Get-Content "$dir\clipboard.txt")
-
-Issue:
-$(Get-Content "$dir\issue.txt")
-
-Resolution:
-$(Get-Content "$dir\resolution.txt")
-)
-
-Rewrite the Ticket Notes, taking into account the following: 
-
-$alterations.
-
-`"`"`"
-"@
     While ($true) {
         Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
-        $alterations = Read-Host "GPT3.5>>>"
+        $alterations = Read-Host "GPT-3.5-Turbo>>>"
 
         switch ($alterations) {
             s {
-                Write-Host "\\\\\\\\\\\ STEPS" -ForegroundColor Green
-                Get-Content $dir\cleaned_steps.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+                Write-Host "\\\\\\\\ STEPS >" -ForegroundColor Green
+                Get-Content $script:dir\cleaned_steps.txt 
             }
             c {
-                Write-Host "\\\\\\\\\\\ CLIPBOARD" -ForegroundColor Green
-                Get-Content $dir\clipboard.txt 
-                Write-Host "\\\\\\\\\\\" -ForegroundColor Green
+                Write-Host "\\\\\\\\ CLIPBOARD >" -ForegroundColor Green
+                Get-Content $script:dir\clipboard.txt 
             }
             $null {
 
             }
             Default {
-                if ($null -ne $response.choices.text) {
-                    $prompt = @"
-Example1 = (
-Issue Reported: Screen flickering
+                if ($null -ne $script:response.choices.message.content) {
+                    $ticket = $script:response.choices.message.content
+                }
+                else {
+                    $ticket = $(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
+                }
 
-Customer Actions Taken: None
-
-Troubleshooting Methods:
-- Checked for Windows Updates.
-- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.
-- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.
-- Searched for 'gtx 1050 drivers' and clicked on the first result.
-- Clicked on the Official Drivers link and downloaded the driver.
-- Updated the graphics driver, resolving the issue.
-
-Resolution: Updating the graphics driver resolved the issue.
-
-Additional Comments: None
-
-
-Message to End User: 
-
-[User Name],
-
-We have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.
-
-Respectfully,
-[Technician Name]
-)
-
-Always mainting the formatting of the example above.
-
-Ticket = (
-$($response.choices.text)
-)
-
-
-#INPUT = (
-Recorded Steps:
-$($script:joinedSteps)
-
-MISC:
-$(Get-Content "$dir\clipboard.txt")
-
-Issue:
-$(Get-Content "$dir\issue.txt")
-
-Resolution:
-$(Get-Content "$dir\resolution.txt")
-)
-
-Rewrite the Ticket, taking into account the following: 
+                $prompt = @"
+$ticket
+                
+Adjust the ticket notes above taking into account the following: 
 
 $alterations.
+"@ | ConvertTo-Json
 
-`"`"`"
-"@
+                $Headers = @{
+                    "Content-Type"  = "application/json"
+                    "Authorization" = "Bearer $OpenAIKey"
                 }
-                $body = @{
-                    'prompt'            = $prompt;
-                    'temperature'       = 0;
-                    'max_tokens'        = 500;
-                    'top_p'             = 1.0;
-                    'frequency_penalty' = 0.0;
-                    'presence_penalty'  = 0.0;
-                    'stop'              = @('"""');
-                }
+                $Body = @{
+                    "model"             = "gpt-3.5-turbo"
+                    "messages"          = @( @{
+                            "role"    = "system"
+                            "content" = "You are a helpful assistant that rewrites IT Support ticket notes using updated information."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "Only add or subtract from the ticket notes based on the information provided by the user."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "The Message to End User email is intended for the end user. All other sections are internal notes for technician review only."
+                        },
+                        @{
+                            "role"    = "system"
+                            "content" = "Format your response properly. Do not return messages in JSON format."
+                        },
+                        @{
+                            "role"    = "user"
+                            "content" = "$prompt"
+                        },
+                        @{
+                            "role"    = "assistant"
+                            "content" = ""
+                        })
+                    "temperature"       = 0
+                    'top_p'             = 1.0
+                    'frequency_penalty' = 0.0
+                    'presence_penalty'  = 0.0
+                    'stop'              = @('"""')
+                } | ConvertTo-Json
                 
-                $JsonBody = $body | ConvertTo-Json -Compress
-                $EncodedJsonBody = [System.Text.Encoding]::UTF8.GetBytes($JsonBody)
-        
-                $response = Invoke-RestMethod -Uri "https://api.openai.com/v1/engines/text-davinci-003/completions" -Method Post -Body $EncodedJsonBody -Headers @{ Authorization = "Bearer $OpenAIKey" } -ContentType "application/json; charset=utf-8"
-                "$($response.choices.text)" | Out-File "$dir\gpt_result2.txt" -Force -Encoding utf8
+                try {
+                    
+                    $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+                }
+                catch {
+                    Write-Error "$($_.Exception.Message)"
+                }
+                "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
+                Start-sleep -Milliseconds 250
                 WriteResultsToHost
             }
         }
