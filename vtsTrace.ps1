@@ -49,8 +49,15 @@ function Trace-vtsSession {
                                                         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠋⠉⠛⠙⠛⠛⠛⠛⠋⠋⠑⠉⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠻
 '@
         Clear-Host
-        Write-Host $title -ForegroundColor DarkGreen 
-        Write-Host "Enter 'r' or 'resume' to continue last session.`n" -ForegroundColor Yellow
+        Write-Host $title -ForegroundColor DarkGreen
+        Write-Host "`"Oh look, another tech genius expecting AI to do all the work."
+        Write-Host "This tool? It's an assistant, not your magical unicorn."
+        Write-Host "It helps jot down ticket notes, but isn't blessed with divine perfection."
+        Write-Host "It is your responsibility to ensure your notes are accurate and thorough."
+        Write-Host "Usage of this tool confirms you agree to this pact.`" -ChatGPT"
+
+        Write-Host "`nFor optimal results, run this tool on the computer where the work is being performed."
+        Write-Host "`nEnter 'r' to resume last session.`n" -ForegroundColor Yellow
     }
     
     function DisplayRecordingBanner {
@@ -121,7 +128,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' -replace 'User ','Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -217,35 +224,39 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text here>\n\nCustomer Actions Taken:<text here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<text here>\n\nComments & Misc. info:<text here>\n\nMessage to End User:\n<email to end user here>"
+                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text describing issue>\n\nCustomer Actions Taken:<customer actions here>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<resolution here>\n\nComments & Misc. info:<miscellaneous info here>\n\nMessage to End User:\n<email to end user here>"
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc., in the Troubleshooting Methods section."
+                    "content" = "Use the data in the Recorded Steps and clipped sections to include printer names, website names, program names, software version numbers, etc."
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
+                    "content" = "Skip Recorded Steps that are duplicated or not relevant to the issue."
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Don't fill out the Customer Actions Taken section."
+                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only. The Troubleshooting Methods section is concise as possible, while still including information such as website names, software names and printer names."
                 },
                 @{
                     "role"    = "system"
-                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only."
+                    "content" = "Always start the email with 'Hi <name>' and sign off with 'Respectfully,'"
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "If Recorded Steps and Clipped sections are blank, use only the Issue Description and Issue Resolution fields to complete the Troubleshooting Methods section."
                 },
                 @{
                     "role"    = "user"
-                    "content" = "Here's an example of the output I want:\n\nIssue Reported: Screen flickering\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Checked for Windows Updates.\n- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.\n- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.\n- Searched for 'gtx 1050 drivers' and clicked on the first result.\n- Clicked on the Official Drivers link and downloaded the driver.\n- Updated the graphics driver, resolving the issue.\n\nResolution: Updating the graphics driver resolved the issue.\n\nAdditional Comments: None\n\n\nMessage to End User: \n\n[User Name],\n\nWe have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.\n\nRespectfully,\n[Technician Name]"
+                    "content" = "Here's an example of the output I want:\n\nIssue Reported: Screen flickering\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Checked for Windows Updates.\n- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.\n- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.\n- Searched for 'gtx 1050 drivers' and clicked on the first result.\n- Clicked on the Official Drivers link and downloaded the driver.\n- Updated the graphics driver, resolving the issue.\n\nResolution: Updating the graphics driver resolved the issue.\n\nAdditional Comments: None\n\n\nMessage to End User: \n\n[User Name],\n\nWe have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.\n\nRespectfully,"
                 },
                 @{
                     "role"    = "user"
-                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Scanner not working\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.\n- Determined the scanner was not being recognized by the computer.\n- Had the user unplug the scanner from the computer and plug it back in.\n- Reinstalled the scanner driver and rebooted.\n\nResolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.\n\nAdditional Comments: None\n\nMessage to End User: \n\n[User Name],\n\nWe have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.\n\nRespectfully,\n[Technician Name]"
+                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Scanner not working\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Accessed the 'Printers and Scanners' Settings menu, located the scanner in the list of devices and right-clicked on it, selecting Properties.\n- Determined the scanner was not being recognized by the computer.\n- Had the user unplug the scanner from the computer and plug it back in.\n- Reinstalled the scanner driver and rebooted.\n\nResolution: Unfortunately, the issue remains unresolved, as the computer is unable to recognize the scanner. This ticket will now be transferred to the onsite support queue for further assistance.\n\nAdditional Comments: None\n\nMessage to End User: \n\n[User Name],\n\nWe have been unable to resolve the issue with your scanner, as the computer is not recognizing the device. To further investigate and address this problem, we will require an onsite technician to visit your location. Should you have any questions or concerns, please feel free to reach out.\n\nRespectfully,"
                 },
                 @{
                     "role"    = "user"
-                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Slow internet connection\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Opened Command Prompt and enterted 'ipconfig /flushdns' to flush the DNS cache.\n- Closed Command Prompt and opened the Start menu, navigating to Settings, chose Network & Internet, and clicked on Change Adapter Options.\n- Right-clicked on the active network connection and selected Properties.\n- Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.\n- Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.\n- Tested internet connectivity, confirming that the issue was resolved.\n\nResolution: Flushing the DNS cache and changing DNS servers resolved the issue.\n\nAdditional Comments: None\n\nMessage to End User:\n\n[User Name],\n\nWe have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.\n\nRespectfully,\n[Technician Name]"
+                    "content" = "Here's another example of the output I want:\n\nIssue Reported: Slow internet connection\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Opened Command Prompt and enterted 'ipconfig /flushdns' to flush the DNS cache.\n- Closed Command Prompt and opened the Start menu, navigating to Settings, chose Network & Internet, and clicked on Change Adapter Options.\n- Right-clicked on the active network connection and selected Properties.\n- Clicked on Internet Protocol Version 4 (TCP/IPv4) and selected Properties.\n- Changed the Preferred DNS server to 8.8.8.8 (Google DNS) and the Alternate DNS server to 8.8.4.4, then clicked OK.\n- Tested internet connectivity, confirming that the issue was resolved.\n\nResolution: Flushing the DNS cache and changing DNS servers resolved the issue.\n\nAdditional Comments: None\n\nMessage to End User:\n\n[User Name],\n\nWe have successfully addressed the slow internet connection issue you reported by clearing the DNS cache and updating the DNS servers. When you have a moment, please check your internet connection to verify that the issue has been resolved. If you come across any further problems or need additional support, please don't hesitate to contact us.\n\nRespectfully,"
                 },
                 @{
                     "role"    = "user"
@@ -302,9 +313,9 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        $issue = Read-Host "Summarize the issue and steps performed by the user."
+        $issue = Read-Host "Enter Ticket Description"
 
-        if ($issue -ne 'r' -and $issue -ne 'resume') {
+        if ($issue -ne 'r') {
             CreateWorkingDirectory
             $issue | Out-File -FilePath "$dir\issue.txt" -Force -Encoding utf8
         }
@@ -327,7 +338,7 @@ $(Get-Content "$dir\resolution.txt")
     finally {
         StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $resolution = Read-Host "Session Conclusion"
+        $resolution = Read-Host "Enter Session Conclusion"
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
