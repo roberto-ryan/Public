@@ -228,7 +228,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc., in the Troubleshooting Methods section."
+                    "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc."
                 },
                 @{
                     "role"    = "system"
@@ -236,11 +236,11 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Skip Recorded Steps that are duplicated or not relevant to the ticket."
+                    "content" = "Skip Recorded Steps that are duplicated or not relevant to the issue."
                 },
                 @{
                     "role"    = "system"
-                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only."
+                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only, and should be as brief and descriptive as possible."
                 },
                 @{
                     "role"    = "system"
