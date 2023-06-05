@@ -228,11 +228,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "Use the data in the Recorded Steps section to include printer names, website names, program names, software version numbers, etc."
-                },
-                @{
-                    "role"    = "system"
-                    "content" = "Use the Clipped section to add more detail to the notes. Add details to the Comments & Misc. section if they don't make sense in the Troubleshooting Methods section."
+                    "content" = "Use the data in the Recorded Steps and clipped sections to include printer names, website names, program names, software version numbers, etc."
                 },
                 @{
                     "role"    = "system"
