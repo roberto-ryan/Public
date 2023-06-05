@@ -307,22 +307,6 @@ $(Get-Content "$dir\resolution.txt")
     function GetClipboard {
         if (" " -ne $(Get-Clipboard)) { ($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null }
     }
-
-    function RemovePasswords {
-        # Define a regex pattern to detect common password patterns
-        $passwordPattern = "^(?:(?:(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]))|(?:(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))|(?:(?=.*[0-9])(?=.*[a-z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]))).{8,32}"
-    
-        # Process input file
-        $script:scrubbedClipboard = $script:clipboard | ForEach-Object {
-            $line = $_
-            $cleanLine = [regex]::Replace($line, $passwordPattern, '')
-            if (-not [string]::IsNullOrWhiteSpace($cleanLine)) {
-                $cleanLine
-            }
-        }
-
-        #$script:KeyloggerResult = (Get-Content $OutputFile) -join [Environment]::NewLine
-    }
     
     EnsureUserIsNotSystem
     
@@ -359,8 +343,7 @@ $(Get-Content "$dir\resolution.txt")
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
-        RemovePasswords
-        $script:scrubbedClipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8 -Append
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8 -Append
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
