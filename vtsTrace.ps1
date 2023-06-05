@@ -236,7 +236,7 @@ $(Get-Content "$dir\resolution.txt")
                 },
                 @{
                     "role"    = "system"
-                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only, and should be as brief and descriptive as possible."
+                    "content" = "The Troubleshooting Methods are written in the first-person by (you) the technician only. The Troubleshooting Methods section is concise as possible, while still including information such as website names, software names and printer names."
                 },
                 @{
                     "role"    = "system"
