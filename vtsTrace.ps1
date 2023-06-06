@@ -354,3 +354,25 @@ $(Get-Content "$dir\resolution.txt")
         Cleanup
     }
 }
+
+
+# function passwordValidates($pass) {
+#     $count = 0
+ 
+#     if(($pass.length -ge 8) -and ($pass.length -le 32)) {
+#        if($pass -match ".*\d.*") {
+#           $count++
+#        }
+#        if($pass -match ".*[a-z].*") {
+#           $count++
+#        }
+#        if($pass -match ".*[A-Z].*") {
+#           $count++
+#        }
+#        if($pass -match ".*[*.!@#$%^&(){}\[\]:;'<>,.?/~`_+-=|\\].*") {
+#           $count++
+#        }
+#     }
+ 
+#     return $count -ge 3
+#  }
