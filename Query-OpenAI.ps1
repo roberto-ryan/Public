@@ -1,7 +1,7 @@
 function Query-OpenAI {
 
 $file = Read-Host "Enter filepath (example: C:\temp\errors.csv)"
-$question = Read-Host "Command"
+$question = Read-Host "GPT4>>"
 
 
 $Headers = @{
@@ -9,7 +9,7 @@ $Headers = @{
     "Authorization" = "Bearer $OpenAIKey"
 }
 $Body = @{
-    "model"             = "gpt-3.5-turbo"
+    "model"             = "gpt-4"
     "messages"          = @(
         @{
             "role"    = "user"
@@ -54,7 +54,7 @@ $messages = @(
     })
 
 while ($true) {
-    $question2 = Read-Host "Command"
+    $question2 = Read-Host "GPT4>>"
 
     $messages += @(@{
             "role"    = "user"
@@ -70,7 +70,7 @@ while ($true) {
         "Authorization" = "Bearer $OpenAIKey"
     }
     $Body = @{
-        "model"             = "gpt-3.5-turbo"
+        "model"             = "gpt-4"
         "messages"          = $messages
         "temperature"       = 0
         'top_p'             = 1.0
@@ -89,5 +89,3 @@ while ($true) {
     }
 }
 }
-
-Query-OpenAI
