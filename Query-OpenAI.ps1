@@ -50,7 +50,7 @@ $messages = @(
     },
     @{
         "role"    = "assistant"
-        "content" = "$response.choices.Message.Content"
+        "content" = $response.choices.Message.Content
     })
 
 while ($true) {
