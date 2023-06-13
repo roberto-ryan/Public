@@ -362,7 +362,7 @@ Output:
 GSM M2362D (DisplayPort (external))
 GSM M2362D (HDMI)
 #>
-function Get-vtsDisplayConnectionType {
+function Get-vtsDisplayDetails {
     $adapterTypes = @{
         '-2'         = 'Unknown'
         '-1'         = 'Unknown'
@@ -390,12 +390,16 @@ function Get-vtsDisplayConnectionType {
     foreach ($monitor in $monitors) {
         $manufacturer = $monitor.ManufacturerName
         $name = $monitor.UserFriendlyName
+        $serialNumber = $monitor.SerialNumberID
         $connectionType = ($connections | Where-Object { $_.InstanceName -eq $monitor.InstanceName }).VideoOutputTechnology
         if ($manufacturer -ne $null) { $manufacturer = [System.Text.Encoding]::ASCII.GetString($manufacturer -ne 0) }
         if ($name -ne $null) { $name = [System.Text.Encoding]::ASCII.GetString($name -ne 0) }
+        if ($serialNumber -ne $null) { $serialNumber = [System.Text.Encoding]::ASCII.GetString($serialNumber).Trim([char]0) }
         $connectionType = $adapterTypes."$connectionType"
         if ($connectionType -eq $null) { $connectionType = 'Unknown' }
-        if (($manufacturer -ne $null) -or ($name -ne $null)) { $arrMonitors += "$manufacturer $name ($connectionType)" }
+        if (($manufacturer -ne $null) -or ($name -ne $null) -or ($serialNumber -ne $null)) { 
+            $arrMonitors += "$manufacturer $name, Serial: $serialNumber ($connectionType)" 
+        }
     }
     $i = 0
     $strMonitors = ''
@@ -408,8 +412,8 @@ function Get-vtsDisplayConnectionType {
     }
     if ($strMonitors -eq '') { $strMonitors = 'None Found' }
     $strMonitors
-
 }
+
 
 <#
 .DESCRIPTION
