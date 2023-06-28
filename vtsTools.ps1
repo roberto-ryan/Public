@@ -1108,7 +1108,6 @@ function Install-vtsPwsh {
 .EXAMPLE
     Get-FTA .pdf
     Show Default Application Program Id for an Extension
-    
 #>
 function Get-FTA {
   [CmdletBinding()]
@@ -1143,6 +1142,17 @@ function Get-FTA {
 <#
 .DESCRIPTION
     Get Protocol Type Association
+
+.NOTES
+    Version    : 1.2.0
+    Author(s)  : Danyfirex & Dany3j
+    Credits    : https://bbs.pediy.com/thread-213954.htm
+                 LMongrain - Hash Algorithm PureBasic Version
+    License    : MIT License
+    Copyright  : 2022 Danysys. <danysys.com>
+
+.EXAMPLE
+    Get-PTA
 #>
 function Get-PTA {
   [CmdletBinding()]
@@ -1187,7 +1197,6 @@ function Get-PTA {
 .EXAMPLE
     Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
     Register Application and Set as Default for .pdf reader
-    
 #>
 function Register-FTA {
   [CmdletBinding()]
@@ -1253,7 +1262,6 @@ function Register-FTA {
                  LMongrain - Hash Algorithm PureBasic Version
     License    : MIT License
     Copyright  : 2022 Danysys. <danysys.com>
-    
 #>
 function Remove-FTA {
   [CmdletBinding()]
@@ -1882,7 +1890,6 @@ function Set-FTA {
 .EXAMPLE
     Set-PTA ChromeHTML http
     Set Google Chrome as Default for http Protocol
-   
 #>
 function Set-PTA {
   [CmdletBinding()]
