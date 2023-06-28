@@ -40,11 +40,11 @@ ForEach-Object {
             Select-Object -ExpandProperty Description |
             Select-Object -ExpandProperty Text
         )
-        Usage            = (Get-Help $_.Name |
-        Select-Object -ExpandProperty Examples |
-        Select-Object -ExpandProperty Example |
-        Select-Object -ExpandProperty Code
-        )
+        # Usage            = (Get-Help $_.Name |
+        # Select-Object -ExpandProperty Examples |
+        # Select-Object -ExpandProperty Example |
+        # Select-Object -ExpandProperty Code
+        # )
     }
 }
 
