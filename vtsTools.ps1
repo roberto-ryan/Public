@@ -1094,11 +1094,8 @@ function Install-vtsPwsh {
 }
 
 <#
-.SYNOPSIS
-    Set File Type Association Windows 8/10/11
-
 .DESCRIPTION
-    Set File/Protocol Type Association Default Application Windows 8/10/11
+    Get File Type Association
 
 .NOTES
     Version    : 1.2.0
@@ -1107,33 +1104,10 @@ function Install-vtsPwsh {
                  LMongrain - Hash Algorithm PureBasic Version
     License    : MIT License
     Copyright  : 2022 Danysys. <danysys.com>
-  
-.EXAMPLE
-    Get-FTA
-    Show All Application Program Id
 
 .EXAMPLE
     Get-FTA .pdf
     Show Default Application Program Id for an Extension
-    
-.EXAMPLE
-    Set-FTA AcroExch.Document.DC .pdf
-    Set Acrobat Reader DC as Default .pdf reader
- 
-.EXAMPLE
-    Set-FTA Applications\SumatraPDF.exe .pdf
-    Set Sumatra PDF as Default .pdf reader
-
-.EXAMPLE
-    Set-PTA ChromeHTML http
-    Set Google Chrome as Default for http Protocol
-
-.EXAMPLE
-    Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
-    Register Application and Set as Default for .pdf reader
-
-.LINK
-    https://github.com/DanysysTeam/PS-SFTA
     
 #>
 function Get-FTA {
@@ -1166,6 +1140,10 @@ function Get-FTA {
   
 }
 
+<#
+.DESCRIPTION
+    Get Protocol Type Association
+#>
 function Get-PTA {
   [CmdletBinding()]
   param (
@@ -1194,6 +1172,23 @@ function Get-PTA {
   }
 }
 
+<#
+.DESCRIPTION
+    Register Application
+
+.NOTES
+    Version    : 1.2.0
+    Author(s)  : Danyfirex & Dany3j
+    Credits    : https://bbs.pediy.com/thread-213954.htm
+                 LMongrain - Hash Algorithm PureBasic Version
+    License    : MIT License
+    Copyright  : 2022 Danysys. <danysys.com>
+
+.EXAMPLE
+    Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
+    Register Application and Set as Default for .pdf reader
+    
+#>
 function Register-FTA {
   [CmdletBinding()]
   param (
@@ -1247,7 +1242,19 @@ function Register-FTA {
   Set-FTA -ProgId $ProgId -Extension $Extension -Icon $Icon
 }
 
+<#
+.DESCRIPTION
+    Unregister Application
 
+.NOTES
+    Version    : 1.2.0
+    Author(s)  : Danyfirex & Dany3j
+    Credits    : https://bbs.pediy.com/thread-213954.htm
+                 LMongrain - Hash Algorithm PureBasic Version
+    License    : MIT License
+    Copyright  : 2022 Danysys. <danysys.com>
+    
+#>
 function Remove-FTA {
   [CmdletBinding()]
   param (
@@ -1356,7 +1363,25 @@ function Remove-FTA {
   Write-Output "Removed: $ProgId" 
 }
 
-
+<#
+.DESCRIPTION
+    Set File Type Association Default
+.NOTES
+    Version    : 1.2.0
+    Author(s)  : Danyfirex & Dany3j
+    Credits    : https://bbs.pediy.com/thread-213954.htm
+                 LMongrain - Hash Algorithm PureBasic Version
+    License    : MIT License
+    Copyright  : 2022 Danysys. <danysys.com>
+    
+.EXAMPLE
+    Set-FTA AcroExch.Document.DC .pdf
+    Set Acrobat Reader DC as Default .pdf reader
+ 
+.EXAMPLE
+    Set-FTA Applications\SumatraPDF.exe .pdf
+    Set Sumatra PDF as Default .pdf reader
+#>
 function Set-FTA {
 
   [CmdletBinding()]
@@ -1842,6 +1867,23 @@ function Set-FTA {
 
 }
 
+<#
+.DESCRIPTION
+    Set Filetype Association
+
+.NOTES
+    Version    : 1.2.0
+    Author(s)  : Danyfirex & Dany3j
+    Credits    : https://bbs.pediy.com/thread-213954.htm
+                 LMongrain - Hash Algorithm PureBasic Version
+    License    : MIT License
+    Copyright  : 2022 Danysys. <danysys.com>
+  
+.EXAMPLE
+    Set-PTA ChromeHTML http
+    Set Google Chrome as Default for http Protocol
+   
+#>
 function Set-PTA {
   [CmdletBinding()]
   param (
