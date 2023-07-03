@@ -1,6 +1,6 @@
 <#
 .Description
-Searches the last 500 System and Application logs for a specified search term.
+Searches the last 500 System and Application logs for a search term.
 .EXAMPLE
 PS> Search-vtsEventLog <search term>
 .EXAMPLE
