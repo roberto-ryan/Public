@@ -200,7 +200,7 @@ Recorded Steps:
 $($script:joinedSteps)
 
 Clipped:
-$(Get-Content "$dir\clipboard.txt")
+$(Get-Content "$dir\clipboard.txt" -Raw)
 
 Issue:
 $(Get-Content "$dir\issue.txt")
@@ -305,7 +305,7 @@ $(Get-Content "$dir\resolution.txt")
     }
 
     function GetClipboard {
-        if (" " -ne $(Get-Clipboard)) { ($script:clipboard).add("$(Get-Clipboard)`n") | Out-Null }
+        if (" " -ne $(Get-Clipboard -Raw)) { ($script:clipboard).add("$(Get-Clipboard -Raw)`n") | Out-Null }
     }
     
     EnsureUserIsNotSystem
