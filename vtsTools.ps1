@@ -1942,7 +1942,7 @@ function Add-vtsPrinter {
   $printers = Get-Printer -ComputerName $Server
 
   # Search for the printer
-  $printer = $printers | Where-Object { $_.Name -like "*$Name*" }
+  $printer = $printers | Where-Object { $_.Name -like "*$Name*" } | Select-Object -First 1
 
   if ($printer -eq $null) {
       Write-Output "No printer found with the name $($printer.Name) on server $Server"
@@ -1955,7 +1955,8 @@ function Add-vtsPrinter {
   if ($userInput -eq 'Y' -or $userInput -eq 'y') {
       # Add the printer
       Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
-      Write-Output "Printer $($printer.Name) added successfully."
+      Write-Output "Printer $($printer.Name) added successfully.`n"
+      Write-Host "Name  : $($printer.Name)`nDriver: $($printer.DriverName)`nPort  : $($printer.PortName)`n"
   } else {
       Write-Output "Printer installation cancelled."
   }
