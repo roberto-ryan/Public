@@ -1908,3 +1908,55 @@ function Set-PTA {
 
   Set-FTA -ProgId $ProgId -Protocol $Protocol -Icon $Icon
 }
+
+<#
+.SYNOPSIS
+    A function to add a printer from a print server.
+
+.DESCRIPTION
+    This function takes a server name and a printer name as input, searches for the printer on the server, and adds it to the local machine. 
+    It prompts the user for confirmation before adding the printer. The function uses the Get-Printer cmdlet to get the list of printers from the server, 
+    and the Add-Printer cmdlet to add the printer.
+
+.PARAMETER Server
+    The name of the server where the printer is located.
+
+.PARAMETER Name
+    The name of the printer to be added. Wildcards can be used for searching.
+
+.EXAMPLE
+    PS C:\> Add-vtsPrinter -Server "ch-dc" -Name "*P18*"
+
+    This command will search for a printer with a name that includes "P18" on the server "ch-dc", and add it to the local machine after user confirmation.
+#>
+function Add-vtsPrinter {
+  param(
+      [Parameter(Mandatory=$true)]
+      [string]$Server,
+
+      [Parameter(Mandatory=$true)]
+      [string]$Name
+  )
+
+  # Get the list of printers from the print server
+  $printers = Get-Printer -ComputerName $Server
+
+  # Search for the printer
+  $printer = $printers | Where-Object { $_.Name -like "*$Name*" }
+
+  if ($printer -eq $null) {
+      Write-Output "No printer found with the name $($printer.Name) on server $Server"
+      return
+  }
+
+  # Confirm with the user
+  $userInput = Read-Host "$($printer.Name) - Is this the correct printer? (Y/n)"
+
+  if ($userInput -eq 'Y' -or $userInput -eq 'y') {
+      # Add the printer
+      Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
+      Write-Output "Printer $($printer.Name) added successfully."
+  } else {
+      Write-Output "Printer installation cancelled."
+  }
+}
