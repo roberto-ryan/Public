@@ -1942,7 +1942,7 @@ function Add-vtsPrinter {
   $printers = Get-Printer -ComputerName $Server | Where-Object { $_.Name -like "*$Name*" }
 
   if ($printers -eq $null) {
-    Write-Output "No printer found with the name $($printer.Name) on server $Server"
+    Write-Output "No printer found with the name $Name on server $Server"
     return
   } else {
     foreach ($printer in $printers) {
