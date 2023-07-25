@@ -1953,7 +1953,7 @@ function Add-vtsPrinter {
     }
 
     # Ask the user which printers to install
-    $userInput = Read-Host "Enter the numbers of the printers you want to install, separated by commas, or enter * to install all printers"
+    $userInput = Read-Host "Enter the numbers of the printers you want to install, separated by commas, or enter * to install all listed printers"
 
     if ($userInput -eq '*') {
       $keys = $printerTable.Keys
