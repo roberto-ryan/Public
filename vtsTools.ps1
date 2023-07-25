@@ -1939,9 +1939,9 @@ function Add-vtsPrinter {
   )
 
   # Get the list of printers from the print server
-  $printers = Get-Printer -ComputerName $Server -Name "*$Name*"
+  $printers = @(Get-Printer -ComputerName $Server -Name "*$Name*")
 
-  if ($printers -eq $null) {
+  if ($printers.Count -eq 0) {
     Write-Output "No printer found with the name $Name on server $Server"
     return
   } else {
@@ -1953,7 +1953,7 @@ function Add-vtsPrinter {
     }
 
     # Ask the user which printers to install
-    $userInput = Read-Host "Enter the numbers of the printers you want to install, separated by commas, or enter * to install all listed printers"
+    $userInput = Read-Host "Enter the numbers of the printers you want to install, separated by commas, or enter * to install all printers"
 
     if ($userInput -eq '*') {
       $keys = $printerTable.Keys
