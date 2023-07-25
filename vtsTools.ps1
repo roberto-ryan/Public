@@ -1939,25 +1939,34 @@ function Add-vtsPrinter {
   )
 
   # Get the list of printers from the print server
-  $printers = Get-Printer -ComputerName $Server | Where-Object { $_.Name -like "*$Name*" }
+  $printers = Get-Printer -ComputerName $Server -Name "*$Name*"
 
   if ($printers -eq $null) {
     Write-Output "No printer found with the name $Name on server $Server"
     return
   } else {
-    foreach ($printer in $printers) {
-      # Confirm with the user
-      $userInput = Read-Host "$($printer.Name) - Is this the correct printer? (Y/n)"
-    
-      if ($userInput -eq 'Y' -or $userInput -eq 'y') {
-        # Add the printer
-        Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
-        Write-Output "Printer $($printer.Name) added successfully.`n"
-        Write-Host "Name  : $($printer.Name)`nDriver: $($printer.DriverName)`nPort  : $($printer.PortName)`n"
-      }
-      else {
-        Write-Output "Printer installation cancelled."
-      }
+    # Create a hashtable of printers
+    $printerTable = @{}
+    for ($i=0; $i -lt $printers.Count; $i++) {
+      $printerTable.Add($i+1, $printers[$i])
+      Write-Output "$($i+1): $($printers[$i].Name)"
+    }
+
+    # Ask the user which printers to install
+    $userInput = Read-Host "Enter the numbers of the printers you want to install, separated by commas, or enter * to install all printers"
+
+    if ($userInput -eq '*') {
+      $keys = $printerTable.Keys
+    } else {
+      $keys = $userInput.Split(',') | ForEach-Object { [int]$_ }
+    }
+
+    foreach ($key in $keys) {
+      $printer = $printerTable[$key]
+      # Add the printer
+      Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
+      Write-Output "Printer $($printer.Name) added successfully.`n"
+      Write-Host "Name  : $($printer.Name)`nDriver: $($printer.DriverName)`nPort  : $($printer.PortName)`n"
     }
   }
 }
