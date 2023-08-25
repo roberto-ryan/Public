@@ -9,7 +9,8 @@ function Trace-vtsSession {
     param (
         [Parameter(Mandatory = $true)]
         [string]
-        $OpenAIKey
+        $OpenAIKey,
+        [switch]$RecordSession
     )
         
     $ErrorActionPreference = 'SilentlyContinue'
@@ -341,18 +342,21 @@ $(Get-Content "$dir\resolution.txt")
             $issue = Get-Content "$dir\issue.txt"
             $resume = "Resuming Last Session. "
         }
-
-        DisplayRecordingBanner
-        StartStepsRecorder
-        set-clipboard " "
-        While ($true) {
-            start-sleep -Milliseconds 250
-            GetClipboard
+        if ($RecordSession -eq $true) {
+            DisplayRecordingBanner
+            StartStepsRecorder
+            set-clipboard " "
+            While ($true) {
+                start-sleep -Milliseconds 250
+                GetClipboard
+            }
         }
     }
     finally {
-        StopStepsRecorder
-        DisplayRecordingCompleteBanner
+        if ($RecordSession -eq $true) {
+            StopStepsRecorder
+            DisplayRecordingCompleteBanner
+        }
         Write-Host "Enter Session Conclusion"
         $resolution = Read-String
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
