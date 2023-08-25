@@ -15,7 +15,7 @@ function Trace-vtsSession {
         
     $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
-    $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
+    $script:dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
     function Read-String ($maxLength = 65536) {
@@ -97,7 +97,7 @@ function Trace-vtsSession {
     }
     
     function CreateWorkingDirectory {
-        if (-not (Test-Path $dir)) { mkdir $dir | Out-Null }
+        if (-not (Test-Path $dir)) { mkdir $script:dir | Out-Null }
     }
     function DisplayRecordingCompleteBanner {
         $complete = @'
@@ -316,7 +316,7 @@ $(Get-Content "$dir\resolution.txt")
     function Cleanup {
         Start-sleep -Milliseconds 250
         Get-Process -Name psr | Stop-Process -Force
-        Get-ChildItem -path $dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+        Get-ChildItem -path $script:dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
 
     function GetClipboard {
@@ -336,7 +336,7 @@ $(Get-Content "$dir\resolution.txt")
             $issue | Out-File -FilePath "$dir\issue.txt" -Force -Encoding utf8
         }
         else {
-            $dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
+            $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
                 Sort-Object Name |
                 Select-Object -ExpandProperty FullName -last 1)
             $issue = Get-Content "$dir\issue.txt"
