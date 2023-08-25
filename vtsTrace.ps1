@@ -328,7 +328,7 @@ $(Get-Content "$script:dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        Write-Host "Enter Ticket Description" -ForegroundColor Red
+        Write-Host "Enter Ticket Description" -ForegroundColor Green
         $issue = Read-String
 
         if ($issue -ne 'r') {
@@ -387,7 +387,7 @@ $(Get-Content "$script:dir\resolution.txt")
             }
         
             While ($true) {
-                Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
+                Write-Host "`nType:`n's' - review recorded actions`n'c' - review copied text.`n'e' - exit.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
                 $alterations = Read-Host "GPT-3.5-Turbo>>>"
         
                 switch ($alterations) {
@@ -398,6 +398,12 @@ $(Get-Content "$script:dir\resolution.txt")
                     c {
                         Write-Host "\\\\\\\\ CLIPBOARD >" -ForegroundColor Green
                         Get-Content $script:dir\clipboard.txt 
+                    }
+                    e {
+                        function prompt {
+                            'PS ' + $(get-location) + '> '
+                        }
+                        prompt
                     }
                     $null {
         
