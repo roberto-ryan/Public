@@ -375,24 +375,8 @@ $(Get-Content "$dir\resolution.txt")
         
         function prompt {
             [CmdletBinding()]
-            param (
-                [Parameter(Mandatory = $true)]
-                [String]
-                $OpenAIKey
-            )
         
             $ErrorActionPreference = 'Continue'
-        
-            $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
-                Sort-Object Name |
-                Select-Object -ExpandProperty FullName -last 1)
-             
-            function EnsureUserIsNotSystem {
-                $identity = whoami.exe
-                if ($identity -eq "nt authority\system") {
-                    break
-                }
-            }
                 
             function WriteResultsToHost {
                 Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ BEGIN >>" -ForegroundColor Green
@@ -401,8 +385,6 @@ $(Get-Content "$dir\resolution.txt")
                 Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
                 Write-Host "/////////////////////////////////////////////////////////////// END >>" -ForegroundColor Red
             }
-            
-            EnsureUserIsNotSystem
         
             While ($true) {
                 Write-Host "`nType 's' to review recorded actions or 'c' to review copied text.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
@@ -441,7 +423,7 @@ $(Get-Content "$dir\resolution.txt")
                             "Authorization" = "Bearer $OpenAIKey"
                         }
                         $Body = @{
-                            "model"             = "gpt-3.5-turbo"
+                            "model"             = "gpt-3.5-turbo-16k-0613"
                             "messages"          = @( @{
                                     "role"    = "system"
                                     "content" = "You are a helpful assistant that rewrites IT Support ticket notes using updated information."
