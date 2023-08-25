@@ -17,60 +17,8 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
-    <#
-.SYNOPSIS
-Read a line of input from the host.
-
-.DESCRIPTION
-Read a line of input from the host. 
-
-.EXAMPLE
-$s = Read-HostLine -prompt "Enter something"
-
-.NOTES
-Read-Host has a limitation of 1022 characters.
-This approach is safe to use with background jobs that require input.
-If pasting content with embedded newlines, only the first line will be read.
-A downside to the ReadKey approach is that it is not possible to easily edit the input string before pressing Enter as with Read-Host.
-#>
-    function Read-HostLine ($prompt = $null) {
-        if ($prompt) {
-            "${prompt}: " | Write-Host
-        }
-
-        $str = ""
-        while ($true) { 
-            $key = $host.UI.RawUI.ReadKey("NoEcho, IncludeKeyDown"); 
-
-            # Paste the clipboard on CTRL-V        
-            if (($key.VirtualKeyCode -eq 0x56) -and # 0x56 is V
-            (([int]$key.ControlKeyState -band [System.Management.Automation.Host.ControlKeyStates]::LeftCtrlPressed) -or 
-                ([int]$key.ControlKeyState -band [System.Management.Automation.Host.ControlKeyStates]::RightCtrlPressed))) { 
-                $clipboard = Get-Clipboard
-                $str += $clipboard
-                Write-Host $clipboard -NoNewline
-                continue
-            }
-            elseif ($key.VirtualKeyCode -eq 0x08) {
-                # 0x08 is Backspace
-                if ($str.Length -gt 0) {
-                    $str = $str.Substring(0, $str.Length - 1)
-                    Write-Host "`b `b" -NoNewline    
-                }
-            }        
-            elseif ($key.VirtualKeyCode -eq 13) {
-                # 13 is Enter
-                Write-Host
-                break 
-            }
-            elseif ($key.Character -ne 0) {
-                $str += $key.Character
-                Write-Host $key.Character -NoNewline
-            }
-        }
-
-        return $str
-    }
+    $maxLength = 65536
+    [System.Console]::SetIn([System.IO.StreamReader]::new([System.Console]::OpenStandardInput($maxLength), [System.Console]::InputEncoding, $false, $maxLength))    
 
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
@@ -368,7 +316,8 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        $issue = Read-HostLine "Enter Ticket Description"
+        Write-Host "Enter Ticket Description"
+        $issue = [System.Console]::ReadLine()
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
@@ -393,7 +342,8 @@ $(Get-Content "$dir\resolution.txt")
     finally {
         StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $resolution = Read-HostLine "Enter Session Conclusion"
+        Write-Host "Enter Session Conclusion"
+        $resolution = [System.Console]::ReadLine() 
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
