@@ -17,8 +17,19 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
-    $maxLength = 65536
-    [System.Console]::SetIn([System.IO.StreamReader]::new([System.Console]::OpenStandardInput($maxLength), [System.Console]::InputEncoding, $false, $maxLength))    
+    function Read-String ($maxLength = 65536) {
+        $str = ""
+        $inputStream = [System.Console]::OpenStandardInput($maxLength);
+        $bytes = [byte[]]::new($maxLength);
+        while ($true) {
+            $len = $inputStream.Read($bytes, 0, $maxLength);
+            $str += [string]::new($bytes, 0, $len)
+            if ($str.EndsWith("`r`n")) {
+                $str = $str.Substring(0, $str.Length - 2)
+                return $str
+            }
+        }
+    }   
 
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
@@ -316,8 +327,8 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        Write-Host "Enter Ticket Description"
-        $issue = [System.Console]::ReadLine()
+        Write-Host "Enter Ticket Description" -ForegroundColor Red
+        $issue = Read-String
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
@@ -343,7 +354,7 @@ $(Get-Content "$dir\resolution.txt")
         StopStepsRecorder
         DisplayRecordingCompleteBanner
         Write-Host "Enter Session Conclusion"
-        $resolution = [System.Console]::ReadLine() 
+        $resolution = Read-String
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
