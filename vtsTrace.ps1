@@ -374,7 +374,7 @@ $(Get-Content "$dir\resolution.txt")
         Cleanup
         
         function prompt {
-            [CmdletBinding()]
+            "GPT>>"
         
             $ErrorActionPreference = 'Continue'
                 
