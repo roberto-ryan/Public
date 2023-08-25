@@ -93,7 +93,7 @@ function Trace-vtsSession {
     }
     
     function StartStepsRecorder {
-        psr.exe /start /output "$dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
+        psr.exe /start /output "$script:dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
     }
     
     function CreateWorkingDirectory {
@@ -139,22 +139,22 @@ function Trace-vtsSession {
 
     function ParseSteps {
         #Parse results
-        Expand-Archive (Get-ChildItem $dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
+        Expand-Archive (Get-ChildItem $script:dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
-        $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
+        $PSRFile = (Get-ChildItem $script:dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$script:dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
-        # Clean up unwanted input from Steps Recorder"$dir\steps.txt"
-        Get-Content "$dir\steps.txt" | 
+        # Clean up unwanted input from Steps Recorder"$script:dir\steps.txt"
+        Get-Content "$script:dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Select-Object -Unique | 
-        Out-File "$dir\cleaned_steps.txt" -Append -Encoding utf8
+        Out-File "$script:dir\cleaned_steps.txt" -Append -Encoding utf8
 
         #Remove last step as it's alway irrelevant
-        $PSRResult = Get-Content "$dir\cleaned_steps.txt"
+        $PSRResult = Get-Content "$script:dir\cleaned_steps.txt"
         $StepCount = $PSRResult.Count - 2
         $steps = $PSRResult[0..$StepCount]
 
@@ -215,15 +215,15 @@ Recorded Steps:
 $($script:joinedSteps)
 
 Clipped:
-$(Get-Content "$dir\clipboard.txt" -Raw)
+$(Get-Content "$script:dir\clipboard.txt" -Raw)
 
 Issue:
-$(Get-Content "$dir\issue.txt")
+$(Get-Content "$script:dir\issue.txt")
 
 Resolution:
-$(Get-Content "$dir\resolution.txt")
+$(Get-Content "$script:dir\resolution.txt")
 "@ | ConvertTo-Json
-        $prompt | Out-File "$dir\prompt.txt" -Encoding utf8
+        $prompt | Out-File "$script:dir\prompt.txt" -Encoding utf8
     }
 
     function APICall {
@@ -298,18 +298,18 @@ $(Get-Content "$dir\resolution.txt")
     }
 
     function WriteResultsToFile {
-        "Session Time: $SessionTime`n" | Out-File "$dir\result_header.txt" -Force -Encoding utf8
-        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "Computer Name: $env:COMPUTERNAME" | Out-File "$dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($script:response.choices.message.content)" | Out-File "$dir\gpt_result.txt" -Force
+        "Session Time: $SessionTime`n" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8
+        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8 -Append
+        "Computer Name: $env:COMPUTERNAME" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8 -Append
+        "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
         #Write final results to the shell
         Start-sleep -Milliseconds 250
         #Clear-Host
-        (Get-Content "$dir\result_header.txt") | ForEach-Object { Write-Host $_ }
-        (Get-Content "$dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
 
@@ -328,18 +328,18 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        Write-Host "Enter Ticket Description"
+        Write-Host "Enter Ticket Description" -ForegroundColor Red
         $issue = Read-String
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
-            $issue | Out-File -FilePath "$dir\issue.txt" -Force -Encoding utf8
+            $issue | Out-File -FilePath "$script:dir\issue.txt" -Force -Encoding utf8
         }
         else {
             $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
                 Sort-Object Name |
                 Select-Object -ExpandProperty FullName -last 1)
-            $issue = Get-Content "$dir\issue.txt"
+            $issue = Get-Content "$script:dir\issue.txt"
             $resume = "Resuming Last Session. "
         }
         if ($RecordSession -eq $true) {
@@ -359,11 +359,11 @@ $(Get-Content "$dir\resolution.txt")
         }
         Write-Host "Enter Session Conclusion"
         $resolution = Read-String
-        Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
+        Add-Content -Path "$script:dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
-        $script:clipboard | Select-Object -unique | Out-File -FilePath "$dir\clipboard.txt" -Force -Encoding utf8 -Append
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$script:dir\clipboard.txt" -Force -Encoding utf8 -Append
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
