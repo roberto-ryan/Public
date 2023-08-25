@@ -17,6 +17,61 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
+    <#
+.SYNOPSIS
+Read a line of input from the host.
+
+.DESCRIPTION
+Read a line of input from the host. 
+
+.EXAMPLE
+$s = Read-HostLine -prompt "Enter something"
+
+.NOTES
+Read-Host has a limitation of 1022 characters.
+This approach is safe to use with background jobs that require input.
+If pasting content with embedded newlines, only the first line will be read.
+A downside to the ReadKey approach is that it is not possible to easily edit the input string before pressing Enter as with Read-Host.
+#>
+    function Read-HostLine ($prompt = $null) {
+        if ($prompt) {
+            "${prompt}: " | Write-Host
+        }
+
+        $str = ""
+        while ($true) { 
+            $key = $host.UI.RawUI.ReadKey("NoEcho, IncludeKeyDown"); 
+
+            # Paste the clipboard on CTRL-V        
+            if (($key.VirtualKeyCode -eq 0x56) -and # 0x56 is V
+            (([int]$key.ControlKeyState -band [System.Management.Automation.Host.ControlKeyStates]::LeftCtrlPressed) -or 
+                ([int]$key.ControlKeyState -band [System.Management.Automation.Host.ControlKeyStates]::RightCtrlPressed))) { 
+                $clipboard = Get-Clipboard
+                $str += $clipboard
+                Write-Host $clipboard -NoNewline
+                continue
+            }
+            elseif ($key.VirtualKeyCode -eq 0x08) {
+                # 0x08 is Backspace
+                if ($str.Length -gt 0) {
+                    $str = $str.Substring(0, $str.Length - 1)
+                    Write-Host "`b `b" -NoNewline    
+                }
+            }        
+            elseif ($key.VirtualKeyCode -eq 13) {
+                # 13 is Enter
+                Write-Host
+                break 
+            }
+            elseif ($key.Character -ne 0) {
+                $str += $key.Character
+                Write-Host $key.Character -NoNewline
+            }
+        }
+
+        return $str
+    }
+
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
         if ($identity -eq "nt authority\system") {
@@ -128,7 +183,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' -replace 'User ','Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -313,7 +368,7 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        $issue = Read-Host "Enter Ticket Description"
+        $issue = Read-HostLine "Enter Ticket Description"
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
@@ -338,7 +393,7 @@ $(Get-Content "$dir\resolution.txt")
     finally {
         StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $resolution = Read-Host "Enter Session Conclusion"
+        $resolution = Read-HostLine "Enter Session Conclusion"
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
