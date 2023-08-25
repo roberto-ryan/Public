@@ -473,9 +473,8 @@ $(Get-Content "$dir\resolution.txt")
                 }
             }
         }
-
-
     }
+    prompt
 }
 
 
