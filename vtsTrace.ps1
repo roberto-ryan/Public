@@ -17,6 +17,20 @@ function Trace-vtsSession {
     $dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
     $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
+    function Read-String ($maxLength = 65536) {
+        $str = ""
+        $inputStream = [System.Console]::OpenStandardInput($maxLength);
+        $bytes = [byte[]]::new($maxLength);
+        while ($true) {
+            $len = $inputStream.Read($bytes, 0, $maxLength);
+            $str += [string]::new($bytes, 0, $len)
+            if ($str.EndsWith("`r`n")) {
+                $str = $str.Substring(0, $str.Length - 2)
+                return $str
+            }
+        }
+    }   
+
     function EnsureUserIsNotSystem {
         $identity = whoami.exe
         if ($identity -eq "nt authority\system") {
@@ -128,7 +142,7 @@ function Trace-vtsSession {
         Start-Sleep -Milliseconds 250
         $PSRFile = (Get-ChildItem $dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹','' -replace 'User ','Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
@@ -217,7 +231,7 @@ $(Get-Content "$dir\resolution.txt")
             "Authorization" = "Bearer $OpenAIKey"
         }
         $Body = @{
-            "model"             = "gpt-3.5-turbo-16k-0613" #"gpt-3.5-turbo"
+            "model"             = "gpt-3.5-turbo-16k-0613"
             "messages"          = @( @{
                     "role"    = "system"
                     "content" = "You are a helpful IT technician that creates comprehensive ticket notes for IT support issues."
@@ -313,7 +327,8 @@ $(Get-Content "$dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        $issue = Read-Host "Enter Ticket Description"
+        Write-Host "Enter Ticket Description"
+        $issue = Read-String
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
@@ -338,7 +353,8 @@ $(Get-Content "$dir\resolution.txt")
     finally {
         StopStepsRecorder
         DisplayRecordingCompleteBanner
-        $resolution = Read-Host "Enter Session Conclusion"
+        Write-Host "Enter Session Conclusion"
+        $resolution = Read-String
         Add-Content -Path "$dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
@@ -354,3 +370,25 @@ $(Get-Content "$dir\resolution.txt")
         Cleanup
     }
 }
+
+
+# function passwordValidates($pass) {
+#     $count = 0
+ 
+#     if(($pass.length -ge 8) -and ($pass.length -le 32)) {
+#        if($pass -match ".*\d.*") {
+#           $count++
+#        }
+#        if($pass -match ".*[a-z].*") {
+#           $count++
+#        }
+#        if($pass -match ".*[A-Z].*") {
+#           $count++
+#        }
+#        if($pass -match ".*[*.!@#$%^&(){}\[\]:;'<>,.?/~`_+-=|\\].*") {
+#           $count++
+#        }
+#     }
+ 
+#     return $count -ge 3
+#  }
