@@ -1970,3 +1970,53 @@ function Add-vtsPrinter {
     }
   }
 }
+<#
+.Synopsis
+   This function schedules a maintenance reboot and warns users in advance.
+
+.Description
+   This function takes two parameters, $warningMessageTime and $rebootTime, which specify when to display a warning message and when to reboot the computer, respectively. The function calculates the difference between the message time and the reboot time and includes this in the warning message. The tasks are scheduled to run only once at the specified times.
+
+.Example
+   Schedule-vtsReboot -messageTime "9:45 PM" -rebootTime "10:00 PM"
+   This will schedule a warning message to be displayed at 9:45 PM and the computer to be rebooted at 10:00 PM.
+#>
+
+function Schedule-vtsReboot {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$warningMessageTime,
+
+        [Parameter(Mandatory=$true)]
+        [string]$rebootTime
+    )
+
+    # Convert the times to 24-hour format
+    $warningMessageTime24 = [DateTime]::ParseExact($warningMessageTime, "h:mm tt", $null).ToString("HH:mm")
+    $rebootTime24 = [DateTime]::ParseExact($rebootTime, "h:mm tt", $null).ToString("HH:mm")
+
+    # Get the current date
+    $date = Get-Date
+
+    # Create the date for the message and the reboot
+    $messageDate = Get-Date -Year $date.Year -Month $date.Month -Day $date.Day -Hour $warningMessageTime24.Split(':')[0] -Minute $warningMessageTime24.Split(':')[1] -Second 0
+    $rebootDate = Get-Date -Year $date.Year -Month $date.Month -Day $date.Day -Hour $rebootTime24.Split(':')[0] -Minute $rebootTime24.Split(':')[1] -Second 0
+
+    # Calculate the difference between the message time and the reboot time
+    $timeDifference = ($rebootDate - $messageDate).TotalHours
+
+    # Determine the time unit and adjust the time difference accordingly
+    if ($timeDifference -lt 1) {
+        $timeDifference = ($rebootDate - $messageDate).TotalMinutes
+        $timeUnit = "minute(s)"
+    } else {
+        $timeDifference = [Math]::Round($timeDifference, 0)
+        $timeUnit = "hour(s)"
+    }
+
+    # Register the task to display the message
+    Register-ScheduledTask -Action (New-ScheduledTaskAction -Execute 'msg' -Argument "* 'This server will undergo a scheduled maintenance reboot in approximately $timeDifference $timeUnit. Please ensure all work is saved to prevent any potential data loss.'") -Trigger (New-ScheduledTaskTrigger -Once -At $messageDate) -TaskName 'RebootWarning' -Description 'Warns users of impending reboot for maintenance'
+
+    # Register the task to reboot the computer
+    Register-ScheduledTask -Action (New-ScheduledTaskAction -Execute 'shutdown.exe' -Argument '/r /f /t 0') -Trigger (New-ScheduledTaskTrigger -Once -At $rebootDate) -TaskName 'RebootTask' -Description 'Reboots the computer for maintenance'
+}
