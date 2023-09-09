@@ -337,9 +337,11 @@ $(Get-Content "$script:dir\resolution.txt")
         }
     
         While ($true) {
-            Write-Host "`nType:`n's' - review recorded actions`n'c' - review copied text.`n'ctrl-c' to exit.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
+            if ($RecordSession) {
+                Write-Host "`nType:`n's' - review recorded actions`n'c' - review copied text.`n'ctrl-c' to exit.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
+            }
+            
             $alterations = Read-Host "GPT-3.5-Turbo>>>"
-    
             switch ($alterations) {
                 s {
                     Write-Host "\\\\\\\\ STEPS >" -ForegroundColor Green
@@ -443,7 +445,7 @@ $(Get-Content "$script:dir\resolution.txt")
             $issue = Get-Content "$script:dir\issue.txt"
             $resume = "Resuming Last Session. "
         }
-        if ($RecordSession -eq $true) {
+        if ($RecordSession) {
             DisplayRecordingBanner
             StartStepsRecorder
             set-clipboard " "
@@ -454,7 +456,7 @@ $(Get-Content "$script:dir\resolution.txt")
         }
     }
     finally {
-        if ($RecordSession -eq $true) {
+        if ($RecordSession) {
             StopStepsRecorder
             DisplayRecordingCompleteBanner
         }
