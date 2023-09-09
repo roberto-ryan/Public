@@ -323,7 +323,7 @@ $(Get-Content "$script:dir\resolution.txt")
         if (" " -ne $(Get-Clipboard -Raw)) { ($script:clipboard).add("$(Get-Clipboard -Raw)`n") | Out-Null }
     }
     
-    function prompt {
+    function global:prompt {
         "GPT>>"
     
         $ErrorActionPreference = 'Continue'
