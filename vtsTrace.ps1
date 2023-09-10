@@ -431,7 +431,7 @@ $(Get-Content "$script:dir\resolution.txt")
     try {
         $SessionStart = Timestamp
         DisplayLogo
-        Write-Host "Enter Ticket Description" -ForegroundColor DarkBlue
+        Write-Host "Enter Ticket Description" -ForegroundColor Red
         $issue = Read-String
 
         if ($issue -ne 'r') {
