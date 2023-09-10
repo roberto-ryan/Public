@@ -383,10 +383,10 @@ $(Get-Content "$global:dir\resolution.txt")
                 Write-Host "/////////////////////////////////////////////////////////////// END >>" -ForegroundColor Red
             }
             
-            if (Test-Path $global:dir\cleaned_steps.txt) {
+            if ((Get-Item $global:dir\cleaned_steps.txt).length -gt 0) {
                 Write-Host "`nType:`n's' - review recorded actions"
             }
-            if (Test-Path $global:dir\clipboard.txt) {
+            if ((Get-Item $global:dir\clipboard.txt).Length -gt 0) {
                 Write-Host "'c' - review copied text."
             }
             Write-Host "You can ask ChatGPT to make alterations to the notes above.`n" -ForegroundColor Yellow
