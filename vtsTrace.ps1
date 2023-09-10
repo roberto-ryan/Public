@@ -15,8 +15,8 @@ function Trace-vtsSession {
         
     $ErrorActionPreference = 'SilentlyContinue'
     $timestamp = Get-Date -format yyyy-MM-dd-HH-mm-ss-ff
-    $global:dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
-    $global:clipboard = New-Object -TypeName "System.Collections.ArrayList"
+    $script:dir = "C:\Windows\TEMP\VTS\PSDOCS\$timestamp"
+    $script:clipboard = New-Object -TypeName "System.Collections.ArrayList"
 
     function Read-String ($maxLength = 65536) {
         $str = ""
@@ -93,11 +93,11 @@ function Trace-vtsSession {
     }
     
     function StartStepsRecorder {
-        psr.exe /start /output "$global:dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
+        psr.exe /start /output "$script:dir\problem_steps_record-$($timestamp).zip" /gui 0 #  /sc 1 #/maxsc 100
     }
     
     function CreateWorkingDirectory {
-        if (-not (Test-Path $dir)) { mkdir $global:dir | Out-Null }
+        if (-not (Test-Path $dir)) { mkdir $script:dir | Out-Null }
     }
     function DisplayRecordingCompleteBanner {
         $complete = @'
@@ -139,27 +139,27 @@ function Trace-vtsSession {
 
     function ParseSteps {
         #Parse results
-        Expand-Archive (Get-ChildItem $global:dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
+        Expand-Archive (Get-ChildItem $script:dir\*.zip | Sort-Object LastWriteTime | Select-Object -last 1) $dir
         Start-Sleep -Milliseconds 250
-        $PSRFile = (Get-ChildItem $global:dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
+        $PSRFile = (Get-ChildItem $script:dir\*.mht | Sort-Object LastWriteTime | Select-Object -last 1)
         $regex = '.*[AP]M\)'
-        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$global:dir\steps.txt" -Encoding utf8
+        (((Get-Content $PSRFile | select-string "^        <p><b>") -replace '^        <p><b>', '' -replace '</b>', '' -replace '</p>', '' -replace '&quot;', "'") -replace $regex | Select-String '^ User' | Select-Object -ExpandProperty Line | ForEach-Object { $_.Substring(1) }) -replace '\[.*?\]', '' -replace 'â€‹', '' -replace 'User ', 'Technician ' | Out-File "$script:dir\steps.txt" -Encoding utf8
     }
 
     function CleanupSteps {
-        # Clean up unwanted input from Steps Recorder"$global:dir\steps.txt"
-        Get-Content "$global:dir\steps.txt" | 
+        # Clean up unwanted input from Steps Recorder"$script:dir\steps.txt"
+        Get-Content "$script:dir\steps.txt" | 
         Where-Object { $_ -notmatch 'mouse drag|mouse wheel|\(pane\)' } | 
         Select-Object -Unique | 
-        Out-File "$global:dir\cleaned_steps.txt" -Append -Encoding utf8
+        Out-File "$script:dir\cleaned_steps.txt" -Append -Encoding utf8
 
         #Remove last step as it's alway irrelevant
-        $PSRResult = Get-Content "$global:dir\cleaned_steps.txt"
+        $PSRResult = Get-Content "$script:dir\cleaned_steps.txt"
         $StepCount = $PSRResult.Count - 2
         $steps = $PSRResult[0..$StepCount]
 
         # Join steps with newline characters to remove blank lines
-        $global:joinedSteps = ($steps | Select-Object -last 30) -join "`n"
+        $script:joinedSteps = ($steps | Select-Object -last 30) -join "`n"
     }
 
     function CalculateSessionTime {
@@ -204,26 +204,26 @@ function Trace-vtsSession {
         }
 
         # Calculate and display the session time
-        $global:SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
+        $script:SessionTime = Get-SessionTime -StartTime $SessionStart -EndTime $SessionEnd
     }
 
     function GeneratePrompt {
-        $global:prompt = @"
+        $script:prompt = @"
 Create ticket notes based on the following information:
 
 Recorded Steps:
-$($global:joinedSteps)
+$($script:joinedSteps)
 
 Clipped:
-$(Get-Content "$global:dir\clipboard.txt" -Raw)
+$(Get-Content "$script:dir\clipboard.txt" -Raw)
 
 Issue:
-$(Get-Content "$global:dir\issue.txt")
+$(Get-Content "$script:dir\issue.txt")
 
 Resolution:
-$(Get-Content "$global:dir\resolution.txt")
+$(Get-Content "$script:dir\resolution.txt")
 "@ | ConvertTo-Json
-        $prompt | Out-File "$global:dir\prompt.txt" -Encoding utf8
+        $prompt | Out-File "$script:dir\prompt.txt" -Encoding utf8
     }
 
     function APICall {
@@ -275,7 +275,7 @@ $(Get-Content "$global:dir\resolution.txt")
                 },
                 @{
                     "role"    = "user"
-                    "content" = "$global:prompt"
+                    "content" = "$script:prompt"
                 },
                 @{
                     "role"    = "assistant"
@@ -290,7 +290,7 @@ $(Get-Content "$global:dir\resolution.txt")
         
         try {
             
-            $global:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+            $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
         }
         catch {
             Write-Error "$($_.Exception.Message)"
@@ -298,73 +298,68 @@ $(Get-Content "$global:dir\resolution.txt")
     }
 
     function WriteResultsToFile {
-        "Session Time: $SessionTime`n" | Out-File "$global:dir\result_header.txt" -Force -Encoding utf8
-        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$global:dir\result_header.txt" -Force -Encoding utf8 -Append
-        "Computer Name: $env:COMPUTERNAME" | Out-File "$global:dir\result_header.txt" -Force -Encoding utf8 -Append
-        "$($global:response.choices.message.content)" | Out-File "$global:dir\gpt_result.txt" -Force
+        "Session Time: $SessionTime`n" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8
+        "User Name: $env:USERDOMAIN\$env:USERNAME" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8 -Append
+        "Computer Name: $env:COMPUTERNAME" | Out-File "$script:dir\result_header.txt" -Force -Encoding utf8 -Append
+        "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force
     }
 
     function WriteResultsToHost {
         #Write final results to the shell
         Start-sleep -Milliseconds 250
         #Clear-Host
-        (Get-Content "$global:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
-        (Get-Content "$global:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+        (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
         Write-Host "`nToken Usage: Prompt=$($response.usage.prompt_tokens) Completion=$($response.usage.completion_tokens) Total=$($response.usage.total_tokens) Cost=`$$(($response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
     }
 
     function Cleanup {
         Start-sleep -Milliseconds 250
         Get-Process -Name psr | Stop-Process -Force
-        Get-ChildItem -path $global:dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
+        Get-ChildItem -path $script:dir -include "*.mht", "*.zip" -Recurse -File | Remove-Item -Recurse -Force -Confirm:$false
     }
 
     function GetClipboard {
-        if (" " -ne $(Get-Clipboard -Raw)) { ($global:clipboard).add("$(Get-Clipboard -Raw)`n") | Out-Null }
+        if (" " -ne $(Get-Clipboard -Raw)) { ($script:clipboard).add("$(Get-Clipboard -Raw)`n") | Out-Null }
     }
     
     function global:prompt {
-
         "GPT>>"
     
         $ErrorActionPreference = 'Continue'
             
         function WriteResultsToHost {
             Write-Host "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ BEGIN >>" -ForegroundColor Green
-            (Get-Content "$global:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
-            (Get-Content "$global:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
-            Write-Host "`nToken Usage: Prompt=$($global:response.usage.prompt_tokens) Completion=$($global:response.usage.completion_tokens) Total=$($global:response.usage.total_tokens) Cost=`$$(($global:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
+            (Get-Content "$script:dir\result_header.txt") | ForEach-Object { Write-Host $_ }
+            (Get-Content "$script:dir\gpt_result.txt") | ForEach-Object { Write-Host $_ }
+            Write-Host "`nToken Usage: Prompt=$($script:response.usage.prompt_tokens) Completion=$($script:response.usage.completion_tokens) Total=$($script:response.usage.total_tokens) Cost=`$$(($script:response.usage.total_tokens / 1000) * 0.002)" -ForegroundColor Gray
             Write-Host "/////////////////////////////////////////////////////////////// END >>" -ForegroundColor Red
         }
     
         While ($true) {
-            if (Test-Path "$global:dir\cleaned_steps.txt" -or Test-Path "$global:dir\clipboard.txt") {
-                Write-Host "`nType:`n's' - review recorded actions`n'c' - review copied text.`n'e' to exit.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
+            if ($RecordSession) {
+                Write-Host "`nType:`n's' - review recorded actions`n'c' - review copied text.`n'ctrl-c' to exit.`nOtherwise, you can ask ChatGPT to make alterations to the notes above.`n`n" -ForegroundColor Yellow
             }
             
             $alterations = Read-Host "GPT-3.5-Turbo>>>"
             switch ($alterations) {
                 s {
                     Write-Host "\\\\\\\\ STEPS >" -ForegroundColor Green
-                    Get-Content $global:dir\cleaned_steps.txt 
+                    Get-Content $script:dir\cleaned_steps.txt 
                 }
                 c {
                     Write-Host "\\\\\\\\ CLIPBOARD >" -ForegroundColor Green
-                    Get-Content $global:dir\clipboard.txt 
-                }
-                e {
-                    function global:prompt {"$(pwd) >"} ; prompt
-                    
+                    Get-Content $script:dir\clipboard.txt 
                 }
                 $null {
     
                 }
                 Default {
-                    if ($null -ne $global:response.choices.message.content) {
-                        $ticket = $global:response.choices.message.content
+                    if ($null -ne $script:response.choices.message.content) {
+                        $ticket = $script:response.choices.message.content
                     }
                     else {
-                        $ticket = $(Get-Content $global:dir\gpt_result.txt -Encoding utf8 -Raw)
+                        $ticket = $(Get-Content $script:dir\gpt_result.txt -Encoding utf8 -Raw)
                     }
     
                     $prompt = @"
@@ -418,12 +413,12 @@ $(Get-Content "$global:dir\resolution.txt")
                     
                     try {
                         
-                        $global:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
+                        $script:response = Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers
                     }
                     catch {
                         Write-Error "$($_.Exception.Message)"
                     }
-                    "$($global:response.choices.message.content)" | Out-File "$global:dir\gpt_result.txt" -Force -Encoding utf8
+                    "$($script:response.choices.message.content)" | Out-File "$script:dir\gpt_result.txt" -Force -Encoding utf8
                     Start-sleep -Milliseconds 250
                     WriteResultsToHost
                 }
@@ -441,16 +436,16 @@ $(Get-Content "$global:dir\resolution.txt")
 
         if ($issue -ne 'r') {
             CreateWorkingDirectory
-            $issue | Out-File -FilePath "$global:dir\issue.txt" -Force -Encoding utf8
+            $issue | Out-File -FilePath "$script:dir\issue.txt" -Force -Encoding utf8
         }
         else {
-            $global:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
+            $script:dir = (Get-ChildItem "C:\Windows\Temp\VTS\PSDOCS\" |
                 Sort-Object Name |
                 Select-Object -ExpandProperty FullName -last 1)
-            $issue = Get-Content "$global:dir\issue.txt"
+            $issue = Get-Content "$script:dir\issue.txt"
             $resume = "Resuming Last Session. "
         }
-        if ($RecordSession -eq $true) {
+        if ($RecordSession) {
             DisplayRecordingBanner
             StartStepsRecorder
             set-clipboard " "
@@ -461,17 +456,17 @@ $(Get-Content "$global:dir\resolution.txt")
         }
     }
     finally {
-        if ($RecordSession -eq $true) {
+        if ($RecordSession) {
             StopStepsRecorder
             DisplayRecordingCompleteBanner
         }
         Write-Host "Enter Session Conclusion"
         $resolution = Read-String
-        Add-Content -Path "$global:dir\resolution.txt" -Value $resolution -Force
+        Add-Content -Path "$script:dir\resolution.txt" -Value $resolution -Force
         DisplayProcessingBanner
         ParseSteps
         CleanupSteps
-        $global:clipboard | Select-Object -unique | Out-File -FilePath "$global:dir\clipboard.txt" -Force -Encoding utf8 -Append
+        $script:clipboard | Select-Object -unique | Out-File -FilePath "$script:dir\clipboard.txt" -Force -Encoding utf8 -Append
         $SessionEnd = Timestamp
         CalculateSessionTime
         GeneratePrompt
@@ -482,6 +477,7 @@ $(Get-Content "$global:dir\resolution.txt")
         Cleanup
         prompt
     }
+    prompt
 }
 
 
