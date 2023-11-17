@@ -2038,7 +2038,7 @@ function Add-vtsPrinterDriver {
         $DriverURL
     )
 
-    $FileName = $DriverURL -split '/' | Select-Object -Last 1
+    $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
 
     if (Test-Path "$WorkingDir\$FileName") {
         try {
