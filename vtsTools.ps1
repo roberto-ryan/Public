@@ -2043,7 +2043,8 @@ function Add-vtsPrinterDriver {
     if (Test-Path "$WorkingDir\$FileName") {
         try {
             Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
-        } catch {
+        }
+        catch {
             Write-Host "Failed to rename $FileName. Error: $_"
         }
     }
@@ -2098,28 +2099,25 @@ function Add-vtsPrinterDriver {
                 $parts = $line -split "="
                 $driverName = $parts[0].Trim()
                 if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                    $DriverNames += ($driverName -replace '"','')
+                    $DriverNames += ($driverName -replace '"', '')
                 }
             }
             if ($line -match '="' -or $line -match ' = "') {
                 $parts = $line -split "="
                 $driverName = $parts[1].Trim()
                 if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                    $DriverNames += ($driverName -replace '"','')
+                    $DriverNames += ($driverName -replace '"', '')
                 }
             }
         }
         $UniqueDriverNames = $DriverNames | Select-Object -unique
     
         foreach ($Driver in $UniqueDriverNames) {
-            try {
-                Write-Host "Adding $Driver driver..."
-                Add-PrinterDriver -Name $Driver -ErrorAction Stop
-            } catch {
-                Write-Host "Failed to add $Driver driver. Error: $_"
-            }
+            Add-PrinterDriver -Name $Driver 2>$null | Out-Null
+            if ($?){Write-Host "Added $Driver driver..."}
         }
-    } else {
+    }
+    else {
         Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed."
     }
 }
