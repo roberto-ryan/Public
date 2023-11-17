@@ -2008,3 +2008,115 @@ function Schedule-vtsReboot {
     # Register the task to reboot the computer
     Register-ScheduledTask -Action (New-ScheduledTaskAction -Execute 'shutdown.exe' -Argument '/r /f /t 0') -Trigger (New-ScheduledTaskTrigger -Once -At $rebootDate) -TaskName 'RebootTask' -Description 'Reboots the computer for maintenance' -RunLevel Highest
 }
+
+<#
+.SYNOPSIS
+This script downloads, extracts, and installs a printer driver from a given URL.
+
+.DESCRIPTION
+The Add-vtsPrinterDriver function downloads a printer driver from a specified URL, extracts it using 7Zip, and installs it on the local machine. 
+It also handles the creation of necessary directories and the installation of required software (Chocolatey and 7Zip).
+
+.PARAMETER WorkingDir
+The directory where the printer driver will be downloaded and extracted. Default is "C:\temp\PrinterDrivers".
+
+.PARAMETER DriverURL
+The URL of the printer driver to be downloaded. This is a mandatory parameter.
+
+.EXAMPLE
+Add-vtsPrinterDriver -WorkingDir "C:\temp\MyDrivers" -DriverURL "http://example.com/driver.zip"
+
+This example downloads the printer driver from http://example.com/driver.zip, extracts it to C:\temp\MyDrivers, and installs it.
+
+.NOTES
+This script requires administrative privileges to install the printer driver and software dependencies.
+#>
+function Add-vtsPrinterDriver {
+    param(
+        $WorkingDir = "C:\temp\PrinterDrivers",
+        [Parameter(Mandatory = $true)]
+        $DriverURL
+    )
+
+    $FileName = $DriverURL -split '/' | Select-Object -Last 1
+
+    if (Test-Path "$WorkingDir\$FileName") {
+        try {
+            Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
+        } catch {
+            Write-Host "Failed to rename $FileName. Error: $_"
+        }
+    }
+
+    # Make $WorkingDir
+    if (!(Test-Path $WorkingDir)) {
+        $FileName
+        Write-Host "Creating $WorkingDir..."
+        mkdir $WorkingDir -Force
+    }
+        
+    # Download Driver
+    Write-Host "Downloading Driver..."
+    Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
+
+        
+    # Remove Chocolatey folder if choco.exe doesn't exist
+    if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
+        Write-Host "Removing Chocolatey folder..."
+        Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
+        # Install Chocolatey
+        Write-Host "Installing Chocolatey..."
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    }
+        
+    # Install 7Zip using Chocolatey
+    if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
+        Write-Host "Installing 7Zip using Chocolatey..."
+        & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
+    }
+        
+    # Use 7Zip to extract driver
+    Write-Host "Extracting driver using 7Zip..."
+    & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName"
+        
+
+    $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
+
+    foreach ($Inf in $InfFiles) {
+        # Add driver to driver store
+        Write-Host "Adding $Inf to driver store..."
+        pnputil.exe /a "$Inf"
+    }
+
+    $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
+
+    $InfFileLines = $InfFileContent -split "`n"
+    $DriverNames = @()
+    foreach ($line in $InfFileLines) {
+        if ($line -match '" = ' -or $line -match '"=') {
+            $parts = $line -split "="
+            $driverName = $parts[0].Trim()
+            if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                $DriverNames += ($driverName -replace '"','')
+            }
+        }
+        if ($line -match '="' -or $line -match ' = "') {
+            $parts = $line -split "="
+            $driverName = $parts[1].Trim()
+            if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                $DriverNames += ($driverName -replace '"','')
+            }
+        }
+    }
+    $UniqueDriverNames = $DriverNames | Select-Object -unique
+
+    foreach ($Driver in $UniqueDriverNames) {
+        try {
+            Write-Host "Adding $Driver driver..."
+            Add-PrinterDriver -Name $Driver -ErrorAction Stop
+        } catch {
+            Write-Host "Failed to add $Driver driver. Error: $_"
+        }
+    }
+
+}
