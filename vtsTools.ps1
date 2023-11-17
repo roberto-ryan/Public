@@ -2038,7 +2038,7 @@ function Add-vtsPrinterDriver {
         $DriverURL
     )
 
-    $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
+    $FileName = $DriverURL -split '/' | Select-Object -Last 1
 
     if (Test-Path "$WorkingDir\$FileName") {
         try {
@@ -2082,41 +2082,44 @@ function Add-vtsPrinterDriver {
 
     $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
 
-    foreach ($Inf in $InfFiles) {
-        # Add driver to driver store
-        Write-Host "Adding $Inf to driver store..."
-        pnputil.exe /a "$Inf"
-    }
-
-    $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
-
-    $InfFileLines = $InfFileContent -split "`n"
-    $DriverNames = @()
-    foreach ($line in $InfFileLines) {
-        if ($line -match '" = ' -or $line -match '"=') {
-            $parts = $line -split "="
-            $driverName = $parts[0].Trim()
-            if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                $DriverNames += ($driverName -replace '"','')
+    if ($InfFiles) {
+        foreach ($Inf in $InfFiles) {
+            # Add driver to driver store
+            Write-Host "Adding $Inf to driver store..."
+            pnputil.exe /a "$Inf"
+        }
+    
+        $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
+    
+        $InfFileLines = $InfFileContent -split "`n"
+        $DriverNames = @()
+        foreach ($line in $InfFileLines) {
+            if ($line -match '" = ' -or $line -match '"=') {
+                $parts = $line -split "="
+                $driverName = $parts[0].Trim()
+                if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                    $DriverNames += ($driverName -replace '"','')
+                }
+            }
+            if ($line -match '="' -or $line -match ' = "') {
+                $parts = $line -split "="
+                $driverName = $parts[1].Trim()
+                if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                    $DriverNames += ($driverName -replace '"','')
+                }
             }
         }
-        if ($line -match '="' -or $line -match ' = "') {
-            $parts = $line -split "="
-            $driverName = $parts[1].Trim()
-            if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                $DriverNames += ($driverName -replace '"','')
+        $UniqueDriverNames = $DriverNames | Select-Object -unique
+    
+        foreach ($Driver in $UniqueDriverNames) {
+            try {
+                Write-Host "Adding $Driver driver..."
+                Add-PrinterDriver -Name $Driver -ErrorAction Stop
+            } catch {
+                Write-Host "Failed to add $Driver driver. Error: $_"
             }
         }
+    } else {
+        Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed."
     }
-    $UniqueDriverNames = $DriverNames | Select-Object -unique
-
-    foreach ($Driver in $UniqueDriverNames) {
-        try {
-            Write-Host "Adding $Driver driver..."
-            Add-PrinterDriver -Name $Driver -ErrorAction Stop
-        } catch {
-            Write-Host "Failed to add $Driver driver. Error: $_"
-        }
-    }
-
 }
