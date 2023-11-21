@@ -2053,45 +2053,45 @@ function Add-vtsPrinterDriver {
         # Make $WorkingDir
         if (!(Test-Path $WorkingDir)) {
             $FileName
-            Write-Host "➜ Creating $WorkingDir..."
+            Write-Host "`n➜ Creating $WorkingDir..."
             New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
-            if ($?){Write-Host "✔ Successfully created $WorkingDir" -ForegroundColor Green}
+            if ($?){Write-Host "✔ Successfully created $WorkingDir`n" -ForegroundColor Green}
         }
           
         # Download Driver
-        Write-Host "➜ Downloading Driver..."
+        Write-Host "`n➜ Downloading Driver..."
         Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
-        if ($?){Write-Host "✔ Successfully Downloaded Driver" -ForegroundColor Green}
+        if ($?){Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green}
   
           
         # Remove Chocolatey folder if choco.exe doesn't exist
         if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
-            Write-Host "➜ Removing Chocolatey folder..."
+            Write-Host "`n➜ Removing Chocolatey folder..."
             Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
-            if ($?){Write-Host "✔ Removed Choloatey folder..." -ForegroundColor Green}
+            if ($?){Write-Host "✔ Removed Choloatey folder...`n" -ForegroundColor Green}
             # Install Chocolatey
-            Write-Host "➜ Installing Chocolatey..."
+            Write-Host "`n➜ Installing Chocolatey..."
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-            if ($?){Write-Host "✔ Installed Chocolatey" -ForegroundColor Green}
+            if ($?){Write-Host "✔ Installed Chocolatey`n" -ForegroundColor Green}
         }
           
         # Install 7Zip using Chocolatey
         if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
-            Write-Host "➜ Installing 7Zip using Chocolatey..."
+            Write-Host "`n➜ Installing 7Zip using Chocolatey..."
             & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
-            if ($?){Write-Host "✔ Installed 7Zip" -ForegroundColor Green}
+            if ($?){Write-Host "✔ Installed 7Zip`n" -ForegroundColor Green}
         }
           
         # Use 7Zip to extract driver
-        Write-Host "➜ Extracting driver using 7Zip..."
+        Write-Host "`n➜ Extracting driver using 7Zip..."
         & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName" | Out-Null
-        if ($?){Write-Host "✔ Files extracted" -ForegroundColor Green}
+        if ($?){Write-Host "✔ Files extracted`n" -ForegroundColor Green}
           
   
         $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
   
         if ($InfFiles) {
-            Write-Host "➜ Adding Drivers..."
+            Write-Host "`n➜ Adding Drivers..."
             foreach ($Inf in $InfFiles) {
                 # Add driver to driver store
                 pnputil.exe /a "$Inf" | Out-Null
