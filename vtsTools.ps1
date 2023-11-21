@@ -2097,14 +2097,14 @@ function Add-vtsPrinterDriver {
             $InfFileLines = $InfFileContent -split "`n"
             $DriverNames = @()
             foreach ($line in $InfFileLines) {
-                if ($line -match '" = ' -or $line -match '"=') {
+                if ($line -match '".*=.*') {
                     $parts = $line -split "="
                     $driverName = $parts[0].Trim()
                     if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
                         $DriverNames += ($driverName -replace '"', '')
                     }
                 }
-                if ($line -match '="' -or $line -match ' = "') {
+                if ($line -match '.*=.*"') {
                     $parts = $line -split "="
                     $driverName = $parts[1].Trim()
                     if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
@@ -2128,9 +2128,6 @@ function Add-vtsPrinterDriver {
         }
     }
     finally {
-        $userConfirmation = Read-Host "`nWould you like to remove the downloaded files from $WorkingDir? (y/n)"
-        if ($userConfirmation -eq 'y') {
-            Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
-        }
+        Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
     }
 }
