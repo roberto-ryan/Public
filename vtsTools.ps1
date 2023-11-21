@@ -2046,50 +2046,56 @@ function Add-vtsPrinterDriver {
                 Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
             }
             catch {
-                Write-Host "Failed to rename $FileName. Error: $_"
+                Write-Host "Failed to rename $FileName. Error: $_" -ForegroundColor Red
             }
         }
   
         # Make $WorkingDir
         if (!(Test-Path $WorkingDir)) {
             $FileName
-            Write-Host "Creating $WorkingDir..."
+            Write-Host "➜ Creating $WorkingDir..."
             New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
+            if ($?){Write-Host "✔ Successfully created $WorkingDir" -ForegroundColor Green}
         }
           
         # Download Driver
-        Write-Host "Downloading Driver..."
+        Write-Host "➜ Downloading Driver..."
         Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
+        if ($?){Write-Host "✔ Successfully Downloaded Driver" -ForegroundColor Green}
   
           
         # Remove Chocolatey folder if choco.exe doesn't exist
         if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
-            Write-Host "Removing Chocolatey folder..."
+            Write-Host "➜ Removing Chocolatey folder..."
             Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
+            if ($?){Write-Host "✔ Removed Choloatey folder..." -ForegroundColor Green}
             # Install Chocolatey
-            Write-Host "Installing Chocolatey..."
+            Write-Host "➜ Installing Chocolatey..."
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            if ($?){Write-Host "✔ Installed Chocolatey" -ForegroundColor Green}
         }
           
         # Install 7Zip using Chocolatey
         if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
-            Write-Host "Installing 7Zip using Chocolatey..."
+            Write-Host "➜ Installing 7Zip using Chocolatey..."
             & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
+            if ($?){Write-Host "✔ Installed 7Zip" -ForegroundColor Green}
         }
           
         # Use 7Zip to extract driver
-        Write-Host "Extracting driver using 7Zip..."
+        Write-Host "➜ Extracting driver using 7Zip..."
         & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName" | Out-Null
-        if ($?){Write-Host "Files extracted..."}
+        if ($?){Write-Host "✔ Files extracted" -ForegroundColor Green}
           
   
         $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
   
         if ($InfFiles) {
+            Write-Host "➜ Adding Drivers..."
             foreach ($Inf in $InfFiles) {
                 # Add driver to driver store
                 pnputil.exe /a "$Inf" | Out-Null
-                if($?){Write-Host "Added $Inf to driver store..."}
+                if($?){Write-Host "✔ Added $Inf to driver store" -ForegroundColor Green}
             }
       
             $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
@@ -2120,11 +2126,11 @@ function Add-vtsPrinterDriver {
                 $currentDriver++
                 Write-Progress -Activity "Installing printer drivers..." -Status "$([math]::Round(($currentDriver / $totalDrivers) * 100))%" -PercentComplete (($currentDriver / $totalDrivers) * 100)
                 Add-PrinterDriver -Name $Driver 2>$null | Out-Null
-                if ($?) { Write-Host "Added $Driver driver..." }
+                if ($?) { Write-Host "✔ Added $Driver driver" -ForegroundColor Green }
             }
             Write-Progress -Activity "Adding printer drivers..." -Completed
         } else {
-            Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed."
+            Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed." -ForegroundColor Red
         }
     }
     finally {
