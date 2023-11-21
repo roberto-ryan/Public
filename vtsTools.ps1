@@ -2037,87 +2037,100 @@ function Add-vtsPrinterDriver {
         [Parameter(Mandatory = $true)]
         $DriverURL
     )
-
-    $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
-
-    if (Test-Path "$WorkingDir\$FileName") {
-        try {
-            Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
-        }
-        catch {
-            Write-Host "Failed to rename $FileName. Error: $_"
-        }
-    }
-
-    # Make $WorkingDir
-    if (!(Test-Path $WorkingDir)) {
-        $FileName
-        Write-Host "Creating $WorkingDir..."
-        mkdir $WorkingDir -Force
-    }
-        
-    # Download Driver
-    Write-Host "Downloading Driver..."
-    Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
-
-        
-    # Remove Chocolatey folder if choco.exe doesn't exist
-    if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
-        Write-Host "Removing Chocolatey folder..."
-        Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
-        # Install Chocolatey
-        Write-Host "Installing Chocolatey..."
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-    }
-        
-    # Install 7Zip using Chocolatey
-    if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
-        Write-Host "Installing 7Zip using Chocolatey..."
-        & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
-    }
-        
-    # Use 7Zip to extract driver
-    Write-Host "Extracting driver using 7Zip..."
-    & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName"
-        
-
-    $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
-
-    if ($InfFiles) {
-        foreach ($Inf in $InfFiles) {
-            # Add driver to driver store
-            Write-Host "Adding $Inf to driver store..."
-            pnputil.exe /a "$Inf"
-        }
-    
-        $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
-    
-        $InfFileLines = $InfFileContent -split "`n"
-        $DriverNames = @()
-        foreach ($line in $InfFileLines) {
-            if ($line -match '" = ' -or $line -match '"=') {
-                $parts = $line -split "="
-                $driverName = $parts[0].Trim()
-                if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                    $DriverNames += ($driverName -replace '"', '')
-                }
+  
+    try {
+        $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
+  
+        if (Test-Path "$WorkingDir\$FileName") {
+            try {
+                Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
             }
-            if ($line -match '="' -or $line -match ' = "') {
-                $parts = $line -split "="
-                $driverName = $parts[1].Trim()
-                if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                    $DriverNames += ($driverName -replace '"', '')
-                }
+            catch {
+                Write-Host "Failed to rename $FileName. Error: $_"
             }
         }
-        $UniqueDriverNames = $DriverNames | Select-Object -unique
-    
-        foreach ($Driver in $UniqueDriverNames) {
-            Add-PrinterDriver -Name $Driver 2>$null | Out-Null
-            if ($?){Write-Host "Added $Driver driver..."}
+  
+        # Make $WorkingDir
+        if (!(Test-Path $WorkingDir)) {
+            $FileName
+            Write-Host "Creating $WorkingDir..."
+            New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
+        }
+          
+        # Download Driver
+        Write-Host "Downloading Driver..."
+        Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
+  
+          
+        # Remove Chocolatey folder if choco.exe doesn't exist
+        if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
+            Write-Host "Removing Chocolatey folder..."
+            Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
+            # Install Chocolatey
+            Write-Host "Installing Chocolatey..."
+            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        }
+          
+        # Install 7Zip using Chocolatey
+        if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
+            Write-Host "Installing 7Zip using Chocolatey..."
+            & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
+        }
+          
+        # Use 7Zip to extract driver
+        Write-Host "Extracting driver using 7Zip..."
+        & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName" | Out-Null
+        if ($?){Write-Host "Files extracted..."}
+          
+  
+        $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
+  
+        if ($InfFiles) {
+            foreach ($Inf in $InfFiles) {
+                # Add driver to driver store
+                pnputil.exe /a "$Inf" | Out-Null
+                if($?){Write-Host "Added $Inf to driver store..."}
+            }
+      
+            $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
+      
+            $InfFileLines = $InfFileContent -split "`n"
+            $DriverNames = @()
+            foreach ($line in $InfFileLines) {
+                if ($line -match '" = ' -or $line -match '"=') {
+                    $parts = $line -split "="
+                    $driverName = $parts[0].Trim()
+                    if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                        $DriverNames += ($driverName -replace '"', '')
+                    }
+                }
+                if ($line -match '="' -or $line -match ' = "') {
+                    $parts = $line -split "="
+                    $driverName = $parts[1].Trim()
+                    if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+                        $DriverNames += ($driverName -replace '"', '')
+                    }
+                }
+            }
+            $UniqueDriverNames = $DriverNames | Select-Object -unique
+      
+            $totalDrivers = $UniqueDriverNames.Count
+            $currentDriver = 0
+            foreach ($Driver in $UniqueDriverNames) {
+                $currentDriver++
+                Write-Progress -Activity "Installing printer drivers..." -Status "$([math]::Round(($currentDriver / $totalDrivers) * 100))%" -PercentComplete (($currentDriver / $totalDrivers) * 100)
+                Add-PrinterDriver -Name $Driver 2>$null | Out-Null
+                if ($?) { Write-Host "Added $Driver driver..." }
+            }
+            Write-Progress -Activity "Adding printer drivers..." -Completed
+        } else {
+            Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed."
         }
     }
-    else {
-        Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed."
+    finally {
+        $userConfirmation = Read-Host "`nWould you like to remove the downloaded files from $WorkingDir? (y/n)"
+        if ($userConfirmation -eq 'y') {
+            Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
+        }
     }
 }
