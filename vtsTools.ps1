@@ -2137,3 +2137,39 @@ function Add-vtsPrinterDriver {
         Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
     }
 }
+<#
+.SYNOPSIS
+This function retrieves the license details for a list of users.
+
+.DESCRIPTION
+The function Get-365UserLicenseDetails connects to the Graph API and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
+
+.PARAMETER UserList
+A single string or comma separated email addresses for which the license details are to be retrieved.
+
+.EXAMPLE
+Get-365UserLicenseDetails -UserList "user1@domain.com, user2@domain.com"
+
+This example retrieves the license details for user1@domain.com and user2@domain.com.
+#>
+
+function Get-365UserLicenseDetails {
+    param (
+        [Parameter(Mandatory=$true, HelpMessage="Enter a single email or a comma separated list of emails.")]
+        $UserList
+    )
+
+    Connect-Graph -Scopes User.ReadWrite.All, Organization.Read.All
+
+#     $UserList = $UserList -split ','
+    $LicenseDetails = @()
+
+    foreach ($User in $UserList) {
+        $LicenseDetails += [pscustomobject]@{
+            User    = $User.Trim()
+            License = (Get-MgUserLicenseDetail -UserId $User.Trim() | Select -expand SkuPartNumber) -join ", "
+        }
+    }
+
+    $LicenseDetails
+}
