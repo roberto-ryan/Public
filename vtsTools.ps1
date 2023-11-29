@@ -2161,7 +2161,6 @@ function Get-365UserLicenseDetails {
 
     Connect-Graph -Scopes User.ReadWrite.All, Organization.Read.All
 
-#     $UserList = $UserList -split ','
     $LicenseDetails = @()
 
     foreach ($User in $UserList) {
