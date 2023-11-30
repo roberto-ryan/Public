@@ -2199,7 +2199,7 @@ function Format-vtsMacAddress {
     )
 
     # Remove any separators from the MAC address and convert it to lowercase
-    $cleanMac = ($MacAddress -replace '[-:.]', '').ToLower()
+    $cleanMac = (($MacAddress -replace '[-:.]', '').ToLower()).Trim() | Where-Object Length -eq 12
 
     # Check if the MAC address is 12 characters long
     if ($cleanMac.Length -ne 12) {
