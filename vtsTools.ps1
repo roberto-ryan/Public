@@ -2175,24 +2175,27 @@ function Get-365UserLicenseDetails {
 
 <#
 .SYNOPSIS
-This function formats a MAC address input by the user.
+This function formats a MAC address input by the user or from the clipboard if not specified.
 
 .DESCRIPTION
-The function Format-vtsMacAddress takes a MAC address as a parameter, removes any separators, converts it to lowercase, checks if it is 12 characters long, and then formats it by inserting colons after every 2 characters. The formatted MAC address is then copied to the clipboard.
+The function Format-vtsMacAddress takes a MAC address as a parameter, removes any separators, converts it to lowercase, checks if it is 12 characters long, and then formats it by inserting colons after every 2 characters. If the MacAddress parameter is not specified, the function will use the current content of the clipboard. The formatted MAC address is then copied to the clipboard.
 
 .PARAMETER MacAddress
-A string representing the MAC address to be formatted.
+A string representing the MAC address to be formatted. If not specified, the function will use the current content of the clipboard.
 
 .EXAMPLE
 Format-vtsMacAddress -MacAddress "00:0a:95:9d:68:16"
 
 This example formats the provided MAC address.
-#>
 
+.EXAMPLE
+Format-vtsMacAddress
+
+This example formats the MAC address currently in the clipboard.
+#>
 function Format-vtsMacAddress {
     param (
-        [Parameter(Mandatory=$true, HelpMessage="Enter the MAC address.")]
-        $MacAddress
+        $MacAddress = (Get-Clipboard)
     )
 
     # Remove any separators from the MAC address and convert it to lowercase
