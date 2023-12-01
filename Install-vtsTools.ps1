@@ -47,7 +47,14 @@ ForEach-Object {
     }
 }
 
-$commands | Sort-Object Category, 'Installed Command' | Select-Object 'Installed Command', Category, Description
+# $commands | Sort-Object Category, 'Installed Command' | Select-Object 'Installed Command', Category, Description | Format-Table -View Category
+
+$groupedCommands = $commands | Group-Object -Property Category
+
+foreach ($group in $groupedCommands) {
+    Write-Host "`nCategory: $($group.Name)"
+    $group.Group | Format-Table 'Installed Command', Description
+}
 
 "`nType 'get-help -full' followed by the command name for more information.
 
