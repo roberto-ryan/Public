@@ -51,10 +51,17 @@ ForEach-Object {
 
 $groupedCommands = $commands | Group-Object -Property Category
 
+Write-Host "VTS Toolkit" -ForegroundColor Cyan
+
 foreach ($group in $groupedCommands) {
-    Write-Host "`nCategory: $($group.Name)"
+    $windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+    Write-Host ('-' * $windowWidth)
+    Write-Host "`nCategory: $($group.Name)" -ForegroundColor Yellow
     $group.Group | Format-Table 'Installed Command', Description
 }
+
+$windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+Write-Host ('-' * $windowWidth)
 
 "`nType 'get-help -full' followed by the command name for more information.
 
