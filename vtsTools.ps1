@@ -2340,7 +2340,7 @@ function Copy-vts365MailToMailbox {
         $mailbox = $mailboxTable[$key].Location
         # Perform the search and copy the emails to the target mailbox's inbox
         Write-Host "Performing search and copying emails from mailbox: $mailbox..."
-        Search-Mailbox -Identity $mailbox -SearchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate" -TargetMailbox $targetMailbox -TargetFolder $targetFolder -LogLevel Full | Out-Null
+        Search-Mailbox -Identity $mailbox -SearchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate" -TargetMailbox $targetMailbox -TargetFolder $targetFolder -LogLevel Full 3>$null | Out-Null
     }
 
     Write-Host "Operation completed."
