@@ -2283,6 +2283,7 @@ function Copy-vts365MailToMailbox {
     Write-Host "Waiting for compliance search to complete..."
     while ((Get-ComplianceSearch -Identity "$SearchName" | Select-Object -ExpandProperty Status) -ne "Completed") {
         Start-Sleep -Seconds 5
+        Get-ComplianceSearch -Identity "$SearchName" | Out-Null
     }
     
     # Get the compliance search results
