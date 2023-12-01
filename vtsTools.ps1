@@ -1115,7 +1115,7 @@ function Install-vtsPwsh {
 
 <#
 .DESCRIPTION
-    Get File Type Association
+    Get the default application associated with a specific file extension. If no extension is provided, it returns a list of all file extensions and their associated default applications.
 
 .NOTES
     Version    : 1.2.0
@@ -1164,7 +1164,7 @@ function Get-FTA {
 
 <#
 .DESCRIPTION
-    Get Protocol Type Association
+    Get the default application associated with a specific protocol. If no protocol is provided, it returns a list of all protocols and their associated default applications.
 
 .NOTES
     Version    : 1.2.0
@@ -1210,7 +1210,7 @@ function Get-PTA {
 
 <#
 .DESCRIPTION
-    Register Application
+    Register an application and set it as the default for a specified file extension or protocol.
 
 .NOTES
     Version    : 1.2.0
@@ -1222,7 +1222,7 @@ function Get-PTA {
 
 .EXAMPLE
     Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
-    Register Application and Set as Default for .pdf reader
+    This example registers SumatraPDF as the default PDF reader.
 
 .LINK
 File Association Management
@@ -1282,7 +1282,7 @@ function Register-FTA {
 
 <#
 .DESCRIPTION
-    Unregister Application
+    Remove the file type association for a given application.
 
 .NOTES
     Version    : 1.2.0
@@ -1405,7 +1405,7 @@ function Remove-FTA {
 
 <#
 .DESCRIPTION
-    Set File Type Association Default
+    Set the default file type association. It can be used to set the default application for a specific file type or protocol.
 .NOTES
     Version    : 1.2.0
     Author(s)  : Danyfirex & Dany3j
@@ -1912,7 +1912,9 @@ function Set-FTA {
 
 <#
 .DESCRIPTION
-    Set Filetype Association
+    Set the default application for a specific protocol. It takes a ProgId, a Protocol, and an optional Icon as parameters. 
+    The ProgId is the identifier of the application to be set as default. The Protocol is the protocol for which the application will be set as default. 
+    The Icon is an optional parameter that sets the icon for the application.
 
 .NOTES
     Version    : 1.2.0
