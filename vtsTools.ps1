@@ -11,6 +11,9 @@ TimeGenerated : 9/13/2022 9:14:30 AM
 Message       : Media disconnected on NIC /DEVICE/{90E7B0EA-AE78-4836-8CBC-B73F1BCD5894} (Friendly Name: Microsoft
                 Network Adapter Multiplexor Driver).
 Log           : System
+
+.LINK
+Log Management
 #>
 function Search-vtsEventLog {
   [CmdletBinding()]
@@ -60,6 +63,9 @@ DriveLetter         : Y
 RemotePath          : https://live.sysinternals.com
 ConnectWithUsername : rober
 SID                 : S-1-5-21-376445358-2603134888-3166729622-1001
+
+.LINK
+Drive Management
 #>
 function Get-vtsMappedDrive {
   # This is required for Verbose to work correctly.
@@ -122,6 +128,9 @@ Last Successful Ping : 09/14/2022 10:31:30
 
 Press Ctrl-C to exit
 logfile saved to C:\temp\PingResults-8.8.8.8.log
+
+.LINK
+Network
 #>
 function Start-vtsPingReport {
   Param(
@@ -198,6 +207,9 @@ PS> New-vtsRandomPassword
 
 Output:
 Random Password Copied to Clipboard
+
+.LINK
+Utilities
 #>
 function New-vtsRandomPassword {
   $numbers = 0..9
@@ -233,6 +245,9 @@ romeo
 india
 november
 golf
+
+.LINK
+Utilities
 #>
 function Out-vtsPhoneticAlphabet {
   [CmdletBinding()]
@@ -322,6 +337,9 @@ PS> Get-vtsDisplayConnectionType
 Output:
 GSM M2362D (DisplayPort (external))
 GSM M2362D (HDMI)
+
+.LINK
+System Information
 #>
 function Get-vtsDisplayDetails {
   $adapterTypes = @{
@@ -381,6 +399,9 @@ function Get-vtsDisplayDetails {
 Adds a Google Chrome extension to the forced install list. Can be used for forcing installation of any Google Chrome extension. Takes existing extensions into account which might be added by other means, such as GPO and MDM.
 .EXAMPLE
 PS> Install-vtsChromeExtension -extensionId "ddloeodolhdfbohkokiflfbacbfpjahp"
+
+.LINK
+Package Management
 #>
 function Install-vtsChromeExtension {
   param(
@@ -445,6 +466,9 @@ PS> Get-vtsTemperature
 
 Output:
 27.85 C : 82.1300000000001 F : 301K
+
+.LINK
+System Information
 #>
 function Get-vtsTemperature {
   $t = Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi"
@@ -487,6 +511,9 @@ FriendlyName                                          Present Status
 ------------                                          ------- ------
 EPSON Utility                                            True OK
 EPSON ES-400                                             True OK
+
+.LINK
+Device Management
 #>
 function Get-vtsUSB {
   param (
@@ -556,6 +583,9 @@ D     avg. disk bytes/transfer                       0
 D     avg. disk queue length                         0
 D     % disk time                                    0
 D     current disk queue length                      0
+
+.LINK
+System Information
 #>
 function Get-vtsDiskStat {
   param (
@@ -629,6 +659,9 @@ You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 Ensuring Chocolatey commands are on the path
 Ensuring chocolatey.nupkg is in the lib folder
+
+.LINK
+Package Management
 #>
 function Install-vtsChoco {
   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -650,7 +683,10 @@ Output:
      Upload:   309.15 Mbps (data used: 526.0 MB )
 Packet Loss:     0.0%
  Result URL: https://www.speedtest.net/result/c/23d057dd-8de5-4d62-aef9-72beb122d7a4
-#>
+
+ .LINK
+
+ #>
 function Start-vtsSpeedTest {
   if (Test-Path "C:\ProgramData\chocolatey\bin\speedtest.exe") {
     C:\ProgramData\chocolatey\bin\speedtest.exe
@@ -682,6 +718,9 @@ X ComputerName Result     KB          Size Title
 2 CH-BIMA-W... Downloaded KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
 3 CH-BIMA-W... Installed  KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
 Reboot is required. Do it now? [Y / N] (default is 'N')
+
+.LINK
+Package Management
 #>
 function Install-vtsWindowsUpdate {
   $NuGet = Get-PackageProvider -Name NuGet
@@ -741,6 +780,9 @@ Message     : The user "domain\robert.ryan, on client computer "100.121.185.200"
               and received 4463546 bytes. The client session duration was 435 seconds. Connection protocol used:
               "HTTP".
 Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+
+.LINK
+Log Management
 #>
 function Search-vtsRDPGatewayLog {
   [CmdletBinding()]
@@ -780,6 +822,9 @@ function Search-vtsRDPGatewayLog {
 Uninstall ninja and remove keys, files and services.
 .EXAMPLE
 PS> Uninstall-vtsNinja
+
+.LINK
+Package Management
 #>
 function Uninstall-vtsNinja {
   param (
@@ -961,6 +1006,9 @@ Sets the default printer.
 PS> Set-vtsDefaultPrinter -Name brother
 .EXAMPLE
 PS> Set-vtsDefaultPrinter -Name "HP Laserjet"
+
+.LINK
+Print Management
 #>
 function Set-vtsDefaultPrinter {
   Param(
@@ -994,6 +1042,9 @@ PS> Show-vtsToastNotification
 .EXAMPLE
 Show notifications for a selected user
 PS> Show-vtsToastNotification -user john.doe
+
+.LINK
+Device Management
 #>
 function Show-vtsToastNotification {
   param(
@@ -1028,6 +1079,9 @@ Maps a remote drive.
 PS> New-vtsMappedDrive -Letter A -Path \\192.168.0.4\sharedfolder
 .EXAMPLE
 PS> New-vtsMappedDrive -Letter A -Path "\\192.168.0.4\folder with spaces"
+
+.LINK
+Drive Management
 #>
 function New-vtsMappedDrive {
   param(
@@ -1046,6 +1100,9 @@ function New-vtsMappedDrive {
 Install PowerShell 7
 .EXAMPLE
 PS> Install-vtsPwsh
+
+.LINK
+Package Management
 #>
 function Install-vtsPwsh {
   msiexec.exe /i "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi" /qn
@@ -1069,7 +1126,10 @@ function Install-vtsPwsh {
 .EXAMPLE
     Get-FTA .pdf
     Show Default Application Program Id for an Extension
-#>
+
+.LINK
+File Association Management
+    #>
 function Get-FTA {
   [CmdletBinding()]
   param (
@@ -1114,7 +1174,10 @@ function Get-FTA {
 
 .EXAMPLE
     Get-PTA
-#>
+
+.LINK
+File Association Management
+    #>
 function Get-PTA {
   [CmdletBinding()]
   param (
@@ -1158,7 +1221,10 @@ function Get-PTA {
 .EXAMPLE
     Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
     Register Application and Set as Default for .pdf reader
-#>
+
+.LINK
+File Association Management
+    #>
 function Register-FTA {
   [CmdletBinding()]
   param (
@@ -1223,7 +1289,10 @@ function Register-FTA {
                  LMongrain - Hash Algorithm PureBasic Version
     License    : MIT License
     Copyright  : 2022 Danysys. <danysys.com>
-#>
+
+.LINK
+File Association Management
+    #>
 function Remove-FTA {
   [CmdletBinding()]
   param (
@@ -1350,7 +1419,10 @@ function Remove-FTA {
 .EXAMPLE
     Set-FTA Applications\SumatraPDF.exe .pdf
     Set Sumatra PDF as Default .pdf reader
-#>
+
+.LINK
+File Association Management
+    #>
 function Set-FTA {
 
   [CmdletBinding()]
@@ -1851,7 +1923,10 @@ function Set-FTA {
 .EXAMPLE
     Set-PTA ChromeHTML http
     Set Google Chrome as Default for http Protocol
-#>
+
+.LINK
+File Association Management
+    #>
 function Set-PTA {
   [CmdletBinding()]
   param (
@@ -1889,7 +1964,10 @@ function Set-PTA {
     PS C:\> Add-vtsPrinter -Server "ch-dc" -Name "*P18*"
 
     This command will search for a printer with a name that includes "P18" on the server "ch-dc", and add it to the local machine after user confirmation.
-#>
+
+.LINK
+    Print Mangement
+    #>
 function Add-vtsPrinter {
   param(
     [Parameter(Mandatory = $true)]
@@ -1905,11 +1983,12 @@ function Add-vtsPrinter {
   if ($printers.Count -eq 0) {
     Write-Output "No printer found with the name $Name on server $Server"
     return
-  } else {
+  }
+  else {
     # Create a hashtable of printers
     $printerTable = @{}
-    for ($i=0; $i -lt $printers.Count; $i++) {
-      $printerTable.Add($i+1, $printers[$i])
+    for ($i = 0; $i -lt $printers.Count; $i++) {
+      $printerTable.Add($i + 1, $printers[$i])
       Write-Output "$($i+1): $($printers[$i].Name)"
     }
 
@@ -1918,7 +1997,8 @@ function Add-vtsPrinter {
 
     if ($userInput -eq '*') {
       $keys = $printerTable.Keys
-    } else {
+    }
+    else {
       $keys = $userInput.Split(',') | ForEach-Object { [int]$_ }
     }
 
@@ -1953,112 +2033,116 @@ This example downloads the printer driver from http://example.com/driver.zip, ex
 
 .NOTES
 This script requires administrative privileges to install the printer driver and software dependencies.
+
+.LINK
+Print Management
 #>
 function Add-vtsPrinterDriver {
-    param(
-        $WorkingDir = "C:\temp\PrinterDrivers",
-        [Parameter(Mandatory = $true)]
-        $DriverURL
-    )
+  param(
+    $WorkingDir = "C:\temp\PrinterDrivers",
+    [Parameter(Mandatory = $true)]
+    $DriverURL
+  )
   
-    try {
-        $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
+  try {
+    $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
   
-        if (Test-Path "$WorkingDir\$FileName") {
-            try {
-                Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
-            }
-            catch {
-                Write-Host "Failed to rename $FileName. Error: $_" -ForegroundColor Red
-            }
-        }
-  
-        # Make $WorkingDir
-        if (!(Test-Path $WorkingDir)) {
-            $FileName
-            Write-Host "`n➜ Creating $WorkingDir..."
-            New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
-            if ($?){Write-Host "✔ Successfully created $WorkingDir`n" -ForegroundColor Green}
-        }
-          
-        # Download Driver
-        Write-Host "`n➜ Downloading Driver..."
-        Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
-        if ($?){Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green}
-  
-          
-        # Remove Chocolatey folder if choco.exe doesn't exist
-        if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
-            Write-Host "`n➜ Removing Chocolatey folder..."
-            Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
-            if ($?){Write-Host "✔ Removed Choloatey folder...`n" -ForegroundColor Green}
-            # Install Chocolatey
-            Write-Host "`n➜ Installing Chocolatey..."
-            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-            if ($?){Write-Host "✔ Installed Chocolatey`n" -ForegroundColor Green}
-        }
-          
-        # Install 7Zip using Chocolatey
-        if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
-            Write-Host "`n➜ Installing 7Zip using Chocolatey..."
-            & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
-            if ($?){Write-Host "✔ Installed 7Zip`n" -ForegroundColor Green}
-        }
-          
-        # Use 7Zip to extract driver
-        Write-Host "`n➜ Extracting driver using 7Zip..."
-        & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName" | Out-Null
-        if ($?){Write-Host "✔ Files extracted`n" -ForegroundColor Green}
-          
-  
-        $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
-  
-        if ($InfFiles) {
-            Write-Host "`n➜ Adding Drivers..."
-            foreach ($Inf in $InfFiles) {
-                # Add driver to driver store
-                pnputil.exe /a "$Inf" | Out-Null
-                if($?){Write-Host "✔ Added $Inf to driver store" -ForegroundColor Green}
-            }
-      
-            $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
-      
-            $InfFileLines = $InfFileContent -split "`n"
-            $DriverNames = @()
-            foreach ($line in $InfFileLines) {
-                if ($line -match '".*=.*') {
-                    $parts = $line -split "="
-                    $driverName = $parts[0].Trim()
-                    if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                        $DriverNames += ($driverName -replace '"', '')
-                    }
-                }
-                if ($line -match '.*=.*"') {
-                    $parts = $line -split "="
-                    $driverName = $parts[1].Trim()
-                    if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
-                        $DriverNames += ($driverName -replace '"', '')
-                    }
-                }
-            }
-            $UniqueDriverNames = $DriverNames | Select-Object -unique
-      
-            $totalDrivers = $UniqueDriverNames.Count
-            $currentDriver = 0
-            foreach ($Driver in $UniqueDriverNames) {
-                $currentDriver++
-                Write-Progress -Activity "Installing printer drivers..." -Status "$([math]::Round(($currentDriver / $totalDrivers) * 100))%" -PercentComplete (($currentDriver / $totalDrivers) * 100)
-                Add-PrinterDriver -Name $Driver 2>$null | Out-Null
-                if ($?) { Write-Host "✔ Added $Driver driver" -ForegroundColor Green }
-            }
-            Write-Progress -Activity "Adding printer drivers..." -Completed
-        } else {
-            Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed." -ForegroundColor Red
-        }
+    if (Test-Path "$WorkingDir\$FileName") {
+      try {
+        Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
+      }
+      catch {
+        Write-Host "Failed to rename $FileName. Error: $_" -ForegroundColor Red
+      }
     }
-    finally {
-        Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
+  
+    # Make $WorkingDir
+    if (!(Test-Path $WorkingDir)) {
+      $FileName
+      Write-Host "`n➜ Creating $WorkingDir..."
+      New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
+      if ($?) { Write-Host "✔ Successfully created $WorkingDir`n" -ForegroundColor Green }
     }
+          
+    # Download Driver
+    Write-Host "`n➜ Downloading Driver..."
+    Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
+    if ($?) { Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green }
+  
+          
+    # Remove Chocolatey folder if choco.exe doesn't exist
+    if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
+      Write-Host "`n➜ Removing Chocolatey folder..."
+      Remove-Item "C:\ProgramData\chocolatey" -Force -Recurse -Confirm:$False
+      if ($?) { Write-Host "✔ Removed Choloatey folder...`n" -ForegroundColor Green }
+      # Install Chocolatey
+      Write-Host "`n➜ Installing Chocolatey..."
+      Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+      if ($?) { Write-Host "✔ Installed Chocolatey`n" -ForegroundColor Green }
+    }
+          
+    # Install 7Zip using Chocolatey
+    if (-not (Test-Path "C:\Program Files\7-Zip\7z.exe")) {
+      Write-Host "`n➜ Installing 7Zip using Chocolatey..."
+      & "C:\ProgramData\chocolatey\choco.exe" install 7zip.install -y
+      if ($?) { Write-Host "✔ Installed 7Zip`n" -ForegroundColor Green }
+    }
+          
+    # Use 7Zip to extract driver
+    Write-Host "`n➜ Extracting driver using 7Zip..."
+    & "C:\Program Files\7-Zip\7z.exe" x -y -o"$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" "$WorkingDir\$FileName" | Out-Null
+    if ($?) { Write-Host "✔ Files extracted`n" -ForegroundColor Green }
+          
+  
+    $InfFiles = Get-ChildItem -Path "$WorkingDir\$(($FileName -split '.') | Select-Object -Last 1)" -Include "*.inf" -Recurse -File | Select-Object -ExpandProperty FullName
+  
+    if ($InfFiles) {
+      Write-Host "`n➜ Adding Drivers..."
+      foreach ($Inf in $InfFiles) {
+        # Add driver to driver store
+        pnputil.exe /a "$Inf" | Out-Null
+        if ($?) { Write-Host "✔ Added $Inf to driver store" -ForegroundColor Green }
+      }
+      
+      $InfFileContent = $InfFiles | ForEach-Object { Get-Content $_ }
+      
+      $InfFileLines = $InfFileContent -split "`n"
+      $DriverNames = @()
+      foreach ($line in $InfFileLines) {
+        if ($line -match '".*=.*') {
+          $parts = $line -split "="
+          $driverName = $parts[0].Trim()
+          if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+            $DriverNames += ($driverName -replace '"', '')
+          }
+        }
+        if ($line -match '.*=.*"') {
+          $parts = $line -split "="
+          $driverName = $parts[1].Trim()
+          if ($driverName -notmatch 'NULL|{|<|Port|\(DOT|http') {
+            $DriverNames += ($driverName -replace '"', '')
+          }
+        }
+      }
+      $UniqueDriverNames = $DriverNames | Select-Object -unique
+      
+      $totalDrivers = $UniqueDriverNames.Count
+      $currentDriver = 0
+      foreach ($Driver in $UniqueDriverNames) {
+        $currentDriver++
+        Write-Progress -Activity "Installing printer drivers..." -Status "$([math]::Round(($currentDriver / $totalDrivers) * 100))%" -PercentComplete (($currentDriver / $totalDrivers) * 100)
+        Add-PrinterDriver -Name $Driver 2>$null | Out-Null
+        if ($?) { Write-Host "✔ Added $Driver driver" -ForegroundColor Green }
+      }
+      Write-Progress -Activity "Adding printer drivers..." -Completed
+    }
+    else {
+      Write-Host "No .inf files were detected post driver extraction. Consequently, no drivers have been installed." -ForegroundColor Red
+    }
+  }
+  finally {
+    Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
+  }
 }
 <#
 .SYNOPSIS
@@ -2074,26 +2158,29 @@ A single string or comma separated email addresses for which the license details
 Get-vts365UserLicenseDetails -UserList "user1@domain.com, user2@domain.com"
 
 This example retrieves the license details for user1@domain.com and user2@domain.com.
+
+.LINK
+M365
 #>
 
 function Get-vts365UserLicenseDetails {
-    param (
-        [Parameter(Mandatory=$true, HelpMessage="Enter a single email or a comma separated list of emails.")]
-        $UserList
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    $UserList
+  )
 
-    Connect-Graph -Scopes User.ReadWrite.All, Organization.Read.All
+  Connect-Graph -Scopes User.ReadWrite.All, Organization.Read.All
 
-    $LicenseDetails = @()
+  $LicenseDetails = @()
 
-    foreach ($User in $UserList) {
-        $LicenseDetails += [pscustomobject]@{
-            User    = $User.Trim()
-            License = (Get-MgUserLicenseDetail -UserId $User.Trim() | Select -expand SkuPartNumber) -join ", "
-        }
+  foreach ($User in $UserList) {
+    $LicenseDetails += [pscustomobject]@{
+      User    = $User.Trim()
+      License = (Get-MgUserLicenseDetail -UserId $User.Trim() | Select -expand SkuPartNumber) -join ", "
     }
+  }
 
-    $LicenseDetails
+  $LicenseDetails
 }
 
 <#
@@ -2115,27 +2202,31 @@ This example formats the provided MAC address.
 Format-vtsMacAddress
 
 This example formats the MAC address currently in the clipboard.
+
+.LINK
+Utilities
 #>
 function Format-vtsMacAddress {
-    param (
-        $MacAddress = (Get-Clipboard)
-    )
+  param (
+    $MacAddress = (Get-Clipboard)
+  )
 
-    # Remove any separators from the MAC address and convert it to lowercase
-    $cleanMac = (($MacAddress -replace '[-:.]', '').ToLower()).Trim() | Where-Object Length -eq 12
+  # Remove any separators from the MAC address and convert it to lowercase
+  $cleanMac = (($MacAddress -replace '[-:.]', '').ToLower()).Trim() | Where-Object Length -eq 12
 
-    # Check if the MAC address is 12 characters long
-    if ($cleanMac.Length -ne 12) {
-        Write-Host "The MAC address is invalid. It should be 12 hexadecimal characters."
-    } else {
-        # Insert colons after every 2 characters to format the MAC address
-        $outputMac = $cleanMac -replace '(.{2})', '$1:'
-        # Remove the trailing colon
-        $outputMac = $outputMac.TrimEnd(':')
+  # Check if the MAC address is 12 characters long
+  if ($cleanMac.Length -ne 12) {
+    Write-Host "The MAC address is invalid. It should be 12 hexadecimal characters."
+  }
+  else {
+    # Insert colons after every 2 characters to format the MAC address
+    $outputMac = $cleanMac -replace '(.{2})', '$1:'
+    # Remove the trailing colon
+    $outputMac = $outputMac.TrimEnd(':')
 
-        # Output the formatted MAC address
-        Write-Host "Copied to clipboard:"
-        Write-Host "show mac address-table dynamic address $outputMac"
-        "show mac address-table dynamic address $outputMac" | Set-Clipboard
-    }
+    # Output the formatted MAC address
+    Write-Host "Copied to clipboard:"
+    Write-Host "show mac address-table dynamic address $outputMac"
+    "show mac address-table dynamic address $outputMac" | Set-Clipboard
+  }
 }
