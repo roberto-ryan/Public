@@ -2149,13 +2149,13 @@ function Add-vtsPrinterDriver {
 This function retrieves the license details for a list of users.
 
 .DESCRIPTION
-The function Get-vts365UserLicenseDetails connects to the Graph API and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
+The function Get-vts365UserLicense connects to the Graph API and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
 
 .PARAMETER UserList
 A single string or comma separated email addresses for which the license details are to be retrieved.
 
 .EXAMPLE
-Get-vts365UserLicenseDetails -UserList "user1@domain.com, user2@domain.com"
+Get-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
 
 This example retrieves the license details for user1@domain.com and user2@domain.com.
 
@@ -2163,7 +2163,7 @@ This example retrieves the license details for user1@domain.com and user2@domain
 M365
 #>
 
-function Get-vts365UserLicenseDetails {
+function Get-vts365UserLicense {
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
