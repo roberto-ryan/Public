@@ -32,7 +32,7 @@ $commands = @()
 
 Get-Command -Module VTS |
 Select-Object Name, Description |
-Sort-Object { $_.Name.Split('-')[1] } |
+Sort-Object Name |
 ForEach-Object {
     $commands += [pscustomobject]@{
         'Installed Command' = $_.Name
@@ -40,11 +40,6 @@ ForEach-Object {
             Select-Object -ExpandProperty Description |
             Select-Object -ExpandProperty Text
         )
-        # Usage            = (Get-Help $_.Name |
-        # Select-Object -ExpandProperty Examples |
-        # Select-Object -ExpandProperty Example |
-        # Select-Object -ExpandProperty Code
-        # )
     }
 }
 
