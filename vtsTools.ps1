@@ -1966,7 +1966,7 @@ function Set-PTA {
     This command will search for a printer with a name that includes "P18" on the server "ch-dc", and add it to the local machine after user confirmation.
 
 .LINK
-    Print Mangement
+    Print Management
     #>
 function Add-vtsPrinter {
   param(
