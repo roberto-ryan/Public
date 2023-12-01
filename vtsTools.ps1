@@ -2266,8 +2266,7 @@ function Copy-vts365MailToMailbox {
         [Parameter(Mandatory = $true, HelpMessage = "Enter the end date in the format 'MM/dd/yyyy'")]
         [string]$endDate,
 
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the search name")]
-        [string]$SearchName
+        [string]$SearchName = "Copy-vts365MailToMailbox-$(Get-Date -Format MM-dd-yy-mm-ss)"
     )
 
     # Connect to Exchange Online PowerShell
