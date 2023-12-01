@@ -49,7 +49,7 @@ ForEach-Object {
 
 # $commands | Sort-Object Category, 'Installed Command' | Select-Object 'Installed Command', Category, Description | Format-Table -View Category
 
-$groupedCommands = $commands | Group-Object -Property Category
+$groupedCommands = $commands | Group-Object -Property Category | Sort-Object Name
 
 function LineAcrossScreen {
     $windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
