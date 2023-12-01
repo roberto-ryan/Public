@@ -1,10 +1,10 @@
 <#
 .Description
-Searches the last 500 System and Application logs for a search term.
+Searches the last 500 System and Application logs using a term.
 .EXAMPLE
-PS> Search-vtsEventLog <search term>
+PS> Search-vtsEventLog <term>
 .EXAMPLE
-PS> Search-vtsEventLog driver
+PS> Search-vtsEventLog "driver"
 
 Output:
 TimeGenerated : 9/13/2022 9:14:30 AM
@@ -53,7 +53,7 @@ function Search-vtsEventLog {
 
 <#
 .Description
-Retrieves Mapped Drives from the Windows Registry.
+Displays Mapped Drives information from the Windows Registry.
 .EXAMPLE
 PS> Get-vtsMappedDrive
 
@@ -396,7 +396,7 @@ function Get-vtsDisplayDetails {
 
 <#
 .DESCRIPTION
-Adds a Google Chrome extension to the forced install list. Can be used for forcing installation of any Google Chrome extension. Takes existing extensions into account which might be added by other means, such as GPO and MDM.
+Forces the installation of a specified Google Chrome extension.
 .EXAMPLE
 PS> Install-vtsChromeExtension -extensionId "ddloeodolhdfbohkokiflfbacbfpjahp"
 
@@ -1002,8 +1002,10 @@ function Uninstall-vtsNinja {
 <#
 .Description
 Sets the default printer.
+
 .EXAMPLE
-PS> Set-vtsDefaultPrinter -Name brother
+PS> Set-vtsDefaultPrinter -Name <"Printer">
+
 .EXAMPLE
 PS> Set-vtsDefaultPrinter -Name "HP Laserjet"
 
