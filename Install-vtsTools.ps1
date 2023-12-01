@@ -35,7 +35,10 @@ Select-Object Name, Description |
 Sort-Object Name |
 ForEach-Object {
     $commands += [pscustomobject]@{
-        Category            = (Get-help Format-vtsMacAddress).relatedLinks
+        Category            = (Get-help $_.Name |
+        Select-Object -ExpandProperty relatedLinks |
+        Select-Object -ExpandProperty navigationLink |
+        Select-Object -ExpandProperty linkText )
         'Installed Command' = $_.Name
         Description         = (Get-Help $_.Name |
             Select-Object -ExpandProperty Description |
@@ -44,7 +47,7 @@ ForEach-Object {
     }
 }
 
-$commands | Sort-Object Category, 'Installed Command', Description
+$commands | Sort-Object Category, 'Installed Command' | Select-Object 'Installed Command', Category, Description
 
 "`nType 'get-help -full' followed by the command name for more information.
 

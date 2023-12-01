@@ -685,7 +685,7 @@ Packet Loss:     0.0%
  Result URL: https://www.speedtest.net/result/c/23d057dd-8de5-4d62-aef9-72beb122d7a4
 
  .LINK
-
+Network
  #>
 function Start-vtsSpeedTest {
   if (Test-Path "C:\ProgramData\chocolatey\bin\speedtest.exe") {
