@@ -73,3 +73,4 @@ LineAcrossScreen
 Example: PS> get-help -full Get-vtsMappedDrive"
 
 LineAcrossScreen
+""
