@@ -68,7 +68,7 @@ foreach ($group in $groupedCommands) {
 
 LineAcrossScreen
 
-"`nType 'get-help -full' followed by the command name for more information.
+"Type 'get-help -full' followed by the command name for more information.
 
 Example: PS> get-help -full Get-vtsMappedDrive"
 
