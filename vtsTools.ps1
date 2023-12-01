@@ -2272,8 +2272,8 @@ function Copy-vts365MailToMailbox {
 
     # Connect to Exchange Online PowerShell
     Write-Host "Connecting to Exchange Online PowerShell..."
-    # Connect-ExchangeOnline
-    # Connect-IPPSSession
+    Connect-ExchangeOnline
+    Connect-IPPSSession
 
     # Create a new compliance search
     Write-Host "Creating new compliance search..."
