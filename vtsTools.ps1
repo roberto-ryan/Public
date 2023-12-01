@@ -2234,3 +2234,114 @@ function Format-vtsMacAddress {
     "show mac address-table dynamic address $outputMac" | Set-Clipboard
   }
 }
+
+<#
+.SYNOPSIS
+This function copies emails from a specified sender within a date range from all mailboxes to a target mailbox and folder.
+
+.DESCRIPTION
+The Copy-vts365MailToMailbox function connects to Exchange Online PowerShell and creates a new compliance search for emails from a specified sender within a specified date range. It waits for the compliance search to complete, gets the results, parses them, and creates objects from the results. It then gets the mailboxes to search, performs the search, and copies the emails to the target mailbox's specified folder.
+
+.EXAMPLE
+Copy-vts365MailToMailbox -senderAddress "sender@example.com" -targetMailbox "target@example.com" -targetFolder "Folder" -startDate "01/01/2020" -endDate "12/31/2020" -SearchName "Search1"
+This example copies all emails from sender@example.com sent between 01/01/2020 and 12/31/2020 from all mailboxes to the "Folder" in the target@example.com mailbox.
+
+.LINK
+M365
+#>
+function Copy-vts365MailToMailbox {
+    param(
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the sender's email address")]
+        [string]$senderAddress,
+
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the target mailbox to copy the results")]
+        [string]$targetMailbox,
+
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the target folder to copy the results")]
+        [string]$targetFolder,
+
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the start date in the format 'MM/dd/yyyy'")]
+        [string]$startDate,
+
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the end date in the format 'MM/dd/yyyy'")]
+        [string]$endDate,
+
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the search name")]
+        [string]$SearchName
+    )
+
+    # Connect to Exchange Online PowerShell
+    Write-Host "Connecting to Exchange Online PowerShell..."
+    # Connect-ExchangeOnline
+    # Connect-IPPSSession
+
+    # Create a new compliance search
+    Write-Host "Creating new compliance search..."
+    New-ComplianceSearch -Name "$SearchName" -ExchangeLocation All -ContentMatchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate"
+    Start-ComplianceSearch -Identity "$SearchName"
+
+    # Wait for the compliance search to complete
+    Write-Host "Waiting for compliance search to complete..."
+    while ((Get-ComplianceSearch -Identity "$SearchName" | Select-Object -ExpandProperty Status) -ne "Completed") {
+        Start-Sleep -Seconds 5
+    }
+    
+    # Get the compliance search results
+    Write-Host "Getting compliance search results..."
+    $Results = Get-ComplianceSearch -Identity "$SearchName" | Select-Object -expand SuccessResults
+
+    # Parse the results
+    Write-Host "Parsing results..."
+    $array = ($Results -replace "{|}" -split ",").Trim()
+
+    # Create objects from the results
+    Write-Host "Creating objects from results..."
+    $objects = for ($i = 0; $i -lt $array.Count; $i += 3) {
+        New-Object PSObject -Property @{
+            Location  = ($array[$i] -split ": ")[1]
+            ItemCount = [int]($array[$i + 1] -split ": ")[1]
+            TotalSize = [int]($array[$i + 2] -split ": ")[1]
+        }
+    }
+
+    # Get the mailboxes to search
+    Write-Host "Getting mailboxes to search...`n"
+    $MailboxesToSearch = $objects | Where-Object ItemCount -gt 0 | Select-Object -ExpandProperty Location
+
+    $MailboxesWithContent = $objects | Where-Object ItemCount -gt 0 | Sort-Object ItemCount -Descending | Select-Object Location, ItemCount, TotalSize
+
+    # Initialize a hashtable for mailboxes
+    $mailboxTable = @{}
+
+    # Iterate over each mailbox to search
+    for ($i = 0; $i -lt $MailboxesToSearch.Count; $i++) {
+        # Add each mailbox to the hashtable with its corresponding details
+        $mailboxTable.Add($i + 1, @{
+            Location  = $MailboxesToSearch[$i]
+            ItemCount = $MailboxesWithContent[$i].ItemCount
+            TotalSize = $MailboxesWithContent[$i].TotalSize
+        })
+
+        # Output the mailbox details
+        Write-Output "$($i+1): $($MailboxesToSearch[$i]) ItemCount: $($MailboxesWithContent[$i].ItemCount) TotalSize: $($MailboxesWithContent[$i].TotalSize)"
+    }
+
+    # Ask the user which mailboxes to search
+    $userInput = Read-Host "`nEnter the numbers of the mailboxes you want to search, separated by commas, or enter * to search all mailboxes"
+
+    if ($userInput -eq '*') {
+        $keys = $mailboxTable.Keys
+    }
+    else {
+        $keys = $userInput.Split(',') | ForEach-Object { [int]$_ }
+    }
+
+    foreach ($key in $keys) {
+        $mailbox = $mailboxTable[$key].Location
+        # Perform the search and copy the emails to the target mailbox's inbox
+        Write-Host "Performing search and copying emails from mailbox: $mailbox..."
+        Search-Mailbox -Identity $mailbox -SearchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate" -TargetMailbox $targetMailbox -TargetFolder $targetFolder -LogLevel Full | Out-Null
+    }
+
+    Write-Host "Operation completed."
+}
