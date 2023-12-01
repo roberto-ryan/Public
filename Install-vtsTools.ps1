@@ -51,18 +51,25 @@ ForEach-Object {
 
 $groupedCommands = $commands | Group-Object -Property Category
 
+function LineAcrossScreen {
+    $windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+    Write-Host ('-' * $windowWidth)
+}
+
+LineAcrossScreen
+
 Write-Host "VTS Toolkit" -ForegroundColor Cyan
 
 foreach ($group in $groupedCommands) {
-    $windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
-    Write-Host ('-' * $windowWidth)
+    LineAcrossScreen
     Write-Host "`nCategory: $($group.Name)" -ForegroundColor Yellow
     $group.Group | Format-Table 'Installed Command', Description
 }
 
-$windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
-Write-Host ('-' * $windowWidth)
+LineAcrossScreen
 
 "`nType 'get-help -full' followed by the command name for more information.
 
 Example: PS> get-help -full Get-vtsMappedDrive"
+
+LineAcrossScreen
