@@ -103,45 +103,6 @@ function Get-vtsMappedDrive {
 
 <#
 .Description
-Blocks Windows 11 update. Requires Windows 10 version 21H1 or 21H2.
-.EXAMPLE
-PS> Block-vtsWindows11Upgrade
-
-Output:
-The operation completed successfully.
-The operation completed successfully.
-Success - Current Version (21H2)
-#>
-function Block-vtsWindows11Upgrade {
-  $buildNumber = [System.Environment]::OSVersion.Version.Build
-
-  switch ($buildNumber) {
-    19044 {
-      cmd /c 'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v TargetReleaseversion /t REG_DWORD /d 1'
-      cmd /c 'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v TargetReleaseversionInfo /t REG_SZ /d 21H1'
-      if ($?) {
-        Write-Host 'Success - Current Version (21H2)' -ForegroundColor Green
-      }
-      else {
-        Write-Host "Failed" -ForegroundColor Red
-      }
-    }
-    19043 {
-      cmd /c 'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v TargetReleaseversion /t REG_DWORD /d 1'
-      cmd /c 'reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v TargetReleaseversionInfo /t REG_SZ /d 21H1'
-      if ($?) {
-        Write-Host 'Success - Current Version (21H1)' -ForegroundColor Green
-      }
-      else {
-        Write-Host "Failed" -ForegroundColor Red
-      }
-    }
-    Default { Write-Host "Script only works for Windows 10 versions 21H1 and 21H2" }
-  }
-}
-
-<#
-.Description
 Continuous Ping Report. Tracks failed ping times and outputs data to a logfile.
 .EXAMPLE
 PS> Start-vtsPingReport google.com
