@@ -52,13 +52,13 @@ ForEach-Object {
 $groupedCommands = $commands | Group-Object -Property Category | Sort-Object Name
 
 function LineAcrossScreen {
-    $windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+    $script:windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
     Write-Host ('-' * $windowWidth)
 }
 
 LineAcrossScreen
 
-Write-Host "VTS Toolkit" -ForegroundColor Cyan
+Write-Host "$('█' * ($windowWidth/2 - 6)) VTS Toolkit $('█' * ($windowWidth/2 - 7))" -ForegroundColor Cyan
 
 foreach ($group in $groupedCommands) {
     LineAcrossScreen
