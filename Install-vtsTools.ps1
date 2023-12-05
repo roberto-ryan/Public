@@ -66,11 +66,12 @@ foreach ($group in $groupedCommands) {
     $group.Group | Format-Table 'Installed Command', Description
 }
 
-LineAcrossScreen
+# LineAcrossScreen
 
-"Type 'get-help -full' followed by the command name for more information.
+"`nType 'get-help -full' followed by the command name for more information.
 
-Example: PS> get-help -full Get-vtsMappedDrive"
+Example: PS> get-help -full Get-vtsMappedDrive`n"
 
-LineAcrossScreen
+$script:windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+Write-Host ('█' * $windowWidth) -ForegroundColor Cyan
 ""
