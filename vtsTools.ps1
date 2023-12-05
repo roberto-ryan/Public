@@ -2272,6 +2272,7 @@ function Copy-vts365MailToMailbox {
   # Connect to Exchange Online PowerShell
   Write-Host "Connecting to Exchange Online PowerShell..."
   Connect-ExchangeOnline -ShowBanner:$false
+  Write-Host "Connecting to Security & Compliance PowerShell..."
   Connect-IPPSSession -ShowBanner:$false
 
   # Create a new compliance search
@@ -2306,8 +2307,6 @@ function Copy-vts365MailToMailbox {
 
   # Get the mailboxes to search
   Write-Host "Getting mailboxes to search...`n"
-  # $MailboxesToSearch = $objects | Where-Object ItemCount -gt 0 | Select-Object -ExpandProperty Location
-
   $MailboxesWithContent = $objects | Where-Object ItemCount -gt 0 | Sort-Object ItemCount -Descending | Select-Object Location, ItemCount, TotalSize
 
   # Initialize a hashtable for mailboxes
@@ -2329,7 +2328,7 @@ function Copy-vts365MailToMailbox {
   # Output the mailbox details
   $mailboxTable
 
-  if ($null -ne $mailboxTable){
+  if ($null -ne $mailboxTable) {
     # Ask the user which mailboxes to search
     $userInput = Read-Host "`nEnter the numbers of the mailboxes you want to search, separated by commas, or enter * to search all mailboxes"
   
@@ -2345,7 +2344,9 @@ function Copy-vts365MailToMailbox {
       Write-Host "Performing search and copying emails from mailbox: $mailbox..."
       Search-Mailbox -Identity $mailbox -SearchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate" -TargetMailbox $targetMailbox -TargetFolder $targetFolder -LogLevel Full 3>$null | Out-Null
     }
-  } else { Write-Host "No matches found." -ForegroundColor Red}
+  } else { 
+    Write-Host "No matches found." -ForegroundColor Red
+  }
 
   Write-Host "Operation completed."
 }
