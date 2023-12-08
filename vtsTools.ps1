@@ -2173,7 +2173,7 @@ function Get-vts365UserLicense {
     $UserList
   )
 
-  Connect-Graph -Scopes User.ReadWrite.All, Organization.Read.All
+  Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
 
   $LicenseDetails = @()
 
@@ -2344,9 +2344,80 @@ function Copy-vts365MailToMailbox {
       Write-Host "Performing search and copying emails from mailbox: $mailbox..."
       Search-Mailbox -Identity $mailbox -SearchQuery "from:$senderAddress AND received>=$startDate AND received<=$endDate" -TargetMailbox $targetMailbox -TargetFolder $targetFolder -LogLevel Full 3>$null | Out-Null
     }
-  } else { 
+  }
+  else { 
     Write-Host "No matches found." -ForegroundColor Red
   }
 
+  Write-Host "Operation completed."
+}
+
+<#
+.SYNOPSIS
+This function adds licenses to a list of users.
+
+.DESCRIPTION
+The function Add-vts365UserLicense connects to the Graph API and adds licenses to a list of users. The user list is passed as a parameter to the function. The function also allows the user to select which licenses to add.
+
+.PARAMETER UserList
+A single string or comma separated email addresses to which the licenses are to be added.
+
+.EXAMPLE
+Add-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
+
+.LINK
+M365
+#>
+function Add-vts365UserLicense {
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    $UserList
+  )
+
+  $UserList = ($UserList -split ",").Trim()
+
+  Write-Host "Connecting to Graph API..."
+  Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
+
+  Write-Host "Getting available SKUs..."
+  $SKUs = Get-MgSubscribedSku
+
+  $key = 0
+  $LicenseDisplay = @()
+  foreach ($item in $SKUs) {
+    $key++
+    $LicenseDisplay += [PSCustomObject]@{
+      Key           = $key
+      SkuPartNumber = $item.SkuPartNumber
+      SkuID         = $item.SkuID
+    }
+  }
+
+  Write-Host "Displaying available licenses..."
+  $LicenseDisplay | Out-Host
+
+  $userInput = Read-Host "`nEnter the numbers of the licenses you want to add, separated by commas, or enter * to add all available licenses"
+  
+  if ($userInput -eq '*') {
+    Write-Host "Adding all available licenses..."
+    $SelectedLicenses = $LicenseDisplay.SkuID
+  }
+  else {
+    Write-Host "Adding selected licenses..."
+    $SelectedLicenses = $LicenseDisplay | Where-Object Key -in ($userInput -split ",") | Select-Object -ExpandProperty SkuID
+  }
+  
+  $FormattedSKUs = @()
+  foreach ($Sku in $SelectedLicenses) {
+    $FormattedSKUs += @{SkuId = $Sku }
+  }
+  
+  $FormattedSKUs
+  
+  Write-Host "Adding licenses to users..."
+  foreach ($User in $UserList) {
+    Write-Host "Adding licenses to $User..."
+    Set-MgUserLicense -UserId $User -AddLicenses $FormattedSKUs -RemoveLicenses @()
+  }
   Write-Host "Operation completed."
 }
