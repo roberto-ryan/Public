@@ -2479,7 +2479,7 @@ function Search-vtsAllLogs {
   # Get the logs from the Event Viewer based on the provided log name
   foreach ($LogName in $SelectedLogs) {
     Write-Host "Searching $LogName log..." -ForegroundColor Yellow
-    Get-WinEvent -LogName "$LogName" |
+    Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
     Where-Object Message -like "*$SearchTerm*" |
     Select-Object TimeCreated, Message, ProviderName, ContainerLog, MachineName |
     Format-List
