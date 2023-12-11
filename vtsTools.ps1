@@ -2444,49 +2444,44 @@ This command will prompt you to select the logs you want to search for the term 
 Log Management
 #>
 function Search-vtsAllLogs {
-    [CmdletBinding()]
-    param(
-        [string]$SearchTerm
-    )
+  [CmdletBinding()]
+  param(
+    [string]$SearchTerm
+  )
 
-    # Validate the log name
-    $validLogNames = (Get-WinEvent -ListLog *).LogName 2>$null
+  # Validate the log name
+  $validLogNames = (Get-WinEvent -ListLog *).LogName 2>$null
 
-    $LogTable = @()
-    $key = 1
+  $LogTable = @()
+  $key = 1
 
-    foreach ($log in $validLogNames){
-        $LogTable += [pscustomobject]@{
-            Key = $key
-            Log = $log
-        }
-        $key++
+  foreach ($log in $validLogNames) {
+    $LogTable += [pscustomobject]@{
+      Key = $key
+      Log = $log
     }
+    $key++
+  }
 
-    $LogTable | Out-Host
+  $LogTable | Out-Host
 
-    $userInput = Read-Host "Please input the log numbers you wish to search, separated by commas. Alternatively, input '*' to search all logs."
+  $userInput = Read-Host "Please input the log numbers you wish to search, separated by commas. Alternatively, input '*' to search all logs."
 
-    if ($userInput -eq '*') {
-        Write-Host "Searching all available logs..."
-        $SelectedLogs = $LogTable.Log
-      }
-      else {
-        Write-Host "Searching selected logs..."
-        $SelectedLogs = $LogTable | Where-Object Key -in ($userInput -split ",") | Select-Object -ExpandProperty Log
-      }
+  if ("$userInput" -eq '*') {
+    Write-Host "Searching all available logs..."
+    $SelectedLogs = $LogTable.Log
+  }
+  else {
+    Write-Host "Searching selected logs..."
+    $SelectedLogs = $LogTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Log
+  }
 
-    # Get the logs from the Event Viewer based on the provided log name
-    try {
-        foreach ($LogName in $SelectedLogs){
-            Write-Host "Searching $LogName log..." -ForegroundColor Yellow
-            Get-WinEvent -LogName "$LogName" -ErrorAction Stop |
-            Where-Object Message -like "*$SearchTerm*" |
-            Select-Object TimeCreated, Message, ProviderName, ContainerLog, MachineName |
-            Format-List
-        }
-    }
-    catch {
-        Write-Host "An error occurred while retrieving the logs: $_"
-    }
+  # Get the logs from the Event Viewer based on the provided log name
+  foreach ($LogName in $SelectedLogs) {
+    Write-Host "Searching $LogName log..." -ForegroundColor Yellow
+    Get-WinEvent -LogName "$LogName" |
+    Where-Object Message -like "*$SearchTerm*" |
+    Select-Object TimeCreated, Message, ProviderName, ContainerLog, MachineName |
+    Format-List
+  }
 }
