@@ -2446,7 +2446,10 @@ Log Management
 function Search-vtsAllLogs {
   [CmdletBinding()]
   param(
-    [string]$SearchTerm
+    [Parameter(Mandatory=$true)]
+    [string]$SearchTerm,
+    [Parameter(Mandatory=$true)]
+    [string]$ReportPath
   )
 
   # Validate the log name
@@ -2477,11 +2480,20 @@ function Search-vtsAllLogs {
   }
 
   # Get the logs from the Event Viewer based on the provided log name
+  $Results = @()
   foreach ($LogName in $SelectedLogs) {
     Write-Host "Searching $LogName log..." -ForegroundColor Yellow
-    Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
-    Where-Object Message -like "*$SearchTerm*" |
-    Select-Object TimeCreated, Message, ProviderName, ContainerLog, MachineName |
-    Format-List
+    $Results += Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
+    Where-Object Message -like "*$SearchTerm*" | Tee-Object -Variable temp
+  }
+  
+  # Export the results to a CSV file
+  $Results | Export-Csv -Path $ReportPath -NoTypeInformation
+  
+  # Ask the user if they want to open the report
+  $openReport = Read-Host "Do you want to open the report? (Y/N)"
+  
+  if ($openReport -eq 'Y' -or $openReport -eq 'y') {
+    Invoke-Item $ReportPath
   }
 }
