@@ -2427,23 +2427,23 @@ function Add-vts365UserLicense {
 This function searches for a specific term in the Windows Event Logs.
 
 .DESCRIPTION
-The Search-vtsLogs function allows you to search for a specific term in the Windows Event Logs. You can choose to search in all logs or specify the logs you want to search in by their numbers.
+The Search-vtsAllLogs function allows you to search for a specific term in the Windows Event Logs. You can choose to search in all logs or specify the logs you want to search in by their numbers.
 
 .PARAMETER SearchTerm
 The term you want to search for in the logs.
 
 .EXAMPLE
-Search-vtsLogs -SearchTerm "Error"
+Search-vtsAllLogs -SearchTerm "Error"
 This command will prompt you to select the logs you want to search for the term "Error".
 
 .EXAMPLE
-Search-vtsLogs -SearchTerm "Warning"
+Search-vtsAllLogs -SearchTerm "Warning"
 This command will prompt you to select the logs you want to search for the term "Warning".
 
 .LINK
 Log Management
 #>
-function Search-vtsLogs {
+function Search-vtsAllLogs {
     [CmdletBinding()]
     param(
         [string]$SearchTerm
