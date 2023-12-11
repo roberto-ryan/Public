@@ -2150,10 +2150,10 @@ function Add-vtsPrinterDriver {
 }
 <#
 .SYNOPSIS
-This function retrieves the license details for a list of users.
+This function retrieves the license details for a list of users after validating their existence.
 
 .DESCRIPTION
-The function Get-vts365UserLicense connects to the Graph API and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
+The function Get-vts365UserLicense connects to the Graph API, validates if the users exist, and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
 
 .PARAMETER UserList
 A single string or comma separated email addresses for which the license details are to be retrieved.
@@ -2161,12 +2161,11 @@ A single string or comma separated email addresses for which the license details
 .EXAMPLE
 Get-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
 
-This example retrieves the license details for user1@domain.com and user2@domain.com.
+This example validates and retrieves the license details for user1@domain.com and user2@domain.com.
 
 .LINK
 M365
 #>
-
 function Get-vts365UserLicense {
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
@@ -2178,9 +2177,16 @@ function Get-vts365UserLicense {
   $LicenseDetails = @()
 
   foreach ($User in $UserList) {
-    $LicenseDetails += [pscustomobject]@{
-      User    = $User.Trim()
-      License = (Get-MgUserLicenseDetail -UserId $User.Trim() | Select-Object -expand SkuPartNumber) -join ", "
+    $User = $User.Trim()
+    $UserExists = Get-MgUser -UserId $User -ErrorAction SilentlyContinue
+    if ($UserExists) {
+      $LicenseDetails += [pscustomobject]@{
+        User    = $User
+        License = (Get-MgUserLicenseDetail -UserId $User | Select-Object -expand SkuPartNumber) -join ", "
+      }
+    }
+    else {
+      Write-Host "User $User does not exist." -ForegroundColor Red
     }
   }
 
