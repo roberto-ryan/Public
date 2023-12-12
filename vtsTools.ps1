@@ -2487,8 +2487,11 @@ function Search-vtsAllLogs {
 
   # Get the logs from the Event Viewer based on the provided log name
   $Results = @()
+  $LogCount = $SelectedLogs.Count
+  $CurrentLog = 0
   foreach ($LogName in $SelectedLogs) {
-    Write-Host "Searching $LogName log..." -ForegroundColor Yellow
+    $CurrentLog++
+    Write-Host "Searching $LogName log... ($CurrentLog/$LogCount)" -ForegroundColor Yellow
     $Results += Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
     Where-Object Message -like "*$SearchTerm*" | Tee-Object -Variable temp
   }
