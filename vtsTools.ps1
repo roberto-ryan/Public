@@ -2454,9 +2454,14 @@ function Search-vtsAllLogs {
   param(
     [Parameter(Mandatory=$true)]
     [string]$SearchTerm,
-    [Parameter(Mandatory=$true)]
-    [string]$ReportPath
+    [string]$ReportPath = "C:\temp\$SearchTerm-$(Get-Date -Format MM-dd-yy-mm-ss).html"
   )
+
+  # Create the parent directory of $ReportPath if it doesn't exist
+  $parentDir = Split-Path -Path $ReportPath -Parent
+  if (!(Test-Path -Path $parentDir)) {
+    New-Item -ItemType Directory -Path $parentDir | Out-Null
+  }
 
   # Validate the log name
   $validLogNames = (Get-WinEvent -ListLog *).LogName 2>$null
@@ -2496,13 +2501,13 @@ function Search-vtsAllLogs {
     Where-Object Message -like "*$SearchTerm*" | Tee-Object -Variable temp
   }
   
-  # Export the results to a CSV file
-  $Results | Export-Csv -Path $ReportPath -NoTypeInformation
-  
-  # Ask the user if they want to open the report
-  $openReport = Read-Host "Do you want to open the report? (Y/N)"
-  
-  if ($openReport -eq 'Y' -or $openReport -eq 'y') {
-    Invoke-Item $ReportPath
+  # Check if PSWriteHTML module is installed, if not, install it
+  if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+    Install-Module -Name PSWriteHTML -Force -Confirm:$false
   }
+  
+  # Export the results to an HTML file using the PSWriteHTML module
+  $Results | Out-HtmlView -FilePath $ReportPath
+
+  Write-Host "Report saved at $ReportPath"
 }
