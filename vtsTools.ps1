@@ -2454,7 +2454,7 @@ function Search-vtsAllLogs {
   param(
     [Parameter(Mandatory=$true)]
     [string]$SearchTerm,
-    [string]$ReportPath = "C:\temp\$SearchTerm-$(Get-Date -Format MM-dd-yy-mm-ss).html"
+    [string]$ReportPath = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -Format MM-dd-yy-mm-ss).html"
   )
 
   # Create the parent directory of $ReportPath if it doesn't exist
