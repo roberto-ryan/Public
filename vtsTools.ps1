@@ -2521,6 +2521,10 @@ function Search-vtsAllLogs {
   switch ($ReportType) {
     csv { 
       $Results | Export-Csv $ReportPath
+      $openFile = Read-Host "Do you want to open the file? (Y/N)"
+      if ($openFile -eq 'Y' -or $openFile -eq 'y') {
+        Invoke-Item $ReportPath
+      }
      }
     html { 
       # Check if PSWriteHTML module is installed, if not, install it
@@ -2535,6 +2539,10 @@ function Search-vtsAllLogs {
     Default {
       Write-Host "Invalid ReportType selection. Defaulting to csv."
       $Results | Export-Csv $ReportPath
+      $openFile = Read-Host "Do you want to open the file? (Y/N)"
+      if ($openFile -eq 'Y' -or $openFile -eq 'y') {
+        Invoke-Item $ReportPath
+      }
     }
   }
   
