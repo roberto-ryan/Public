@@ -2477,17 +2477,19 @@ function Search-vtsAllLogs {
     $key++
   }
 
-  $LogTable | Out-Host
-
-  $userInput = Read-Host "Please input the log numbers you wish to search, separated by commas. Alternatively, input '*' to search all logs."
-
-  if ("$userInput" -eq '*') {
-    Write-Host "Searching all available logs..."
-    $SelectedLogs = $LogTable.Log
-  }
-  else {
-    Write-Host "Searching selected logs..."
-    $SelectedLogs = $LogTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Log
+  if ($(whoami) -eq "nt authority\system"){
+    $LogTable | Out-Host
+    $userInput = Read-Host "Please input the log numbers you wish to search, separated by commas. Alternatively, input '*' to search all logs."
+    if ("$userInput" -eq '*') {
+      Write-Host "Searching all available logs..."
+      $SelectedLogs = $LogTable.Log
+    }
+    else {
+      Write-Host "Searching selected logs..."
+      $SelectedLogs = $LogTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Log
+    }
+  } else {
+    $SelectedLogs = $LogTable | Out-GridView -OutputMode Multiple | Select-Object -ExpandProperty Log
   }
 
   # Get the logs from the Event Viewer based on the provided log name
