@@ -2454,13 +2454,16 @@ function Search-vtsAllLogs {
   param(
     [Parameter(Mandatory=$true)]
     [string]$SearchTerm,
-    [string]$ReportPath = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -Format MM-dd-yy-mm-ss).html"
-  )
+    [ValidateSet("csv", "html")]
+    [string]$ReportType = "csv",
+    [string]$OutputDirectory = "C:\temp"
+    )
+    
+  $ReportPath = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -Format MM-dd-yy-mm-ss).$ReportType"
 
-  # Create the parent directory of $ReportPath if it doesn't exist
-  $parentDir = Split-Path -Path $ReportPath -Parent
-  if (!(Test-Path -Path $parentDir)) {
-    New-Item -ItemType Directory -Path $parentDir | Out-Null
+  # Create Output Dir if not exist
+  if (!(Test-Path -Path $OutputDirectory)) {
+    New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
   }
 
   # Validate the log name
@@ -2503,13 +2506,25 @@ function Search-vtsAllLogs {
     Where-Object Message -like "*$SearchTerm*" | Tee-Object -Variable temp
   }
   
-  # Check if PSWriteHTML module is installed, if not, install it
-  if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
-    Install-Module -Name PSWriteHTML -Force -Confirm:$false
+  switch ($ReportType) {
+    csv { 
+      $Results | Export-Csv $ReportPath
+     }
+    html { 
+      # Check if PSWriteHTML module is installed, if not, install it
+      if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+        Install-Module -Name PSWriteHTML -Force -Confirm:$false
+      }
+      
+      # Export the results to an HTML file using the PSWriteHTML module
+      $Results | Out-HtmlView -FilePath $ReportPath
+
+     }
+    Default {
+      Write-Host "Invalid ReportType selection. Defaulting to csv."
+      $Results | Export-Csv $ReportPath
+    }
   }
   
-  # Export the results to an HTML file using the PSWriteHTML module
-  $Results | Out-HtmlView -FilePath $ReportPath
-
   Write-Host "Report saved at $ReportPath"
 }
