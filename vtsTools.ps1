@@ -2430,21 +2430,31 @@ function Add-vts365UserLicense {
 
 <#
 .SYNOPSIS
-This function searches for a specific term in the Windows Event Logs.
+This function searches for specific terms in the Windows Event Logs and exports the results to a CSV or HTML file.
 
 .DESCRIPTION
-The Search-vtsAllLogs function allows you to search for a specific term in the Windows Event Logs. You can choose to search in all logs or specify the logs you want to search in by their numbers.
+The Search-vtsAllLogs function allows you to search for specific terms in the Windows Event Logs. You can choose to search in all logs or specify the logs you want to search in by their numbers. The function supports GUI selection of logs using Out-GridView. The results are exported to a CSV or HTML file.
 
 .PARAMETER SearchTerm
-The term you want to search for in the logs.
+The terms you want to search for in the logs. This can be a single term or an array of terms.
+
+.PARAMETER ReportType
+The type of report to generate. Can be either "csv" or "html". Default is "csv".
+
+.PARAMETER OutputDirectory
+The directory where the report will be saved. Default is "C:\temp".
 
 .EXAMPLE
 Search-vtsAllLogs -SearchTerm "Error"
-This command will prompt you to select the logs you want to search for the term "Error".
+This command will prompt you to select the logs you want to search for the term "Error" and exports the results to a CSV file.
 
 .EXAMPLE
-Search-vtsAllLogs -SearchTerm "Warning"
-This command will prompt you to select the logs you want to search for the term "Warning".
+Search-vtsAllLogs -SearchTerm "Warning" -ReportType "html"
+This command will prompt you to select the logs you want to search for the term "Warning" and exports the results to an HTML file.
+
+.EXAMPLE
+Search-vtsAllLogs -SearchTerm "Error", "Warning", "Critical"
+This command will prompt you to select the logs you want to search for the terms "Error", "Warning", and "Critical" and exports the results to a CSV file.
 
 .LINK
 Log Management
@@ -2453,7 +2463,7 @@ function Search-vtsAllLogs {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory=$true)]
-    [string]$SearchTerm,
+    $SearchTerm,
     [ValidateSet("csv", "html")]
     [string]$ReportType = "csv",
     [string]$OutputDirectory = "C:\temp"
@@ -2497,13 +2507,15 @@ function Search-vtsAllLogs {
 
   # Get the logs from the Event Viewer based on the provided log name
   $Results = @()
-  $LogCount = $SelectedLogs.Count
+  $LogCount = $SelectedLogs.Count * $SearchTerm.Count
   $CurrentLog = 0
   foreach ($LogName in $SelectedLogs) {
-    $CurrentLog++
-    Write-Host "Searching $LogName log... ($CurrentLog/$LogCount)" -ForegroundColor Yellow
-    $Results += Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
-    Where-Object Message -like "*$SearchTerm*" | Tee-Object -Variable temp
+    foreach ($Term in $SearchTerm) {
+      $CurrentLog++
+      Write-Host "Searching $LogName log for $Term... ($CurrentLog/$LogCount)" -ForegroundColor Yellow
+      $Results += Get-WinEvent -LogName "$LogName" -ErrorAction SilentlyContinue |
+      Where-Object Message -like "*$Term*" | Tee-Object -Variable temp
+    }
   }
   
   switch ($ReportType) {
