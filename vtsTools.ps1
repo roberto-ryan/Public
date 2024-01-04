@@ -2528,7 +2528,7 @@ function Search-vtsAllLogs {
 
   switch ($ReportType) {
     csv { 
-      $Results | Export-Csv $ReportPath
+      $Results | Export-Csv $ReportPath -NoTypeInformation
       $openFile = Read-Host "Do you want to open the file? (Y/N)"
       if ($openFile -eq 'Y' -or $openFile -eq 'y') {
         Invoke-Item $ReportPath
