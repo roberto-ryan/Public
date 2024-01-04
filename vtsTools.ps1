@@ -2439,7 +2439,7 @@ The Search-vtsAllLogs function allows you to search for specific terms in the Wi
 The terms you want to search for in the logs. This can be a single term or an array of terms.
 
 .PARAMETER ReportType
-The type of report to generate. Can be either "csv" or "html". Default is "csv".
+The type of report to generate. Can be either "csv" or "html". Default is less than 150 results is "html", more than 150 results is"csv".
 
 .PARAMETER OutputDirectory
 The directory where the report will be saved. Default is "C:\temp".
@@ -2465,20 +2465,18 @@ function Search-vtsAllLogs {
     [Parameter(Mandatory=$true)]
     $SearchTerm,
     [ValidateSet("csv", "html")]
-    [string]$ReportType = "csv",
+    [string]$ReportType,
     [string]$OutputDirectory = "C:\temp"
     )
     
-  $ReportPath = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -Format MM-dd-yy-mm-ss).$ReportType"
-
-  # Create Output Dir if not exist
-  if (!(Test-Path -Path $OutputDirectory)) {
-    New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
+    # Create Output Dir if not exist
+    if (!(Test-Path -Path $OutputDirectory)) {
+      New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
   }
-
+  
   # Validate the log name
   $validLogNames = (Get-WinEvent -ListLog *).LogName 2>$null
-
+  
   $LogTable = @()
   $key = 1
 
@@ -2489,7 +2487,7 @@ function Search-vtsAllLogs {
     }
     $key++
   }
-
+  
   if ($(whoami) -eq "nt authority\system"){
     $LogTable | Out-Host
     $userInput = Read-Host "Please input the log numbers you wish to search, separated by commas. Alternatively, input '*' to search all logs."
@@ -2518,6 +2516,16 @@ function Search-vtsAllLogs {
     }
   }
   
+  if ("" -eq $ReportType){
+    if ($Results.Count -le 150){
+      $ReportType = "html"
+    } else {
+      $ReportType = "csv"
+    }
+  }
+  
+  $ReportPath = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -Format MM-dd-yy-mm-ss).$ReportType"
+
   switch ($ReportType) {
     csv { 
       $Results | Export-Csv $ReportPath
@@ -2579,7 +2587,7 @@ function Search-vtsAllLogs {
 function Get-vtsNICThroughput {
   [CmdletBinding()]
   param (
-      $AdapterName = (Get-NetAdapter | Where Status -eq Up | Select -expand Name)
+      $AdapterName = (Get-NetAdapter | Where-Object Status -eq Up | Select-Object -expand Name)
   )
 
   function CalculateNetworkAdapterThroughput {
