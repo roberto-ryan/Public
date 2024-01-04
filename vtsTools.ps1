@@ -2558,12 +2558,17 @@ function Search-vtsAllLogs {
     and then calculates the difference in received and sent bytes to determine the throughput.
 
 .PARAMETER adapterName
-    The name of the network adapter. This parameter is mandatory.
+    The name of the network adapter. If not specified, the function will measure the throughput for all active network adapters.
 
 .EXAMPLE
     PS C:\> Get-vtsNICThroughput
 
     This command will start the continuous measurement of throughput for all active network adapters.
+
+.EXAMPLE
+    PS C:\> Get-vtsNICThroughput -AdapterName "Ethernet"
+
+    This command will start the continuous measurement of throughput for the network adapter named "Ethernet".
 
 .NOTES
     To stop the continuous measurement, use Ctrl+C.
@@ -2572,8 +2577,12 @@ function Search-vtsAllLogs {
     Network
 #>
 function Get-vtsNICThroughput {
+  [CmdletBinding()]
+  param (
+      $AdapterName = (Get-NetAdapter | Where Status -eq Up | Select -expand Name)
+  )
+
   function CalculateNetworkAdapterThroughput {
-      [CmdletBinding()]
       param (
           [Parameter(Mandatory = $true)]
           [string]$adapterName
@@ -2583,7 +2592,7 @@ function Get-vtsNICThroughput {
       $statsInitial = Get-NetAdapterStatistics -Name $adapterName
 
       # Wait for 2 seconds to capture the final statistics
-      Start-Sleep -Seconds 2
+      Start-Sleep -Seconds 1
       Clear-Host
 
       # Capture final statistics of the network adapter
@@ -2603,14 +2612,11 @@ function Get-vtsNICThroughput {
       Write-Host "    Throughput Out (Mbps): $throughputOutMbps"
   }
 
-  # Infinite loop to continuously measure NIC throughput
+  # Infinite loop to continuously measure NIC throughput until Ctrl-C is pressed
   while ($true) {
-      # Retrieve only the active network adapters
-      $activeAdapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-  
-      # Iterate over each active adapter and get throughput
-      foreach ($adapter in $activeAdapters) {
-          CalculateNetworkAdapterThroughput -adapterName $adapter.Name
-      }
+    # Call CalculateNetworkAdapterThroughput function for each adapterName
+    foreach ($adapterName in $AdapterName) {
+      CalculateNetworkAdapterThroughput -adapterName $adapterName
+    }
   }
 }
