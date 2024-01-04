@@ -2593,18 +2593,19 @@ function Get-vtsNICThroughput {
 
       # Wait for 2 seconds to capture the final statistics
       Start-Sleep -Seconds 1
-      Clear-Host
-
+      
       # Capture final statistics of the network adapter
       $statsFinal = Get-NetAdapterStatistics -Name $adapterName
-
+      
       # Calculate the differences in received and sent bytes
       $bytesReceivedDiff = $statsFinal.ReceivedBytes - $statsInitial.ReceivedBytes
       $bytesSentDiff = $statsFinal.SentBytes - $statsInitial.SentBytes
-
+      
       # Calculate the throughput in Mbps
       $throughputInMbps = [Math]::Round($bytesReceivedDiff * 8 / 1MB / 2, 2)
       $throughputOutMbps = [Math]::Round($bytesSentDiff * 8 / 1MB / 2, 2)
+      
+      Clear-Host
 
       # Display the throughput
       Write-Host "Adapter: $adapterName"
@@ -2615,8 +2616,8 @@ function Get-vtsNICThroughput {
   # Infinite loop to continuously measure NIC throughput until Ctrl-C is pressed
   while ($true) {
     # Call CalculateNetworkAdapterThroughput function for each adapterName
-    foreach ($adapterName in $AdapterName) {
-      CalculateNetworkAdapterThroughput -adapterName $adapterName
+    foreach ($adapter in $AdapterName) {
+      CalculateNetworkAdapterThroughput -adapterName $adapter
     }
   }
 }
