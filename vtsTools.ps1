@@ -2687,4 +2687,17 @@ function Get-vts365MailboxStatistics {
   # Output the results
   Write-Host "Retrieval complete. Here are the results:"
   $Results | Sort-Object TotalItemSize -Descending | Format-Table -AutoSize
+
+  # Ask user if they want to export a report
+  $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
+  
+  if ($exportReport -eq "Y" -or $exportReport -eq "y") {
+    # Check if PSWriteHTML module is installed, if not, install it
+    if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+      Install-Module -Name PSWriteHTML -Force -Confirm:$false
+    }
+      
+    # Export the results to an HTML file using the PSWriteHTML module
+    $Results | Out-HtmlView
+  }
 }
