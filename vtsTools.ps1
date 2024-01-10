@@ -2723,6 +2723,9 @@ function Get-vts365MailboxStatistics {
     Utilities
 #>
 function Start-vtsScreenRecording {
+  if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
+    mkdir "C:\Windows\Temp\VTS\rc"
+  }
   if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
@@ -3383,9 +3386,6 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
 # USER
   invoke-ascurrentuser -scriptblock {
-    if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
-      mkdir "C:\Windows\Temp\VTS\rc"
-    }
     if (-not (Test-Path "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe")) {
       Set-Location "C:\Windows\Temp\VTS\rc"
       aria2c -x16 -s16 -k1M -c -o ffmpeg.zip "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip" --file-allocation=none
