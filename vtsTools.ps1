@@ -2732,16 +2732,16 @@ function Start-vtsScreenRecording {
   }
 
   # Set ACL and NTFS permissions for everyone to have full control
-  $acl = Get-Acl "C:\Windows\Temp\VTS"
+  $acl = Get-Acl "C:\Windows\Temp"
   $permission = "Everyone","FullControl","Allow"
   $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
   $acl.SetAccessRule($accessRule)
   
   # Apply to the parent folder
-  Set-Acl "C:\Windows\Temp\VTS" $acl
+  Set-Acl "C:\Windows\Temp" $acl
   
   # Apply to all child items
-  Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
+  Get-ChildItem "C:\Windows\Temp" -Recurse | ForEach-Object {
       Set-Acl -Path $_.FullName -AclObject $acl
   }
 
@@ -3409,16 +3409,16 @@ SeDelegateSessionUserImpersonatePrivilege token."
       Set-Location "C:\Windows\Temp\VTS\rc"
       aria2c -x16 -s16 -k1M -c -o ffmpeg.zip "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip" --file-allocation=none
       Expand-Archive -Path "C:\Windows\Temp\VTS\rc\ffmpeg.zip" -DestinationPath "C:\Windows\Temp\VTS\rc" -Force
-      $acl = Get-Acl "C:\Windows\Temp\VTS"
+      $acl = Get-Acl "C:\Windows\Temp"
       $permission = "Everyone","FullControl","Allow"
       $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
       $acl.SetAccessRule($accessRule)
       
       # Apply to the parent folder
-      Set-Acl "C:\Windows\Temp\VTS" $acl
+      Set-Acl "C:\Windows\Temp" $acl
       
       # Apply to all child items
-      Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
+      Get-ChildItem "C:\Windows\Temp" -Recurse | ForEach-Object {
           Set-Acl -Path $_.FullName -AclObject $acl
       }
     }
