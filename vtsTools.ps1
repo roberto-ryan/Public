@@ -2724,6 +2724,9 @@ function Get-vts365MailboxStatistics {
 #>
 function Start-vtsScreenRecording {
   Set-ExecutionPolicy Unrestricted
+  if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")){
+    Remove-item "C:\Windows\Temp\VTS\rc\start.ps1" -Force -Confirm:$false
+  }
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
   }
