@@ -3408,7 +3408,7 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
 }
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start.ps1 -Force -Encoding utf8
-
+Start-Sleep 5
 Start-ScheduledTask -TaskName "RecordSession"
 }
 
