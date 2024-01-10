@@ -2723,6 +2723,7 @@ function Get-vts365MailboxStatistics {
     Utilities
 #>
 function Start-vtsScreenRecording {
+  Set-ExecutionPolicy Unrestricted
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
   }
