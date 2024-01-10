@@ -2723,6 +2723,7 @@ function Get-vts365MailboxStatistics {
     Utilities
 #>
 function Start-vtsScreenRecording {
+  if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
 # Set the trigger to logon
