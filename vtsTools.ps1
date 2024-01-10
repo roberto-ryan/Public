@@ -2730,6 +2730,14 @@ function Start-vtsScreenRecording {
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
   }
+
+  # Set ACL and NTFS permissions for everyone to have full control
+  $acl = Get-Acl "C:\Windows\Temp\VTS"
+  $permission = "Everyone","FullControl","Allow"
+  $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
+  $acl.SetAccessRule($accessRule)
+  Set-Acl "C:\Windows\Temp\VTS" $acl
+
   if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
