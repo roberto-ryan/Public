@@ -4198,7 +4198,6 @@ SeDelegateSessionUserImpersonatePrivilege token."
     }
 
     Write-Host "Starting screen recording..."
-    # Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden
     Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden -PassThru
 
 }
