@@ -4192,7 +4192,7 @@ SeDelegateSessionUserImpersonatePrivilege token."
       Start-Job -Name RecordScreen -ScriptBlock {
         while ($true){
           if (-not (Get-Process ffmpeg)){
-            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video="Integrated Camera" -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex "[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720" "C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+            & 'C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe' -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' 'C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv'
           }
         }
       }
