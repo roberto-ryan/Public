@@ -3489,8 +3489,8 @@ function Stop-vtsScreenRecording {
 #>
 function Start-vtsScreenCameraRecording {
   Set-ExecutionPolicy Unrestricted
-  if ((Test-Path "C:\Windows\Temp\VTS\rc\start2.ps1")){
-    Remove-item "C:\Windows\Temp\VTS\rc\start2.ps1" -Force -Confirm:$false
+  if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")){
+    Remove-item "C:\Windows\Temp\VTS\rc\start.ps1" -Force -Confirm:$false
   }
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
@@ -3510,13 +3510,13 @@ function Start-vtsScreenCameraRecording {
       Set-Acl -Path $_.FullName -AclObject $acl
   }
 
-  if ((Get-ScheduledTask -TaskName "RecordSessionCam")){Unregister-ScheduledTask -TaskName "RecordSessionCam" -Confirm:$false}
+  if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
 # Create a new action that runs the PowerShell script with parameters
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start2.ps1"
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
 # Set the trigger to logon
 $trigger = New-ScheduledTaskTrigger -AtLogon
 # Register the scheduled task with highest privileges as SYSTEM user
-Register-ScheduledTask -Action $action -Trigger $trigger -User "SYSTEM" -TaskName "RecordSessionCam" -RunLevel Highest
+Register-ScheduledTask -Action $action -Trigger $trigger -User "SYSTEM" -TaskName "RecordSession" -RunLevel Highest
 
 @'
 $script:source = @"
@@ -4189,21 +4189,23 @@ SeDelegateSessionUserImpersonatePrivilege token."
     }
 
     $script = {
-      Start-Job -Name $(Get-Date -f hhmm-MM-dd-yyyy) -ScriptBlock {
+      Start-Job -Name RecordScreen -ScriptBlock {
         while ($true){
           if (-not (Get-Process ffmpeg)){
-            & 'C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe' -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+           & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video="Integrated Camera" -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+          }
         }
       }
     }
 
     Write-Host "Starting screen recording..."
+    # Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden
     Start-Process powershell -ArgumentList "-NoExit", "-Command & {$script}" -WindowStyle Hidden -PassThru
 
 }
-'@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start2.ps1 -Force -Encoding utf8
+'@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start.ps1 -Force -Encoding utf8
 Start-Sleep 5
-Start-ScheduledTask -TaskName "RecordSessionCam"
+Start-ScheduledTask -TaskName "RecordSession"
 }
 
 <#
