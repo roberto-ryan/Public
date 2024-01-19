@@ -4187,8 +4187,7 @@ Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
       Start-Job -Name RecordScreen -ScriptBlock {
         while ($true){
           if (-not (Get-Process ffmpeg)){
-            #& "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
-            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' -preset ultrafast -tune zerolatency -hls_flags temp_file "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv" 
+            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -i desktop -filter_complex '[0:v]scale=460:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' -cpu-used auto -tune zerolatency -b:v 140k -c:v libx265 -t 1800 -hls_flags temp_file "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv" 
             Start-Sleep 5
           }
         }
