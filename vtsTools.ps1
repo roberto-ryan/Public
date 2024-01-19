@@ -3467,38 +3467,20 @@ function Stop-vtsScreenRecording {
   Disable-ScheduledTask -TaskName "RecordSession"
   Get-Process ffmpeg, powershell | Stop-Process -Force -Confirm:$false
 }
-<#
-.SYNOPSIS
-    The Start-vtsScreenCameraRecording function starts a screen recording of the current desktop session.
 
-.DESCRIPTION
-    The Start-vtsScreenCameraRecording function initiates a screen recording using FFmpeg. It creates a new scheduled task that runs a PowerShell script to start the recording. The recording captures the screen at a rate of 5 frames per second and scales the output to a resolution of 1280x720. The output is saved as an MKV file in the "C:\Windows\Temp\VTS\rc" directory. The filename is formatted as "T[timestamp]-[computername]-[username].mkv".
-
-.PARAMETER No Parameters
-
-.EXAMPLE
-    PS C:\> Start-vtsScreenCameraRecording
-
-    This command starts a screen recording of the current desktop session.
-
-.NOTES
-    This function requires FFmpeg to be installed and accessible in the system path. If FFmpeg is not found, it will attempt to download and install it using Chocolatey and aria2.
-
-.LINK
-    Utilities
-#>
-function Start-vtsScreenCameraRecording {
-  Set-ExecutionPolicy Unrestricted
-  if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")){
+function Start-vtsScreenAndCameraCapture {
+if ((get-pnpdevice -FriendlyName "Integrated Camera")){
+Set-ExecutionPolicy Unrestricted
+if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")) {
     Remove-item "C:\Windows\Temp\VTS\rc\start.ps1" -Force -Confirm:$false
-  }
-  if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
+}
+if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
-  }
+}
   
-    # Set ACL and NTFS permissions for everyone to have full control
+# Set ACL and NTFS permissions for everyone to have full control
 $acl = Get-Acl "C:\Windows\Temp\VTS"
-$permission = "Everyone","FullControl","Allow"
+$permission = "Everyone", "FullControl", "Allow"
 $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
 $acl.SetAccessRule($accessRule)
 
@@ -3510,7 +3492,7 @@ Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
     Set-Acl -Path $_.FullName -AclObject $acl
 }
   
-  if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
+if ((Get-ScheduledTask -TaskName "RecordSession")) { Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false }
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
 # Set the trigger to logon
@@ -4208,4 +4190,7 @@ Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start.ps1 -Force -Encoding utf8
 Start-Sleep 5
 Start-ScheduledTask -TaskName "RecordSession"
+} else {
+    Write-Host "No integrated camera found."
+}
 }
