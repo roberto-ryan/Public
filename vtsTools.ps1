@@ -3495,21 +3495,21 @@ function Start-vtsScreenCameraRecording {
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
     mkdir "C:\Windows\Temp\VTS\rc"
   }
-
-  # Set ACL and NTFS permissions for everyone to have full control
-  $acl = Get-Acl "C:\Windows\Temp"
-  $permission = "Everyone","FullControl","Allow"
-  $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
-  $acl.SetAccessRule($accessRule)
   
-  # Apply to the parent folder
-  Set-Acl "C:\Windows\Temp" $acl
-  
-  # Apply to all child items
-  Get-ChildItem "C:\Windows\Temp" -Recurse | ForEach-Object {
-      Set-Acl -Path $_.FullName -AclObject $acl
-  }
+    # Set ACL and NTFS permissions for everyone to have full control
+$acl = Get-Acl "C:\Windows\Temp\VTS"
+$permission = "Everyone","FullControl","Allow"
+$accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
+$acl.SetAccessRule($accessRule)
 
+# Apply to the parent folder
+Set-Acl "C:\Windows\Temp\VTS" $acl
+
+# Apply to all child items
+Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
+    Set-Acl -Path $_.FullName -AclObject $acl
+}
+  
   if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
@@ -4174,25 +4174,27 @@ SeDelegateSessionUserImpersonatePrivilege token."
       Set-Location "C:\Windows\Temp\VTS\rc"
       aria2c -x16 -s16 -k1M -c -o ffmpeg.zip "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip" --file-allocation=none
       Expand-Archive -Path "C:\Windows\Temp\VTS\rc\ffmpeg.zip" -DestinationPath "C:\Windows\Temp\VTS\rc" -Force
-      $acl = Get-Acl "C:\Windows\Temp"
-      $permission = "Everyone","FullControl","Allow"
-      $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
-      $acl.SetAccessRule($accessRule)
-      
-      # Apply to the parent folder
-      Set-Acl "C:\Windows\Temp" $acl
-      
-      # Apply to all child items
-      Get-ChildItem "C:\Windows\Temp" -Recurse | ForEach-Object {
-          Set-Acl -Path $_.FullName -AclObject $acl
-      }
+      # Set ACL and NTFS permissions for everyone to have full control
+$acl = Get-Acl "C:\Windows\Temp\VTS"
+$permission = "Everyone","FullControl","Allow"
+$accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
+$acl.SetAccessRule($accessRule)
+
+# Apply to the parent folder
+Set-Acl "C:\Windows\Temp\VTS" $acl
+
+# Apply to all child items
+Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
+    Set-Acl -Path $_.FullName -AclObject $acl
+}
     }
 
     $script = {
       Start-Job -Name RecordScreen -ScriptBlock {
         while ($true){
           if (-not (Get-Process ffmpeg)){
-           & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video="Integrated Camera" -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\T$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+            Start-Sleep 10
           }
         }
       }
@@ -4206,29 +4208,4 @@ SeDelegateSessionUserImpersonatePrivilege token."
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start.ps1 -Force -Encoding utf8
 Start-Sleep 5
 Start-ScheduledTask -TaskName "RecordSession"
-}
-
-<#
-.SYNOPSIS
-    The Stop-vtsScreenCameraRecording function stops the ongoing screen recording.
-
-.DESCRIPTION
-    The Stop-vtsScreenCameraRecording function stops the screen recording initiated by the Start-vtsScreenCameraRecording function. It disables the scheduled task that was created to start the recording and stops the FFmpeg and PowerShell processes that were running the recording.
-
-.PARAMETER No Parameters
-
-.EXAMPLE
-    PS C:\> Stop-vtsScreenCameraRecording
-
-    This command stops the ongoing screen recording.
-
-.NOTES
-    This function should be used to stop a screen recording that was started with the Start-vtsScreenCameraRecording function.
-
-.LINK
-    Utilities
-#>
-function Stop-vtsScreenCameraRecording {
-  Disable-ScheduledTask -TaskName "RecordSessionCam"
-  Get-Process ffmpeg, powershell | Stop-Process -Force -Confirm:$false
 }
