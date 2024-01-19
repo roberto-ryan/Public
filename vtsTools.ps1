@@ -3495,9 +3495,20 @@ Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
 if ((Get-ScheduledTask -TaskName "RecordSession")) { Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false }
 # Create a new action that runs the PowerShell script with parameters
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
-# Set the trigger to logon
-$trigger = New-ScheduledTaskTrigger -AtLogon
-# Register the scheduled task with highest privileges as SYSTEM user
+
+    $triggers = @()
+    $triggers += New-ScheduledTaskTrigger -AtLogOn
+
+    # create TaskEventTrigger, use your own value in Subscription
+    $CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
+    $trigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
+    $trigger.Subscription = 
+@"
+<QueryList><Query Id="0" Path="Microsoft-Windows-NetworkProfile/Operational"><Select Path="Security">*[System[(EventID=4624)]]</Select></Query></QueryList>
+"@
+    $trigger.Enabled = $True 
+    $triggers += $trigger
+
 Register-ScheduledTask -Action $action -Trigger $trigger -User "SYSTEM" -TaskName "RecordSession" -RunLevel Highest
 
 @'
@@ -4142,6 +4153,7 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
 
 # SYSTEM
+  get-process ffmpeg | stop-process -force -confirm:$false
   if (-not (Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
     Remove-item "C:\ProgramData\chocolatey" -Recurse -Force
   }
@@ -4175,8 +4187,9 @@ Get-ChildItem "C:\Windows\Temp\VTS" -Recurse | ForEach-Object {
       Start-Job -Name RecordScreen -ScriptBlock {
         while ($true){
           if (-not (Get-Process ffmpeg)){
-            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
-            Start-Sleep 10
+            #& "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv"
+            & "C:\Windows\Temp\VTS\rc\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe" -f dshow -i video='Integrated Camera' -f gdigrab -framerate 5 -t 1800 -i desktop -filter_complex '[0:v]scale=320:-1[cam];[1:v][cam]overlay=10:10,scale=1280:720' -preset ultrafast -tune zerolatency -hls_flags temp_file "C:\Windows\Temp\VTS\rc\TT$(Get-Date -f hhmm-MM-dd-yyyy)-$($env:COMPUTERNAME)-$($env:USERNAME).mkv" 
+            Start-Sleep 5
           }
         }
       }
