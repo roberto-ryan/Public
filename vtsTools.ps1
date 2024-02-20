@@ -3688,6 +3688,7 @@ function Get-vtsDeviceChange {
 }
 
 
+
 <#
 .SYNOPSIS
 Starts a packet capture using Wireshark's tshark.
@@ -3704,6 +3705,9 @@ The path to the output file. Defaults to a .pcap file in C:\temp with the comput
 .EXAMPLE
 Start-vtsPacketCapture -interface "Ethernet" -output "C:\temp\capture.pcap"
 Starts a packet capture on the Ethernet interface, with the output saved to C:\temp\capture.pcap.
+
+.LINK
+Network
 #>
 function Start-vtsPacketCapture {
     param (
@@ -3763,6 +3767,9 @@ The Stop-vtsPacketCapture function stops the currently running packet capture st
 .EXAMPLE
 Stop-vtsPacketCapture
 Stops the currently running packet capture.
+
+.LINK
+Network
 #>
 function Stop-vtsPacketCapture {
     Write-Host "Stopping packet capture..."
