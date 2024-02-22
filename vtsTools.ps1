@@ -2683,28 +2683,33 @@ function Get-vtsNICThroughput {
     }
   }
 }
+
 <#
 .SYNOPSIS
-This script retrieves mailbox statistics for a list of email addresses.
+This function retrieves mailbox statistics for a list of email addresses from Exchange Online.
 
 .DESCRIPTION
-The script connects to Exchange Online and retrieves mailbox statistics for each email address provided. The results are stored in an array and outputted at the end.
+The Get-vts365MailboxStatistics function connects to Exchange Online and retrieves mailbox statistics for each email address provided. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
 
 .PARAMETER EmailAddress
-An array of email addresses for which to retrieve mailbox statistics.
+An array of email addresses for which to retrieve mailbox statistics. If not provided, the function retrieves statistics for all mailboxes.
 
 .EXAMPLE
 PS C:\> Get-vts365MailboxStatistics -EmailAddress "user1@example.com", "user2@example.com"
 
 This example retrieves mailbox statistics for user1@example.com and user2@example.com.
 
+.EXAMPLE
+PS C:\> Get-vts365MailboxStatistics
+
+This example retrieves mailbox statistics for all mailboxes.
+
 .LINK
 M365
 #>
 function Get-vts365MailboxStatistics {
   param(
-    [Parameter(Mandatory = $true, HelpMessage = "Enter the email addresses for which to retrieve mailbox statistics.")]
-    [string[]]$EmailAddress
+    $EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName)
   )
 
   # Connect to Exchange Online
