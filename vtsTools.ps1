@@ -2709,12 +2709,14 @@ M365
 #>
 function Get-vts365MailboxStatistics {
   param(
-    $EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName)
+    $EmailAddress
   )
 
   # Connect to Exchange Online
   Write-Host "Connecting to Exchange Online..."
   Connect-ExchangeOnline
+
+  if ($null -eq $EmailAddress){$EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName)}
 
   # Initialize results array
   $Results = @()
