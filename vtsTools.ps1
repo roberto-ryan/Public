@@ -3947,7 +3947,7 @@ This function retrieves the source of a user's lockout event.
 
 .DESCRIPTION
 The Get-vtsLockoutSource function uses the Get-WinEvent cmdlet to retrieve the lockout event for a specified user from the Security log. 
-If a lockout event is found, the function returns a custom object with the current time, the locked user, and the source of the lockout. 
+If a lockout event is found, the function returns a custom object with the time of the lockout event, the locked user, and the source of the lockout. 
 If no lockout event is found, the function returns a custom object with the current time, the locked user, and a message indicating that no lockout event was found.
 
 .PARAMETER user
@@ -3990,7 +3990,7 @@ function Get-vtsLockoutSource {
 
   # Output the source of the lockout
   return [pscustomobject]@{
-      Time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+      Time = $lockoutEvent.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss")
       LockedUser = $user
       Source = $lockoutSource
   }
