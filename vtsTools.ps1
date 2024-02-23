@@ -3940,3 +3940,58 @@ function Set-vts365MailboxArchive {
   ViewUserRetentionPolicy
   ViewUserArchiveDetails
 }
+
+<#
+.SYNOPSIS
+This function retrieves the source of a user's lockout event.
+
+.DESCRIPTION
+The Get-vtsLockoutSource function uses the Get-WinEvent cmdlet to retrieve the lockout event for a specified user from the Security log. 
+If a lockout event is found, the function returns a custom object with the current time, the locked user, and the source of the lockout. 
+If no lockout event is found, the function returns a custom object with the current time, the locked user, and a message indicating that no lockout event was found.
+
+.PARAMETER user
+The username for which to retrieve the lockout source. This parameter is mandatory.
+
+.EXAMPLE
+PS C:\> Get-vtsLockoutSource -user "jdoe"
+
+This command retrieves the source of the lockout event for the user "jdoe".
+
+.INPUTS
+System.String
+
+.OUTPUTS
+PSCustomObject
+
+.LINK
+Log Management
+#>
+function Get-vtsLockoutSource {
+  param(
+      [Parameter(Mandatory=$true)]
+      [string]$user
+  )
+
+  # Get the lockout event for the user
+  $lockoutEvent = Get-WinEvent -FilterHashtable @{LogName = 'Security'; Id = 4740 } | Where-Object { $_.Properties[0].Value -eq $user }
+
+  # Check if a lockout event was found
+  if ($null -eq $lockoutEvent) {
+      return [pscustomobject]@{
+          Time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+          LockedUser = $user
+          Source = "No lockout event found"
+      }
+  }
+
+  # Get the source of the lockout
+  $lockoutSource = $lockoutEvent.Properties[1].Value
+
+  # Output the source of the lockout
+  return [pscustomobject]@{
+      Time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+      LockedUser = $user
+      Source = $lockoutSource
+  }
+}
