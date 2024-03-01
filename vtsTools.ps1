@@ -2168,8 +2168,8 @@ M365
 #>
 function Get-vts365UserLicense {
   param (
-    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
-    $UserList
+      [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+      $UserList
   )
 
   Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
@@ -2177,20 +2177,33 @@ function Get-vts365UserLicense {
   $LicenseDetails = @()
 
   foreach ($User in $UserList) {
-    $User = $User.Trim()
-    $UserExists = Get-MgUser -UserId $User -ErrorAction SilentlyContinue
-    if ($UserExists) {
-      $LicenseDetails += [pscustomobject]@{
-        User    = $User
-        License = (Get-MgUserLicenseDetail -UserId $User | Select-Object -expand SkuPartNumber) -join ", "
+      $User = $User.Trim()
+      $UserExists = Get-MgUser -UserId $User -ErrorAction SilentlyContinue
+      if ($UserExists) {
+          $LicenseDetails += [pscustomobject]@{
+              User    = $User
+              License = (Get-MgUserLicenseDetail -UserId $User | Select-Object -expand SkuPartNumber) -join ", "
+          }
       }
-    }
-    else {
-      Write-Host "User $User does not exist." -ForegroundColor Red
-    }
+      else {
+          Write-Host "User $User does not exist." -ForegroundColor Red
+      }
   }
 
-  $LicenseDetails
+  $LicenseDetails | Out-Host
+
+  # Ask user if they want to export a report
+  $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
+  
+  if ($exportReport -eq "Y" -or $exportReport -eq "y") {
+      # Check if PSWriteHTML module is installed, if not, install it
+      if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+          Install-Module -Name PSWriteHTML -Force -Confirm:$false
+      }
+        
+      # Export the results to an HTML file using the PSWriteHTML module
+      $LicenseDetails | Out-HtmlView
+  }
 }
 
 <#
