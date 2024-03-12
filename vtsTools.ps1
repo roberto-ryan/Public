@@ -4445,3 +4445,51 @@ function Get-vts365DistributionListRecipients {
         $Results | Out-HtmlView
     }
 }
+
+<#
+.SYNOPSIS
+This function searches for a specific pattern in the content of files in a given directory.
+
+.DESCRIPTION
+The Get-vtsFileContentMatch function takes a directory path, a pattern to match, and an optional array of file types to exclude. It recursively searches through all files in the specified directory (excluding the specified file types), and returns a custom object for each line in each file that matches the specified pattern. The custom object contains the full path of the file and the line that matched the pattern.
+
+.PARAMETER Path
+The path to the directory to search. This parameter is mandatory.
+
+.PARAMETER Pattern
+The pattern or word to match in the file content. This parameter is mandatory.
+
+.PARAMETER Exclude
+An array of file types to exclude from the search. The default value is '*.exe', '*.dll'. This parameter is optional.
+
+.EXAMPLE
+Get-vtsFileContentMatch -Path "C:\Users\Username\Documents" -Pattern "error"
+
+This example searches for the word "error" in all files in the "C:\Users\Username\Documents" directory, excluding .exe and .dll files.
+
+.LINK
+Utilities
+#>
+function Get-vtsFileContentMatch {
+    param (
+        [Parameter(Mandatory=$true, HelpMessage="Please provide the path to the directory.")]
+        [string]$Path,
+        [Parameter(Mandatory=$true, HelpMessage="Please provide the pattern or word to match.")]
+        [string]$Pattern,
+        [Parameter(Mandatory=$false, HelpMessage="Please provide the file types to exclude. Default is '*.exe', '*.dll'.")]
+        [string[]]$Exclude = @("*.exe", "*.dll")
+    )
+
+    Get-ChildItem -Path $Path -Recurse -File -Exclude $Exclude | ForEach-Object {
+        $filePath = $_.FullName
+        Get-Content -Path $filePath | ForEach-Object {
+            if ($_ -match $Pattern) {
+                $Result = [pscustomobject]@{
+                    FilePath = $filePath
+                    Match = $_
+                }
+                $Result
+            }
+        }
+    }
+}
