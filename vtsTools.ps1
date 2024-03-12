@@ -4533,7 +4533,7 @@ Revoke-vts365EmailMessage -TicketNumber "12345" -From "sender@example.com" -To "
 This example shows how to revoke an email message sent from "sender@example.com" to "recipient@example.com" with the ticket number "12345".
 
 .LINK
-M365
+Still in Development
 
 #>
 function Revoke-vts365EmailMessage {
