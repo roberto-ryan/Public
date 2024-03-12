@@ -4538,15 +4538,15 @@ Still in Development
 #>
 function Revoke-vts365EmailMessage {
     param(
-        [Parameter(Mandatory = $true)]
-        [string]$TicketNumber,
+        # [Parameter(Mandatory = $true)]
+        [string]$TicketNumber = "TEST4",
         [array]$From,
-        [array]$To
+        [array]$To = "Zach.Koscoe@completehealth.com"
     )
     
     Write-Host "Connecting to Exchange Online and IPPS Session..."
-    Connect-ExchangeOnline
-    Connect-IPPSSession
+    # Connect-ExchangeOnline
+    # Connect-IPPSSession
 
     Write-Host "Getting message trace..."
     if (($From -ne $null) -and ($To -ne $null)) {
@@ -4562,19 +4562,7 @@ function Revoke-vts365EmailMessage {
     }
     
     Write-Host "Starting compliance search..."
-    if ($From -ne $null -and $To -ne $null) {
-        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND From:`"$From`" AND To:`"$To`")" | Start-ComplianceSearch
-    }
-    
-    if (($To -ne $null) -and ($From -eq $null)) {
-        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND To:`"$To`")" | Start-ComplianceSearch
-        
-    }
-    
-    if (($To -eq $null) -and ($From -ne $null)) {
-        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND From:`"$From`")" | Start-ComplianceSearch
-    
-    }
+    New-ComplianceSearch -Name $TicketNumber -ExchangeLocation $($Message.RecipientAddress) -ContentMatchQuery "(c:c)(from=$($Message.SenderAddress))(subjecttitle=""$($Message.subject)"")" | Start-ComplianceSearch
     
     Write-Host "Waiting for the search to complete..."
     do {
