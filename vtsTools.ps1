@@ -4448,10 +4448,10 @@ function Get-vts365DistributionListRecipients {
 
 <#
 .SYNOPSIS
-This function searches for a specific pattern in the content of files in a given directory.
+This function searches for a specific pattern in the content of files in a given directory and optionally exports the results to a CSV file.
 
 .DESCRIPTION
-The Get-vtsFileContentMatch function takes a directory path, a pattern to match, and an optional array of file types to exclude. It recursively searches through all files in the specified directory (excluding the specified file types), and returns a custom object for each line in each file that matches the specified pattern. The custom object contains the full path of the file and the line that matched the pattern.
+The Get-vtsFileContentMatch function takes a directory path, a pattern to match, and an optional array of file types to exclude. It recursively searches through all files in the specified directory (excluding the specified file types), and returns a custom object for each line in each file that matches the specified pattern. The custom object contains the full path of the file and the line that matched the pattern. At the end, the function asks the user if they want to export the results to a CSV file.
 
 .PARAMETER Path
 The path to the directory to search. This parameter is mandatory.
@@ -4480,6 +4480,7 @@ function Get-vtsFileContentMatch {
         [string[]]$Exclude = @("*.exe", "*.dll")
     )
 
+    $Results = @()
     Get-ChildItem -Path $Path -Recurse -File -Exclude $Exclude | ForEach-Object {
         $filePath = $_.FullName
         Get-Content -Path $filePath | ForEach-Object {
@@ -4488,8 +4489,15 @@ function Get-vtsFileContentMatch {
                     FilePath = $filePath
                     Match = $_
                 }
-                $Result
+                $Result | Format-List
+                $Results += $Result
             }
         }
+    }
+
+    $exportToCsv = Read-Host -Prompt "Do you want to export the results to a CSV file? (Y/N)"
+    if ($exportToCsv -eq 'Y') {
+        $csvPath = Read-Host -Prompt "Please provide the path to the CSV file"
+        $Results | Export-Csv -Path $csvPath -NoTypeInformation
     }
 }
