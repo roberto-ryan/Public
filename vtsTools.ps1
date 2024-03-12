@@ -4510,3 +4510,86 @@ function Get-vtsFileContentMatch {
         if ($?){Write-Host "Results exported to $CsvPath" -ForegroundColor Yellow}
     }
 }
+
+<#
+.SYNOPSIS
+This function revokes a specific email message in Office 365.
+
+.DESCRIPTION
+The Revoke-vts365EmailMessage function connects to Exchange Online and IPPS Session, gets the message trace, starts a compliance search, waits for the search to complete, purges and deletes the email instances, and checks the status of the search action.
+
+.PARAMETER TicketNumber
+This is a mandatory parameter. It is the unique identifier for the compliance search.
+
+.PARAMETER From
+This is an optional parameter. It is the sender's email address.
+
+.PARAMETER To
+This is an optional parameter. It is the recipient's email address.
+
+.EXAMPLE
+Revoke-vts365EmailMessage -TicketNumber "12345" -From "sender@example.com" -To "recipient@example.com"
+
+This example shows how to revoke an email message sent from "sender@example.com" to "recipient@example.com" with the ticket number "12345".
+
+.LINK
+M365
+
+#>
+function Revoke-vts365EmailMessage {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TicketNumber,
+        [array]$From,
+        [array]$To
+    )
+    
+    Write-Host "Connecting to Exchange Online and IPPS Session..."
+    Connect-ExchangeOnline
+    Connect-IPPSSession
+
+    Write-Host "Getting message trace..."
+    if (($From -ne $null) -and ($To -ne $null)) {
+        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To -SenderAddress $From | Out-GridView -OutputMode Multiple
+    }
+    
+    if (($To -ne $null) -and ($From -eq $null)) {
+        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To | Out-GridView -OutputMode Multiple
+    }
+    
+    if (($To -eq $null) -and ($From -ne $null)) {
+        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -SenderAddress $From | Out-GridView -OutputMode Multiple
+    }
+    
+    Write-Host "Starting compliance search..."
+    if ($From -ne $null -and $To -ne $null) {
+        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND From:`"$From`" AND To:`"$To`")" | Start-ComplianceSearch
+    }
+    
+    if (($To -ne $null) -and ($From -eq $null)) {
+        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND To:`"$To`")" | Start-ComplianceSearch
+        
+    }
+    
+    if (($To -eq $null) -and ($From -ne $null)) {
+        New-ComplianceSearch -Name $TicketNumber -ExchangeLocation All -ContentMatchQuery "(Subject:`"$($Message.subject)`" AND From:`"$From`")" | Start-ComplianceSearch
+    
+    }
+    
+    Write-Host "Waiting for the search to complete..."
+    do {
+        Start-Sleep -Seconds 60
+        $searchStatus = (Get-ComplianceSearch -Identity $TicketNumber).Status
+    } while ($searchStatus -ne 'Completed')
+    
+    Write-Host "Purging and deleting the email instances..."
+    New-ComplianceSearchAction -SearchName $TicketNumber -Purge -PurgeType HardDelete
+    
+    Write-Host "Checking the status of the search action..."
+    do {
+        Start-Sleep -Seconds 60
+        $actionStatus = Get-ComplianceSearchAction | Where-Object Name -eq "$($TicketNumber)_Purge" | Select-Object -expand Status
+    } while ($actionStatus -ne 'Completed')
+
+    Write-Host "Operation completed."
+}
