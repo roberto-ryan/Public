@@ -4608,3 +4608,63 @@ function Start-vtsRepair {
     sfc /scannow
     Write-Host "System File Checker scan completed."
 }
+
+<#
+.SYNOPSIS
+   Get-vtsACLDetails is a function that retrieves Access Control List (ACL) details for a specified path.
+
+.DESCRIPTION
+   This function takes a path as input and recursively retrieves the ACL details for each directory in the path. 
+   It then prompts the user if they want to export these details to a CSV report. If the user agrees, it exports the report 
+   to a specified location or a default location in the TEMP directory with the current date in the filename. 
+   It then prompts the user if they want to open the report.
+
+.PARAMETER Path
+   The path for which to retrieve ACL details. This parameter is mandatory.
+
+.PARAMETER ReportPath
+   The path where the report will be exported. This parameter is optional. If not provided, the report will be exported 
+   to a default location in the TEMP directory with the current date in the filename.
+
+.EXAMPLE
+   Get-vtsACLDetails -Path "C:\Users\Username\Documents"
+
+   This command retrieves the ACL details for the Documents directory and all its subdirectories, and then prompts the user 
+   if they want to export these details to a report.
+
+.LINK
+    File Management
+#>
+function Get-vtsACLDetails {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Path,
+        [Parameter(Mandatory=$false)]
+        [string]$ReportPath = "$($env:TEMP)\$(Get-Date -f yyyyMMdd)-ACLReport.csv"
+    )
+
+    $Result = Get-ChildItem $Path -Recurse -Directory | ForEach-Object {
+        $dirPath = $_.FullName
+        $ACLs = Get-Acl $dirPath
+        $ACLs.Access | ForEach-Object {
+            New-Object PSObject -Property @{
+                FilePath = $dirPath
+                IdentityReference = $_.IdentityReference
+                AccessControlType = $_.AccessControlType
+                FileSystemRights = $_.FileSystemRights
+            }
+        }
+    }
+
+    $Result | Out-Host
+
+    $exportReport = Read-Host -Prompt 'Do you want to export a report? (y/n)'
+    if ($exportReport -eq 'y') {
+        $Result | Export-Csv -Path $ReportPath -NoTypeInformation
+        Write-Host "Report exported to $ReportPath"
+        $openReport = Read-Host -Prompt 'Do you want to open the report? (y/n)'
+        if ($openReport -eq 'y') {
+            Invoke-Item $ReportPath
+        }
+    }
+}
