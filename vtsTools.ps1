@@ -4647,7 +4647,7 @@ New-vtsSPOnlineDocumentLibrary -orgName "contoso" -siteUrl "https://contoso.shar
 This example creates a new document library named "NewLibrary" in the "test" site of the "contoso" organization.
 
 .LINK
-Still in Development
+SharePoint Online
 #>
 function New-vtsSPOnlineDocumentLibrary {
     param (
@@ -4692,7 +4692,7 @@ Get-vtsSPOnlineDocumentLibraryFolders -siteUrl "https://contoso.sharepoint.com/s
 This example retrieves all folders in the "LibraryName" document library on the "test" site.
 
 .LINK
-Still in Development
+SharePoint Online
 #>
 function Get-vtsSPOnlineDocumentLibraryFolders {
     param (
