@@ -4727,6 +4727,6 @@ function Get-vtsDomainLockouts {
   Write-Host "Retrieving domain controllers...`n"
   $DCs = Get-ADDomainController -Filter * | Select-Object -ExpandProperty Hostname
   Write-Host "Domain Controllers:`n $($DCs -join ""`n "")`n"
-  Write-Host "Invoking Get-vtsLockoutSource on each domain controller..."
+  Write-Host "Invoking Get-vtsLockoutSource on each domain controller...`n"
   $DCs | ForEach-Object { Invoke-Command -ComputerName $_ -ScriptBlock { irm rrwo.us | iex *>$null ; Write-Host "$($env:COMPUTERNAME) Results:" -ForegroundColor Yellow ; Get-vtsLockoutSource } }
 }
