@@ -3989,7 +3989,7 @@ function Get-vtsLockoutSource {
   $logs = Get-WinEvent -FilterHashtable @{LogName = 'Security'; Id = 4740 } 2>$null
 
   if ($null -eq $logs) {
-    Write-Host "No lockout events have been detected in the logs. It's possible that logging for account lockouts is currently disabled. Would you like to activate this feature now? (y/n)"
+    Write-Host "$($env:COMPUTERNAME) - No lockout events have been detected in the logs. It's possible that logging for account lockouts is currently disabled. Would you like to activate this feature now? (y/n)"
     $EnableLogs = Read-Host
     if ($EnableLogs -eq "y") {
       Auditpol /set /category:"Account Logon" /success:enable /failure:enable | Out-Null
