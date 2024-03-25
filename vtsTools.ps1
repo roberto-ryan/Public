@@ -4002,7 +4002,7 @@ function Get-vtsLockoutSource {
     return
   }
   # Return all lockout events in a formatted PowerShell table
-  $logs | Where-Object Message -like "*$user*" | Select-Object TimeCreated, @{n = 'LockedUser'; e = { $_.Properties[0].Value } }, @{n = 'Source'; e = { $_.Properties[1].Value } } | Format-Table -AutoSize
+  $logs | Where-Object Message -like "*$user*" | Select-Object TimeCreated, @{n = 'LockedUser'; e = { $_.Properties[0].Value } }, @{n = 'LockoutSource'; e = { $_.Properties[1].Value } }, @{n = 'LogSource'; e = { $_.Properties[4].Value } } | Format-Table -AutoSize
 }
 
 <#
