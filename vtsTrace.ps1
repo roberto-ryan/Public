@@ -232,7 +232,7 @@ $(Get-Content "$global:dir\resolution.txt")
             "Authorization" = "Bearer $OpenAIKey"
         }
         $Body = @{
-            "model"             = "gpt-3.5-turbo-16k-0613"
+            "model"             = "gpt-4-0125-preview"
             "messages"          = @( @{
                     "role"    = "system"
                     "content" = "You are a helpful IT technician that creates comprehensive ticket notes for IT support issues."
@@ -393,7 +393,7 @@ $(Get-Content "$global:dir\resolution.txt")
             
             While ($true) {
                 
-                $alterations = Read-Host "GPT-3.5-Turbo>>>"
+                $alterations = Read-Host "GPT-4-Turbo>>>"
                 switch ($alterations) {
                     "s" {
                         Write-Host "STEPS >" -ForegroundColor Green
@@ -434,7 +434,7 @@ $(Get-Content "$global:dir\resolution.txt")
                             "Authorization" = "Bearer $OpenAIKey"
                         }
                         $Body = @{
-                            "model"             = "gpt-3.5-turbo-16k-0613"
+                            "model"             = "gpt-4-0125-preview"
                             "messages"          = @( @{
                                     "role"    = "system"
                                     "content" = "You are a helpful assistant that rewrites IT Support ticket notes using updated information."
