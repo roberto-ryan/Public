@@ -4802,3 +4802,209 @@ function Suspend-vtsADUser {
     }
 
 }
+
+<#
+.SYNOPSIS
+This script uses OpenAI's GPT-4 model to generate IT support ticket notes and follow-up questions.
+
+.DESCRIPTION
+The script consists of three main functions: LineAcrossScreen, Invoke-OpenAIAPI, and Generate-Questions. 
+
+LineAcrossScreen creates a line across the console screen with a specified color. 
+
+Invoke-OpenAIAPI sends a request to OpenAI's API with a given prompt and API key, and optionally a previous response for context. It returns the AI's response.
+
+Generate-Questions uses the OpenAI API to generate a set of follow-up questions based on the provided ticket notes.
+
+The main loop of the script prompts the user to enter an issue description and ticket notes, generates follow-up questions, and finally generates the ticket notes.
+
+.PARAMETER Prompt
+The prompt to be sent to the OpenAI API.
+
+.PARAMETER OpenAIAPIKey
+The API key for OpenAI.
+
+.PARAMETER PreviousResponse
+The previous response from the AI, used for context in the next API call.
+
+.PARAMETER TicketNotes
+The ticket notes to be used as context for generating follow-up questions.
+
+.PARAMETER Color
+The color of the line to be drawn across the console screen.
+
+.EXAMPLE
+PS> ai3
+
+.LINK
+AI
+#>
+function ai3 {
+
+    if ([string]::IsNullOrEmpty($OpenAIAPIKey)) {
+        $OpenAIAPIKey = Read-Host -Prompt "Please enter your OpenAI API Key" -AsSecureString
+        $OpenAIAPIKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIAPIKey))
+    }
+    function LineAcrossScreen {
+        param (
+            [Parameter(Mandatory = $false)]
+            [string]$Color = "Green"
+        )
+        $script:windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
+        Write-Host ('-' * $windowWidth) -ForegroundColor $Color
+    }
+
+    function Invoke-OpenAIAPI {
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$Prompt,
+            [Parameter(Mandatory = $true)]
+            [string]$OpenAIAPIKey,
+            [Parameter(Mandatory = $false)]
+            [string]$PreviousResponse
+        )
+
+        $Headers = @{
+            "Content-Type"  = "application/json"
+            "Authorization" = "Bearer $OpenAIAPIKey"
+        }
+        $Body = @{
+            "model"             = "gpt-4-0125-preview"
+                "messages"          = @( @{
+                    "role"    = "system"
+                    "content" = "You are a helpful IT technician that creates comprehensive ticket notes for IT support issues."
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text describing issue>\n\nCustomer Actions Taken:<Things that the end user tried (not me)>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<resolution here>\n\nComments & Misc. info:<miscellaneous info here>\n\nMessage to End User:\n<email to end user here using non-technical, common wording>"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Here's an example of the output I want:\n\nIssue Reported: Screen flickering\n\nCustomer Actions Taken: None\n\nTroubleshooting Methods:\n- Checked for Windows Updates.\n- Navigated to the Device Manager, located Display Adapters and right-clicked on the NVIDIA GeForce GTX 1050, selecting Update Driver.\n- Clicked on Search Automatically for Drivers, followed by Search for Updated Drivers on Windows Update.\n- Searched for 'gtx 1050 drivers' and clicked on the first result.\n- Clicked on the Official Drivers link and downloaded the driver.\n- Updated the graphics driver, resolving the issue.\n\nResolution: Updating the graphics driver resolved the issue.\n\nAdditional Comments: None\n\n\nMessage to End User: \n\n[User Name],\n\nWe have successfully resolved the screen flickering issue you were experiencing by updating the graphics driver. At your earliest convenience, please test your system to confirm that the issue with your screen has been rectified. Should you encounter any additional issues or require further assistance, do not hesitate to reach out to us.\n\nRespectfully,"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Only notate steps that have been specifically mentioned. Do not make anything up."
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Use the previous response for context: $PreviousResponse"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Update the ticket notes, taking the following request into account: $prompt"
+                },
+                @{
+                    "role"    = "assistant"
+                    "content" = ""
+                })
+            "temperature"       = 0
+            'top_p'             = 1.0
+            'frequency_penalty' = 0.0
+            'presence_penalty'  = 0.0
+            'stop'              = @('"""')
+        } | ConvertTo-Json
+    
+        try {
+        
+            $global:response = (Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers).choices.message.content
+            Return $global:response
+        }
+        catch {
+            Write-Error "$($_.Exception.Message)"
+        }
+    }
+
+    function Generate-Questions {
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$Prompt,
+            [Parameter(Mandatory = $true)]
+            [string]$OpenAIAPIKey,
+            [Parameter(Mandatory = $false)]
+            [string]$TicketNotes
+        )
+
+        $Headers = @{
+            "Content-Type"  = "application/json"
+            "Authorization" = "Bearer $OpenAIAPIKey"
+        }
+        $Body = @{
+            "model"             = "gpt-4-0125-preview"
+                "messages"          = @( @{
+                    "role"    = "system"
+                    "content" = "You are a helpful IT technician assistant that helps generate followup questions, and outputs them one per line."
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "Ticket Notes: $TicketNotes"
+                },
+                @{
+                    "role"    = "user"
+                    "content" = "$prompt"
+                },
+                @{
+                    "role"    = "assistant"
+                    "content" = ""
+                })
+            "temperature"       = 0
+            'top_p'             = 1.0
+            'frequency_penalty' = 0.0
+            'presence_penalty'  = 0.0
+            'stop'              = @('"""')
+        } | ConvertTo-Json
+    
+        try {
+        
+            $global:response = (Invoke-RestMethod -Uri "https://api.openai.com/v1/chat/completions" -Method Post -Body $Body -Headers $Headers).choices.message.content
+            Return $global:response
+        }
+        catch {
+            Write-Error "$($_.Exception.Message)"
+        }
+    }
+
+    # Main loop
+    $context = "$($global:response)"
+
+    if ( ($null -eq $context) -or ("" -eq $context) ){$context = Read-Host "Enter an issue description" ; LineAcrossScreen}
+
+    $userInput = ""
+    while ($userInput.ToLower() -ne "done") {
+        $userInput = Read-Host "Enter ticket notes (or 'done' to finish)"
+        LineAcrossScreen
+        if ($userInput.ToLower() -eq "done") {
+            break
+        }
+
+        $context += "Human: $userInput`n"
+    }
+
+    Write-Host "Generating follow up questions..."
+
+    LineAcrossScreen -Color Yellow
+
+    # Generate clarifying questions
+    $clarifyingQuestions = (Generate-Questions -prompt "Generate a set of 4 or 5 clarifying questions based on the ticket notes to fill in any gaps that were missed in the original notes: $context" -OpenAIAPIKey $OpenAIAPIKey -TicketNotes $context) -split "`n"
+
+    foreach ($question in $clarifyingQuestions) {
+        if (![string]::IsNullOrEmpty($question)) {
+            $answer = Read-Host -prompt "$question"
+            $context += "AI: $question `nHuman: $answer`n"
+            LineAcrossScreen -Color Yellow
+        }
+    }
+
+    Write-Host "Generating Ticket Notes..."
+
+    LineAcrossScreen
+
+    $response = Invoke-OpenAIAPI -prompt $context -OpenAIAPIKey $OpenAIAPIKey -PreviousResponse $context
+    Write-Host ""
+    Write-Host "Computer Name: "
+    Write-Host ""
+    Write-Host "$response"
+    Write-Host ""
+
+    LineAcrossScreen
+}
