@@ -4985,12 +4985,12 @@ function ai3 {
     LineAcrossScreen -Color Yellow
 
     # Generate clarifying questions
-    $clarifyingQuestions = (Generate-Questions -prompt "Generate a set of 4 or 5 clarifying questions based on the ticket notes to fill in any gaps that were missed in the original notes: $context" -OpenAIAPIKey $OpenAIAPIKey -TicketNotes $context) -split "`n"
+    $clarifyingQuestions = (Generate-Questions -prompt "Generate a set of clarifying questions based on the ticket notes to fill in any gaps that were missed in the original notes: $context" -OpenAIAPIKey $OpenAIAPIKey -TicketNotes $context) -split "`n"
 
     foreach ($question in $clarifyingQuestions) {
         if (![string]::IsNullOrEmpty($question)) {
             $answer = Read-Host -prompt "$question"
-            $context += "AI: $question `nHuman: $answer`n"
+            $context += "assistant: $question`nHuman: $answer`n"
             LineAcrossScreen -Color Yellow
         }
     }
