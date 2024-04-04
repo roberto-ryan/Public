@@ -4841,6 +4841,16 @@ AI
 #>
 function ai3 {
 
+    if (![string]::IsNullOrEmpty($response)) {
+        $continueSession = Read-Host -Prompt "Would you like to continue from where you left off? (y/n)"
+        if ($continueSession -eq "n") {
+            $context = ""
+            $userInput = ""
+            $clarifyingQuestions = ""
+            $global:response = ""
+        }
+    }
+
     if ([string]::IsNullOrEmpty($OpenAIAPIKey)) {
         $OpenAIAPIKey = Read-Host -Prompt "Please enter your OpenAI API Key" -AsSecureString
         $OpenAIAPIKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIAPIKey))
@@ -4884,7 +4894,7 @@ function ai3 {
                 },
                 @{
                     "role"    = "user"
-                    "content" = "Only notate steps that have been specifically mentioned. Do not make anything up."
+                    "content" = "Only notate steps that have been specifically mentioned. Do not make anything up, but make it sound good."
                 },
                 @{
                     "role"    = "user"
@@ -4971,7 +4981,7 @@ function ai3 {
 
     $userInput = ""
     while ($userInput.ToLower() -ne "done") {
-        $userInput = Read-Host "Enter ticket notes (or 'done' to finish)"
+        $userInput = Read-Host "Enter ticket note (or 'done' to finish)"
         LineAcrossScreen
         if ($userInput.ToLower() -eq "done") {
             break
