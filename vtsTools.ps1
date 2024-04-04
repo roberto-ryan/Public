@@ -4886,7 +4886,11 @@ function ai3 {
                 },
                 @{
                     "role"    = "system"
-                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text describing issue>\n\nCustomer Actions Taken:<Things that the end user tried (not me)>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<resolution here>\n\nComments & Misc. info:<miscellaneous info here>\n\nMessage to End User:\n<email to end user here using non-technical, common wording>"
+                    "content" = "You always respond in the first person, in the following format:\n\nReported Issue:<text describing issue>\n\nCustomer Actions Taken:<Things that the end user tried before contacting us.>\n\nTroubleshooting Methods:\n- <bulletted troubleshooting steps here>\n\nResolution:<resolution here>\n\nComments & Misc. info:<miscellaneous info here>\n\nMessage to End User:\n<email to end user here using non-technical, common wording>"
+                },
+                @{
+                    "role"    = "system"
+                    "content" = "All troubleshooting steps should go in the Troubleshooting Methods sections, unless explicitly stated that an action was performed by the user or client."
                 },
                 @{
                     "role"    = "user"
