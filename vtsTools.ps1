@@ -4851,10 +4851,53 @@ function ai3 {
         }
     }
 
-    if ([string]::IsNullOrEmpty($OpenAIAPIKey)) {
-        $OpenAIAPIKey = Read-Host -Prompt "Please enter your OpenAI API Key" -AsSecureString
-        $OpenAIAPIKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIAPIKey))
+    $KeyPath = "$env:LOCALAPPDATA\VTS\SecureKeyFile.txt"
+
+    function Encrypt-SecureString {
+      param(
+          [Parameter(Mandatory=$true)]
+          [string]$InputString,
+          [Parameter(Mandatory=$true)]
+          [string]$FilePath
+      )
+  
+      $secureString = ConvertTo-SecureString -String $InputString -AsPlainText -Force
+      $secureString | Export-Clixml -Path $FilePath
+  }
+
+  function Decrypt-SecureString {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath
+    )
+
+    $secureString = Import-Clixml -Path $FilePath
+    $decryptedString = [System.Net.NetworkCredential]::new("", $secureString).Password
+    return $decryptedString
+}
+    
+    if (Test-Path $KeyPath) {
+      $OpenAIAPIKey = Decrypt-SecureString -FilePath $KeyPath
+      # $OpenAIAPIKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIAPIKey))
     }
+    
+    if ([string]::IsNullOrEmpty($OpenAIAPIKey)) {
+      $OpenAIAPIKey = Read-Host -Prompt "Please enter your OpenAI API Key" -AsSecureString
+      $OpenAIAPIKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIAPIKey))
+      $saveKey = Read-Host -Prompt "Would you like to save the API key for future use? (y/n)"
+      if ($saveKey -eq "y") {
+      $KeyDirectory = Split-Path -Path $KeyPath -Parent
+      # Check if the directory exists, if not, create it
+      if (!(Test-Path -Path $KeyDirectory)) {
+          New-Item -ItemType Directory -Path $KeyDirectory | Out-Null
+      }
+
+      Encrypt-SecureString -InputString $OpenAIAPIKey -FilePath $KeyPath
+
+        Write-Host "Your API key has been saved securely."
+    }
+    }
+
     function LineAcrossScreen {
         param (
             [Parameter(Mandatory = $false)]
