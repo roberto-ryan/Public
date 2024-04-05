@@ -4983,11 +4983,11 @@ function ai3 {
     # Main loop
     $context = "$($global:response)"
 
-    if ( ($null -eq $context) -or ("" -eq $context) ){$context = Read-Host "Enter an issue description" ; LineAcrossScreen}
+    if ( ($null -eq $context) -or ("" -eq $context) ){$context = Read-Host "`nEnter an issue description`n" ; LineAcrossScreen}
 
     $userInput = ""
     while ($userInput.ToLower() -ne "done") {
-        $userInput = Read-Host "Enter ticket note (or 'done' to finish)"
+        $userInput = Read-Host "`nEnter ticket note (or 'done' to finish)`n`n"
         LineAcrossScreen
         if ($userInput.ToLower() -eq "done") {
             break
@@ -5005,7 +5005,7 @@ function ai3 {
 
     foreach ($question in $clarifyingQuestions) {
         if (![string]::IsNullOrEmpty($question)) {
-            $answer = Read-Host -prompt "$question"
+            $answer = Read-Host -prompt "`n$question`n`n"
             $context += "assistant: $question`nHuman: $answer`n"
             LineAcrossScreen -Color Yellow
         }
