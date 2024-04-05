@@ -5049,7 +5049,9 @@ function ai3 {
     foreach ($question in $clarifyingQuestions) {
         if (![string]::IsNullOrEmpty($question)) {
             $answer = Read-Host -prompt "`n$question`n`n"
+            if (![string]::IsNullOrEmpty($answer)) {
             $context += "assistant: $question`nHuman: $answer`n"
+            }
             LineAcrossScreen -Color Yellow
         }
     }
