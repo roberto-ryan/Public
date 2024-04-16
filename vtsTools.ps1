@@ -4841,6 +4841,8 @@ AI
 #>
 function ai3 {
 
+  Start-Transcript | Out-Null
+
   if (![string]::IsNullOrEmpty($response)) {
     $continueSession = Read-Host -Prompt "Would you like to continue from where you left off? (y/n)"
     if ($continueSession -eq "n") {
@@ -5066,4 +5068,6 @@ function ai3 {
   Write-Host ""
 
   LineAcrossScreen
+
+  Stop-Transcript
 }
