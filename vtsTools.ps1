@@ -4993,7 +4993,7 @@ function Connect-vtsWiFi {
       [string]$SSID,
       
       [Parameter(Mandatory=$false)]
-      [string]$Password
+      [SecureString]$Password
   )
 
   Write-Host "`nChecking for wifiprofilemanagement module..."
@@ -5015,32 +5015,30 @@ function Connect-vtsWiFi {
           $i++
       }
       $selection = Read-Host -Prompt "`nPlease select a network by number"
-      $SSID = $networkList[$selection - 1]
+      $SSID = ($networkList[$selection - 1]).Trim()
   }
 
   if (-not $Password) {
       $Password = Read-Host -Prompt "Please enter the password for $SSID" -AsSecureString
   }
 
-  $PW = ConvertTo-SecureString $Password -AsPlainText -Force
   Write-Host "`nChecking for existing WiFi profile..."
-  if (Get-WiFiProfile -ProfileName $SSID) {
+  if (Get-WiFiProfile -ProfileName $SSID 2>$null) {
       $userChoice = Read-Host -Prompt "WiFi profile for $SSID already exists. Do you want to remove the old profile and replace it? (y/n)"
       if ($userChoice -eq "y") {
           Write-Host "`nRemoving old WiFi profile..."
           Remove-WiFiProfile -ProfileName $SSID
           Write-Host "`nCreating new WiFi profile..."
-          New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $PW -Encryption AES
+          New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $Password -Encryption AES
       }
   } else {
       Write-Host "`nCreating new WiFi profile..."
-      New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $PW -Encryption AES
+      New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $Password -Encryption AES
   }
   Write-Host "`nConnecting to WiFi profile..."
   Connect-WiFiProfile -ProfileName $SSID
 
 }
-
 
 <#
 .SYNOPSIS
