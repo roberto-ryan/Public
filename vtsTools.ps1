@@ -5004,10 +5004,9 @@ function Connect-vtsWiFi {
 
   if (-not $SSID) {
       Write-Host "`nFetching available networks...`n"
-      $networks = Get-WiFiAvailableNetwork |
-      Where-Object SecurityEnabled -eq $true |
-      Select-Object -expand ProfileName |
-      Select-String ^[A-Za-z0-9]
+
+      $networks = (netsh wlan show networks | sls ^SSID) -replace "SSID . : " | sort
+
       $i = 1
       $networkList = @()
       foreach ($network in $networks) {
