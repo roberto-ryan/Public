@@ -4912,7 +4912,7 @@ function Compare-vtsFiles {
   param (
       [string]$SourceFolder,
       [string]$DestinationFolder,
-      [string]$ReportPath = "$env:TEMP\VTS\$(Get-Date -f yyyy-MM-dd)_Hashes.csv"
+      [string]$ReportPath = "$env:TEMP\VTS\$(Get-Date -f yyyy-MM-dd-hhmmss)_Hashes.csv"
   )
 
   # Initialize a new list to store the results
