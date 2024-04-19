@@ -4922,7 +4922,7 @@ function Compare-vtsFiles {
   $sb = {
       process {
           # Ignore 'Thumbs.db' files
-          if($_.Name -eq 'Thumbs.db') { return }
+          if ($_.Name -eq 'Thumbs.db') { return }
 
           # Create a custom object with file properties
           [PSCustomObject]@{
@@ -4934,29 +4934,38 @@ function Compare-vtsFiles {
   }
 
   # Get all files from the source and destination folders
-  $sourceFiles  = Get-ChildItem $SourceFolder -Recurse -File | & $sb
+  $sourceFiles = Get-ChildItem $SourceFolder -Recurse -File | & $sb
   $destinationFiles = Get-ChildItem $DestinationFolder -Recurse -File | & $sb
 
-  # Process each file in the destination folder
-  foreach($file in $destinationFiles) {
-      # If the file exists in both folders
-      if($sourceFile = $sourceFiles | Where-Object { $_.n -eq $file.n }) {
+  # Process each file in the source folder
+  foreach ($file in $sourceFiles) {
+      # If the file exists in the destination folder
+      if ($destinationFile = $destinationFiles | Where-Object { $_.n -eq $file.n }) {
           # Create a custom object with source and target file properties
           $comparisonResult = [PSCustomObject]@{
-              SourceFilePath = $sourceFile.fn
-              SourceFileHash = $sourceFile.h
-              TargetFilePath = $file.fn
-              TargetFileHash = $file.h
-              Status = if($sourceFile.h -eq $file.h) { 'Hashes Match' } else { 'Hashes Do Not Match' }
+              SourceFilePath = $file.fn
+              SourceFileHash = $file.h
+              TargetFilePath = $destinationFile.fn
+              TargetFileHash = $destinationFile.h
+              Status         = if ($file.h -eq $destinationFile.h) { 'Hashes Match' } else { 'Hashes Do Not Match' }
           }
-
-          # Add the comparison result to the result list
-          $result.Add($comparisonResult)
+      } else {
+          # If the file does not exist in the destination folder
+          $comparisonResult = [PSCustomObject]@{
+              SourceFilePath = $file.fn
+              SourceFileHash = $file.h
+              TargetFilePath = $null
+              TargetFileHash = $null
+              Status         = 'File not found in destination'
+          }
       }
+
+      # Add the comparison result to the result list
+      $result.Add($comparisonResult)
   }
 
   $ReportDirectory = Split-Path -Path $ReportPath -Parent
-  if(!(Test-Path -Path $ReportDirectory)) {
+  if (!(Test-Path -Path $ReportDirectory)) {
       New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
   }
 
