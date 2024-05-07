@@ -5277,30 +5277,36 @@ function ai3 {
   if ( ($null -eq $context) -or ("" -eq $context) ) { $context = Read-Host "`nEnter an issue description`n" ; LineAcrossScreen }
 
   $userInput = ""
-  while ($userInput.ToLower() -ne "done") {
-    $userInput = Read-Host "`nEnter ticket note (or 'done' to finish)`n`n"
+  while ($userInput.ToLower() -ne "done" -and $userInput.ToLower() -ne "skip") {
+    $userInput = Read-Host "`nEnter ticket note (or 'done' to finish or 'skip' to skip follow up questions)`n`n"
     LineAcrossScreen
     if ($userInput.ToLower() -eq "done") {
+      break
+    }
+    if ($userInput.ToLower() -eq "skip") {
+      $skip = $true
       break
     }
 
     $context += "Human: $userInput`n"
   }
 
-  Write-Host "Generating follow up questions..."
-
-  LineAcrossScreen -Color Yellow
-
-  # Generate clarifying questions
-  $clarifyingQuestions = (Generate-Questions -prompt "Please generate a set of clarifying questions for the IT technician to answer. These questions should be based on the ticket notes and aim to address any missing information or unclear details in the original notes: $context" -OpenAIAPIKey $OpenAIAPIKey -TicketNotes $context) -split "`n"
-
-  foreach ($question in $clarifyingQuestions) {
-    if (![string]::IsNullOrEmpty($question)) {
-      $answer = Read-Host -prompt "`n$question`n`n"
-      if (![string]::IsNullOrEmpty($answer)) {
-        $context += "assistant: $question`nHuman: $answer`n"
+  if (-not($skip)){
+    Write-Host "Generating follow up questions..."
+  
+    LineAcrossScreen -Color Yellow
+  
+    # Generate clarifying questions
+    $clarifyingQuestions = (Generate-Questions -prompt "Please generate a set of clarifying questions for the IT technician to answer. These questions should be based on the ticket notes and aim to address any missing information or unclear details in the original notes: $context" -OpenAIAPIKey $OpenAIAPIKey -TicketNotes $context) -split "`n"
+  
+    foreach ($question in $clarifyingQuestions) {
+      if (![string]::IsNullOrEmpty($question)) {
+        $answer = Read-Host -prompt "`n$question`n`n"
+        if (![string]::IsNullOrEmpty($answer)) {
+          $context += "assistant: $question`nHuman: $answer`n"
+        }
+        LineAcrossScreen -Color Yellow
       }
-      LineAcrossScreen -Color Yellow
     }
   }
 
