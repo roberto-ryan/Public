@@ -5440,3 +5440,124 @@ function Get-vtsFilePathCharacterCount {
 
     Write-Host "Export completed successfully"
 }
+
+<#
+.SYNOPSIS
+    This function resets the printer drivers and settings on a Windows machine.
+
+.DESCRIPTION
+    The Reset-vtsPrintersandDrivers function is a destructive process that resets the printer drivers and settings on a Windows machine. It should be used as a last resort. The function first prompts the user for confirmation before proceeding. It then checks for the RunAsUser module and installs it if not present. The function then gets the network printers and saves them to a temporary directory. It stops the spooler service, removes the driver and registry paths, and starts the spooler service again. Finally, it removes the printer drivers.
+
+.PARAMETER driverPath
+    The path to the printer drivers. Default is "C:\Windows\System32\spool\drivers".
+
+.PARAMETER printProcessorRegPath
+    The registry path to the print processors. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors".
+
+.PARAMETER driverRegPath
+    The registry path to the drivers. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers".
+
+.PARAMETER printProcessorName
+    The name of the print processor. Default is "winprint".
+
+.PARAMETER printProcessorDll
+    The DLL of the print processor. Default is "winprint.dll".
+
+.EXAMPLE
+    Reset-vtsPrintersandDrivers
+    This command will reset the printer drivers and settings on the machine with the default parameters.
+
+.EXAMPLE
+    Reset-vtsPrintersandDrivers -driverPath "C:\CustomPath\drivers"
+    This command will reset the printer drivers and settings on the machine with a custom driver path.
+
+.LINK
+    Print Management
+#>
+function Reset-vtsPrintersandDrivers {
+    param (
+        [string]$driverPath = "C:\Windows\System32\spool\drivers",
+        [string]$printProcessorRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors",
+        [string]$driverRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers",
+        [string]$printProcessorName = "winprint",
+        [string]$printProcessorDll = "winprint.dll"
+    )
+
+    Write-Host "Starting Reset-vtsPrintersandDrivers function..."
+
+    $userConfirmation = Read-Host -Prompt "This is a destructive process and should be used as a last resort. Are you sure you want to proceed? (yes/no)"
+    if ($userConfirmation -ne 'yes') {
+        Write-Host "Operation cancelled by user."
+        return
+    }
+
+    Write-Host "Checking for RunAsUser module..."
+    if (!(Get-Module -ListAvailable -Name RunAsUser)) {
+        Write-Host "Installing RunAsUser module..."
+        Install-Module RunAsUser -Force
+    }
+
+    Invoke-AsCurrentUser {
+        Write-Host "Getting network printers..."
+        $printers = Get-Printer "\\*" | Select-Object -ExpandProperty Name
+        $tempPath = "C:\temp"
+        if (!(Test-Path $tempPath)) {
+            Write-Host "Creating temp directory..."
+            New-Item -ItemType Directory -Path $tempPath
+        }
+        $printers | Out-File "$tempPath\printers.txt" -Append
+        Write-Host "Network printers saved to $tempPath\printers.txt" -ForegroundColor Yellow
+    }
+
+    Write-Host "Stopping spooler service..."
+    Stop-Service -Name spooler -Force
+
+    Write-Host "Removing driver and registry paths..."
+    Remove-Item -Path $driverPath -Recurse -Force -Confirm:$false
+    Remove-Item -Path $printProcessorRegPath -Recurse -Force -Confirm:$false
+    Remove-Item -Path $driverRegPath -Recurse -Force -Confirm:$false
+
+    Write-Host "Starting spooler service..."
+    Start-Service -Name spooler -Force
+
+    Write-Host "Removing printer drivers..."
+    Get-PrinterDriver | Remove-PrinterDriver -Confirm:$false
+
+    if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        Write-Host "Please run PowerShell as an Administrator."
+        return
+    }
+
+    Try {
+        Write-Host "Checking for existing Print Processor..."
+        if (Test-Path "$printProcessorRegPath\$printProcessorName") {
+            Write-Host "Print Processor '$printProcessorName' already exists. Consider updating existing registry entries instead."
+            return
+        }
+
+        Write-Host "Creating new registry entries for Print Processor..."
+        New-Item -Path "$printProcessorRegPath\$printProcessorName" -Force | Out-Null
+        New-ItemProperty -Path "$printProcessorRegPath\$printProcessorName" -Name "Driver" -Value $printProcessorDll -PropertyType String -Force | Out-Null
+        $path = "HKLM:\SYSTEM\CURRENTCONTROLSET\CONTROL\PRINT\ENVIRONMENTS\WINDOWS X64\PRINT PROCESSORS\winprint"
+        if (!(Test-Path $path)) {
+            New-Item -Path $path -Force | Out-Null
+        }
+        Set-ItemProperty -Path $path -Name "Driver" -Value "winprint.dll" | Out-Null
+
+        Write-Host "Registry entries for Print Processor '$printProcessorName' have been (re)created successfully."
+    }
+    Catch {
+        Write-Error "An error occurred while recreating registry entries for Print Processor '$printProcessorName': $_"
+    }
+
+    Invoke-AsCurrentUser{
+        Write-Host "Restoring network printers..."
+        $printers = Get-Content "C:\temp\printers.txt"
+        foreach ($p in $printers) {
+            Write-Host "Adding printer $p..."
+            Add-Printer -ConnectionName "$p"
+        }
+    }
+
+    Write-Host "Reset-vtsPrintersandDrivers function completed."
+}
