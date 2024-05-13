@@ -5539,7 +5539,6 @@ function Reset-vtsPrintersandDrivers {
       Write-Host "Checking for existing Print Processor..."
       if (Test-Path "$printProcessorRegPath\$printProcessorName") {
           Write-Host "Print Processor '$printProcessorName' already exists. Consider updating existing registry entries instead."
-          return
       }
 
       Write-Host "Creating new registry entries for Print Processor..."
@@ -5588,7 +5587,6 @@ function Reset-vtsPrintersandDrivers {
           if ($currentValue -eq $registryKey.Value) {
               # If the current value is the same as the desired value, print a message and continue to the next iteration
               Write-Host "Registry key $($registryKey.Path)\$($registryKey.Name) is already set to $($registryKey.Value). No change was made."
-              continue
           }
 
           # Check if the property exists
