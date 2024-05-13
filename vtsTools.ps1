@@ -5446,7 +5446,7 @@ function Get-vtsFilePathCharacterCount {
     This function resets the printer drivers and settings on a Windows machine.
 
 .DESCRIPTION
-    The Reset-vtsPrintersandDrivers function is a destructive process that resets the printer drivers and settings on a Windows machine. It should be used as a last resort. The function first prompts the user for confirmation before proceeding. It then checks for the RunAsUser module and installs it if not present. The function then gets the network printers and saves them to a temporary directory. It stops the spooler service, removes the driver and registry paths, and starts the spooler service again. Finally, it removes the printer drivers.
+    The Reset-vtsPrintersandDrivers function is a destructive process that resets the printer drivers and settings on a Windows machine. It should be used as a last resort. The function first prompts the user for confirmation before proceeding. It then checks for the RunAsUser module and installs it if not present. The function then gets the network printers and saves them to a temporary directory. It attempts to remove the driver and registry paths with the spooler service running, then stops the spooler service and tries again. Finally, it starts the spooler service and removes the printer drivers.
 
 .PARAMETER driverPath
     The path to the printer drivers. Default is "C:\Windows\System32\spool\drivers".
@@ -5509,11 +5509,18 @@ function Reset-vtsPrintersandDrivers {
       Write-Host "Network printers saved to $tempPath\printers.txt" -ForegroundColor Yellow
   }
 
+  Write-Host "Attempting to remove driver and registry paths with spooler running..."
+  $items = Get-ChildItem -Path $driverPath -Recurse -Depth 0
+  $items | Sort-Object -Property FullName -Descending | ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -Confirm:$false }
+  Remove-Item -Path $printProcessorRegPath -Recurse -Force -Confirm:$false
+  Remove-Item -Path $driverRegPath -Recurse -Force -Confirm:$false
+  
   Write-Host "Stopping spooler service..."
   net stop spooler
-
-  Write-Host "Removing driver and registry paths with spooler stopped..."
-  Remove-Item -Path $driverPath -Recurse -Force -Confirm:$false
+  
+  Write-Host "Attempting to remove driver and registry paths with spooler stopped..."
+  $items = Get-ChildItem -Path $driverPath -Recurse -Depth 0
+  $items | Sort-Object -Property FullName -Descending | ForEach-Object { Remove-Item -Path $_.FullName -Recurse -Force -Confirm:$false }
   Remove-Item -Path $printProcessorRegPath -Recurse -Force -Confirm:$false
   Remove-Item -Path $driverRegPath -Recurse -Force -Confirm:$false
 
