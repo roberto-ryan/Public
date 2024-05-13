@@ -5518,7 +5518,7 @@ function Reset-vtsPrintersandDrivers {
     Remove-Item -Path $driverRegPath -Recurse -Force -Confirm:$false
 
     Write-Host "Starting spooler service..."
-    Start-Service -Name spooler -Force
+    Start-Service -Name Spooler
 
     Write-Host "Removing printer drivers..."
     Get-PrinterDriver | Remove-PrinterDriver -Confirm:$false
