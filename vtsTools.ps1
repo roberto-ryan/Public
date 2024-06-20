@@ -2290,7 +2290,9 @@ function Copy-vts365MailToMailbox {
 
   # Connect to Exchange Online PowerShell
   Write-Host "Connecting to Exchange Online PowerShell..."
-  Connect-ExchangeOnline -ShowBanner:$false
+  if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
+}
   Write-Host "Connecting to Security & Compliance PowerShell..."
   Connect-IPPSSession -ShowBanner:$false
 
@@ -2727,7 +2729,9 @@ function Get-vts365MailboxStatistics {
 
   # Connect to Exchange Online
   Write-Host "Connecting to Exchange Online..."
-  Connect-ExchangeOnline
+  if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
+}
 
   if ($null -eq $EmailAddress){$EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName)}
 
@@ -3824,13 +3828,8 @@ function Set-vts365MailboxArchive {
 
   # Attempt to connect to Exchange Online
   Write-Host "Attempting to connect to Exchange Online..."
-  try {
-      Connect-ExchangeOnline -ErrorAction Stop
-      Write-Host "Successfully connected to Exchange Online."
-  }
-  catch {
-      Write-Error "Failed to connect to Exchange Online: $_"
-      return
+  if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
   }
 
   # Function to view user retention policies
@@ -4043,7 +4042,9 @@ function Set-vts365CalendarPermissions {
         [string]$accessRights
     )
 
-    Connect-ExchangeOnline
+    if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
+}
 
     # Identify the Calendar Path
     $calendarPath = $user + ":\Calendar"
@@ -4376,7 +4377,9 @@ M365
 #>
 function Get-vts365DistributionListRecipients {
 
-    Connect-ExchangeOnline
+    if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
+}
 
     # Get all dynamic distribution groups and suppress error output
     $distributionGroups = Get-DynamicDistributionGroup | Select-Object -ExpandProperty Name 2>$null
@@ -4541,7 +4544,9 @@ function Revoke-vts365EmailMessage {
     )
     
     Write-Host "Connecting to Exchange Online and IPPS Session..."
-    # Connect-ExchangeOnline
+    if (-not(Get-ConnectionInformation)) {
+      Connect-ExchangeOnline -ShowBanner:$false
+    }
     # Connect-IPPSSession
 
     Write-Host "Getting message trace..."
