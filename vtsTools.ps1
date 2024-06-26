@@ -5745,7 +5745,7 @@ function Convert-vtsScreenToAscii {
 
       for ($i = 1; $i -le $NumOfImages; $i++) {
           $imagePath = Join-Path -Path $ImageDirectory -ChildPath "image_$i.png"
-          Get-vtsScreenshot -Path $imagePath
+          Get-vtsScreenshot -Path $imagePath *>$null
 
       
           # Convert the image to ASCII art
@@ -5758,6 +5758,7 @@ function Convert-vtsScreenToAscii {
               if ($line.Length -gt 100) {
                   # If the line is longer than 100 characters, split it into chunks
                   $chunks = $line -split "(.{100})", -1, 'RegexMatch'
+                  Clear-Host
                   foreach ($chunk in $chunks) {
                       if ($chunk -ne "") {
                           Write-Host $chunk
