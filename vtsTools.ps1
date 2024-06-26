@@ -5695,7 +5695,7 @@ Utilities
 #>
 function Convert-vtsScreenToAscii {
   param (
-      [string]$ImageDirectory = "C:\temp\",
+      [string]$ImageDirectory = "$env:temp\",
       [int]$NumOfImages = 100,
       [int]$SleepInterval = 0
   )
@@ -5704,77 +5704,83 @@ function Convert-vtsScreenToAscii {
       Write-Error "Must run script as logged in user. Running as system doesn't work."
   }
   else {
-
-      if (!(Test-Path -Path $ImageDirectory)) {
-          New-Item -ItemType Directory -Force -Path $ImageDirectory
-      }
-
       # Define the ImageToAscii class
       Add-Type -TypeDefinition @"
-  using System;
-  using System.Drawing;
-  public class ImageToAscii {
-      public static string ConvertImageToAscii(string imagePath, int width) {
-          Bitmap image = new Bitmap(imagePath, true);
-          image = GetResizedImage(image, width);
-          return ConvertToAscii(image);
-      }
-      private static Bitmap GetResizedImage(Bitmap original, int width) {
-          int height = (int)(original.Height * ((double)width / original.Width) / 2); // Adjust for aspect ratio of ASCII characters
-          var resized = new Bitmap(original, new Size(width, height));
-          return resized;
-      }
-      private static string ConvertToAscii(Bitmap image) {
-          string ascii = "";
-          for (int h = 0; h < image.Height; h++) {
-              for (int w = 0; w < image.Width; w++) {
-                  Color pixelColor = image.GetPixel(w, h);
-                  int grayScale = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
-                  ascii += GetAsciiCharForGrayscale(grayScale);
-              }
-              ascii += "\\n";
-          }
-          return ascii;
-      }
-      private static char GetAsciiCharForGrayscale(int grayScale) {
-          string asciiChars = "@%#*+=-:. ";
-          return asciiChars[grayScale * asciiChars.Length / 256];
-      }
+using System;
+using System.Drawing;
+public class ImageToAscii {
+  public static string ConvertImageToAscii(string imagePath, int width) {
+      Bitmap image = new Bitmap(imagePath, true);
+      image = GetResizedImage(image, width);
+      return ConvertToAscii(image);
   }
-"@ -ReferencedAssemblies System.Drawing
+  private static Bitmap GetResizedImage(Bitmap original, int width) {
+      int height = (int)(original.Height * ((double)width / original.Width) / 2); // Adjust for aspect ratio of ASCII characters
+      var resized = new Bitmap(original, new Size(width, height));
+      return resized;
+  }
+  private static string ConvertToAscii(Bitmap image) {
+      string ascii = "";
+      for (int h = 0; h < image.Height; h++) {
+          for (int w = 0; w < image.Width; w++) {
+              Color pixelColor = image.GetPixel(w, h);
+              int grayScale = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
+              ascii += GetAsciiCharForGrayscale(grayScale);
+          }
+          ascii += "\\n";
+      }
+      return ascii;
+  }
+  private static char GetAsciiCharForGrayscale(int grayScale) {
+      string asciiChars = "@%#*+=-:. ";
+      return asciiChars[grayScale * asciiChars.Length / 256];
+  }
+}
+"@ -ReferencedAssemblies System.Drawing *>$null -ErrorAction SilentlyContinue
 
-      for ($i = 1; $i -le $NumOfImages; $i++) {
-          $imagePath = Join-Path -Path $ImageDirectory -ChildPath "image_$i.png"
-          Get-vtsScreenshot -Path $imagePath *>$null
-
-      
-          # Convert the image to ASCII art
-          $asciiArt = [ImageToAscii]::ConvertImageToAscii($imagePath, 100) # Adjust the width for ASCII character aspect ratio
-      
-          # Print the ASCII art to the host a chunk at a time
-          $lines = $asciiArt -split "\\n"
-      
-          foreach ($line in $lines) {
-              if ($line.Length -gt 100) {
-                  # If the line is longer than 100 characters, split it into chunks
-                  $chunks = $line -split "(.{100})", -1, 'RegexMatch'
-                  Clear-Host
-                  foreach ($chunk in $chunks) {
-                      if ($chunk -ne "") {
-                          Write-Host $chunk
+      try {
+          if (!(Test-Path -Path $ImageDirectory)) {
+              New-Item -ItemType Directory -Force -Path $ImageDirectory
+          }
+    
+    
+          for ($i = 1; $i -le $NumOfImages; $i++) {
+              $imagePath = Join-Path -Path $ImageDirectory -ChildPath "image_$i.png"
+              Get-vtsScreenshot -Path $imagePath *>$null
+    
+          
+              # Convert the image to ASCII art
+              $asciiArt = [ImageToAscii]::ConvertImageToAscii($imagePath, 100) # Adjust the width for ASCII character aspect ratio
+          
+              # Print the ASCII art to the host a chunk at a time
+              $lines = $asciiArt -split "\\n"
+          
+              foreach ($line in $lines) {
+                  if ($line.Length -gt 100) {
+                      # If the line is longer than 100 characters, split it into chunks
+                      $chunks = $line -split "(.{100})", -1, 'RegexMatch'
+                      Clear-Host
+                      foreach ($chunk in $chunks) {
+                          if ($chunk -ne "") {
+                              Write-Host $chunk
+                          }
                       }
                   }
+                  else {
+                      # If the line is not longer than 100 characters, just print it
+                      Write-Host $line
+                  }
+    
               }
-              else {
-                  # If the line is not longer than 100 characters, just print it
-                  Write-Host $line
-              }
-
+              Start-Sleep $SleepInterval
           }
-          Start-Sleep $SleepInterval
+    
+      }
+      finally {
+          <#Do this after the try block regardless of whether an exception occurred or not#>
+          Remove-Item "$ImageDirectory\image_*.png" -Recurse -Force -Confirm:$false
       }
 
   }
 
-  Remove-Item "$ImageDirectory\image_*.png" -Recurse -Force -Confirm:$false
 }
