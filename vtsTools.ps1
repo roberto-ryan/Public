@@ -5770,4 +5770,6 @@ function Convert-vtsScreenToAscii {
 
       Start-Sleep $SleepInterval
   }
+
+  Remove-Item "$ImageDirectory\image_*.png" -Recurse -Force -Confirm:$false
 }
