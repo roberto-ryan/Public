@@ -5705,6 +5705,10 @@ function Convert-vtsScreenToAscii {
   }
   else {
 
+      if (!(Test-Path -Path $ImageDirectory)) {
+          New-Item -ItemType Directory -Force -Path $ImageDirectory
+      }
+
       # Define the ImageToAscii class
       Add-Type -TypeDefinition @"
   using System;
