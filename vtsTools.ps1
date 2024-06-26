@@ -5696,7 +5696,7 @@ Utilities
 function Convert-vtsScreenToAscii {
   param (
       [string]$ImageDirectory = "C:\temp\",
-      [int]$NumOfImages = 3,
+      [int]$NumOfImages = 1,
       [int]$SleepInterval = 1
   )
 
