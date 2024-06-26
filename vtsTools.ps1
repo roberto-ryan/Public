@@ -5697,7 +5697,7 @@ function Convert-vtsScreenToAscii {
   param (
       [string]$ImageDirectory = "C:\temp\",
       [int]$NumOfImages = 100,
-      [int]$SleepInterval = 1
+      [int]$SleepInterval = 0
   )
 
   if ((whoami) -eq "nt authority\system") {
