@@ -2009,9 +2009,18 @@ function Add-vtsPrinter {
     foreach ($key in $keys) {
       $printer = $printerTable[$key]
       # Add the printer
-      Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
-      Write-Output "Printer $($printer.Name) added successfully.`n"
-      Write-Host "Name  : $($printer.Name)`nDriver: $($printer.DriverName)`nPort  : $($printer.PortName)`n"
+      try {
+        Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
+        if ($null -ne (Get-Printer -Name "\\$Server\$($printer.Name)")) {
+          Write-Output "Printer $($printer.Name) added successfully.`n"
+          $newPrinter = (Get-Printer -Name "\\$Server\$($printer.Name)")
+          Write-Host "Name  : $($newPrinter.Name)`nDriver: $($newPrinter.DriverName)`nPort  : $($newPrinter.PortName)`n"
+        } else {
+          Write-Error "Failed to add printer $($printer.Name)."
+        }
+      } catch {
+        Write-Error "Failed to add printer $($printer.Name). $($_.Exception.Message)"
+      }
     }
   }
 }
