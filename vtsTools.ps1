@@ -2012,9 +2012,12 @@ function Add-vtsPrinter {
       try {
         Add-Printer -ConnectionName "\\$Server\$($printer.Name)"
         if ($null -ne (Get-Printer -Name "\\$Server\$($printer.Name)")) {
-          Write-Output "Printer $($printer.Name) added successfully.`n"
+          Write-Host "`nPrinter $($printer.Name) added successfully.`n" -f Green
           $newPrinter = (Get-Printer -Name "\\$Server\$($printer.Name)")
           Write-Host "Name  : $($newPrinter.Name)`nDriver: $($newPrinter.DriverName)`nPort  : $($newPrinter.PortName)`n"
+          if (($($Printer.DriverName)) -ne ($($newPrinter.DriverName))){
+            Write-Host "Driver mismatch. Printer server is using: `n$($Printer.DriverName)" -f Yellow
+          }
         } else {
           Write-Error "Failed to add printer $($printer.Name)."
         }
