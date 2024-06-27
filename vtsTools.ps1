@@ -2079,7 +2079,8 @@ function Add-vtsPrinterDriver {
           
     # Download Driver
     Write-Host "`n➜ Downloading Driver..."
-    Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
+    Invoke-vtsFastDownload -DownloadPath "$WorkingDir" -URL "$DriverURL" -FileName "$FileName"
+    #Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
     if ($?) { Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green }
   
           
