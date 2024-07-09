@@ -5909,23 +5909,23 @@ function Get-vts365TeamsMembershipReport {
 
 <#
 .SYNOPSIS
-    This function pings a list of IP addresses or hostnames and generates a report.
+    This function performs a ping operation on a list of IP addresses or hostnames and compiles a report.
 
 .DESCRIPTION
-    The Ping-vtsList function pings a list of IP addresses or hostnames provided in a file. 
-    It generates a report showing the status and response time for each target. 
-    The function also offers the option to export the report to an HTML file.
+    The Ping-vtsList function conducts a ping test on a list of IP addresses or hostnames that are provided in a file. 
+    It then compiles a comprehensive report detailing the status and response time for each target. 
+    Additionally, the function provides an option to export this report to an HTML file for easy viewing and sharing.
 
 .PARAMETER TargetIPAddressFile
-    The full path to the file containing the target IP addresses or hostnames.
+    This parameter requires the full path to the file that contains the target IP addresses or hostnames.
 
 .PARAMETER ReportTitle
-    The title of the report. Default is "Ping Report".
+    This parameter allows you to set the title of the report. If not specified, the default title is "Ping Report".
 
 .EXAMPLE
     Ping-vtsList -TargetIPAddressFile "C:\temp\IPList.txt" -ReportTitle "Server Ping Report"
 
-    This example pings the IP addresses or hostnames listed in the file "C:\temp\IPList.txt" and generates a report titled "Server Ping Report".
+    In this example, the function pings the IP addresses or hostnames listed in the file "C:\temp\IPList.txt" and generates a report with the title "Server Ping Report".
 
 .LINK
     Network
