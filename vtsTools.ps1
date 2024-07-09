@@ -5335,11 +5335,13 @@ function ai3 {
   $context = "$($global:response)"
 
   if ( ($null -eq $context) -or ("" -eq $context) ) { $context = Read-Host "`nEnter an issue description`n" ; LineAcrossScreen }
-
+  
+  Write-Host "`nEnter ticket note (or 'done' to finish or 'skip' to skip follow up questions)`n`n"
   $userInput = ""
   while ($userInput.ToLower() -ne "done" -and $userInput.ToLower() -ne "skip") {
-    $userInput = Read-Host "`nEnter ticket note (or 'done' to finish or 'skip' to skip follow up questions)`n`n"
+    $userInput = Read-Host
     LineAcrossScreen
+    ""
     if ($userInput.ToLower() -eq "done") {
       break
     }
