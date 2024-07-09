@@ -5898,3 +5898,78 @@ function Get-vts365TeamsMembershipReport {
 
   Write-Host "Results copied to clipboard." -f Yellow
 }
+
+<#
+.SYNOPSIS
+    This function pings a list of IP addresses or hostnames and generates a report.
+
+.DESCRIPTION
+    The Ping-vtsList function pings a list of IP addresses or hostnames provided in a file. 
+    It generates a report showing the status and response time for each target. 
+    The function also offers the option to export the report to an HTML file.
+
+.PARAMETER TargetIPAddressFile
+    The full path to the file containing the target IP addresses or hostnames.
+
+.PARAMETER ReportTitle
+    The title of the report. Default is "Ping Report".
+
+.EXAMPLE
+    Ping-vtsList -TargetIPAddressFile "C:\temp\IPList.txt" -ReportTitle "Server Ping Report"
+
+    This example pings the IP addresses or hostnames listed in the file "C:\temp\IPList.txt" and generates a report titled "Server Ping Report".
+
+.LINK
+    Network
+#>
+function Ping-vtsList {
+    param (
+        [Parameter(Mandatory = $true, HelpMessage = "Enter the full path to the file containing the target IP addresses / hostnames.")]
+        $TargetIPAddressFile,
+        $ReportTitle = "Ping Report"
+    )
+
+    $IPList = Get-Content $TargetIPAddressFile
+
+    $Report = @()
+
+    foreach ($IP in $IPList) {
+        Clear-Variable Ping
+        try {
+            $Ping = Test-Connection $IP -Count 1 -ErrorAction Stop
+        
+        }
+        catch {
+            $PingError = $_.Exception.Message
+        }
+        if ((($Ping).StatusCode -eq 0) -or (($Ping).Status -eq "Success")) {
+            $Report += [pscustomobject]@{
+                Target       = $IP
+                Status       = "OK"
+                ResponseTime = if ($Ping.ResponseTime){$Ping.ResponseTime} elseif ($Ping.Latency){$Ping.Latency}
+            }
+        }
+        else {
+            $Report += [pscustomobject]@{
+                Target       = $IP
+                Status       = if ($PingError){$PingError} else {"Failed"}
+                ResponseTime = "n/a"
+            }
+        
+        }
+    }
+
+    $Report | Out-Host
+
+    $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
+  
+    if ($exportReport -eq "Y" -or $exportReport -eq "y") {
+        # Check if PSWriteHTML module is installed, if not, install it
+        if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+            Install-Module -Name PSWriteHTML -Force -Confirm:$false
+        }
+        
+        # Export the results to an HTML file using the PSWriteHTML module
+        $Report | Out-HtmlView -Title $ReportTitle
+    }
+}
