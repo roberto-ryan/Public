@@ -232,7 +232,7 @@ function New-vtsRandomPassword {
   $symbol = $symbols | Get-Random
 
   if ($Easy) {
-    if (!(Test-Path $WordListPath)){
+    if (!(Test-Path $WordListPath)) {
       Invoke-WebRequest -uri "https://raw.githubusercontent.com/roberto-ryan/Public/main/wordlist.csv" -UseBasicParsing -OutFile $WordListPath
     }
     $words = Import-Csv -Path $WordListPath | ForEach-Object { $_.Word } 
@@ -240,7 +240,8 @@ function New-vtsRandomPassword {
     $randomWord1 = $words | Get-Random
     $randomWord2 = $words | Get-Random
     $NewPW = $randomWord1 + $randomPreposition + $randomWord2 + $number + $symbol
-  } else {
+  }
+  else {
     $string = ( -join ((0x30..0x39) + ( 0x41..0x5A) + ( 0x61..0x7A) |
         Get-Random -Count 12  |
         ForEach-Object { [char]$_ }))
@@ -253,7 +254,8 @@ function New-vtsRandomPassword {
 
   if ($Easy) {
     Write-Output "Easy Random Password Copied to Clipboard - $NewPW"
-  } else {
+  }
+  else {
     Write-Output "Random Password Copied to Clipboard - $NewPW"
   }
 }
@@ -2047,13 +2049,15 @@ function Add-vtsPrinter {
           Write-Host "`nPrinter $($printer.Name) added successfully.`n" -f Green
           $newPrinter = (Get-Printer -Name "\\$Server\$($printer.Name)")
           Write-Host "Name  : $($newPrinter.Name)`nDriver: $($newPrinter.DriverName)`nPort  : $($newPrinter.PortName)`n"
-          if (($($Printer.DriverName)) -ne ($($newPrinter.DriverName))){
+          if (($($Printer.DriverName)) -ne ($($newPrinter.DriverName))) {
             Write-Host "Driver mismatch. Printer server is using: `n$($Printer.DriverName)" -f Yellow
           }
-        } else {
+        }
+        else {
           Write-Error "Failed to add printer $($printer.Name)."
         }
-      } catch {
+      }
+      catch {
         Write-Error "Failed to add printer $($printer.Name). $($_.Exception.Message)"
       }
     }
@@ -2213,8 +2217,8 @@ M365
 #>
 function Get-vts365UserLicense {
   param (
-      [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
-      $UserList
+    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    $UserList
   )
 
   Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
@@ -2222,17 +2226,17 @@ function Get-vts365UserLicense {
   $LicenseDetails = @()
 
   foreach ($User in $UserList) {
-      $User = $User.Trim()
-      $UserExists = Get-MgUser -UserId $User -ErrorAction SilentlyContinue
-      if ($UserExists) {
-          $LicenseDetails += [pscustomobject]@{
-              User    = $User
-              License = (Get-MgUserLicenseDetail -UserId $User | Select-Object -expand SkuPartNumber) -join ", "
-          }
+    $User = $User.Trim()
+    $UserExists = Get-MgUser -UserId $User -ErrorAction SilentlyContinue
+    if ($UserExists) {
+      $LicenseDetails += [pscustomobject]@{
+        User    = $User
+        License = (Get-MgUserLicenseDetail -UserId $User | Select-Object -expand SkuPartNumber) -join ", "
       }
-      else {
-          Write-Host "User $User does not exist." -ForegroundColor Red
-      }
+    }
+    else {
+      Write-Host "User $User does not exist." -ForegroundColor Red
+    }
   }
 
   $LicenseDetails | Out-Host
@@ -2241,13 +2245,13 @@ function Get-vts365UserLicense {
   $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
   
   if ($exportReport -eq "Y" -or $exportReport -eq "y") {
-      # Check if PSWriteHTML module is installed, if not, install it
-      if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
-          Install-Module -Name PSWriteHTML -Force -Confirm:$false
-      }
+    # Check if PSWriteHTML module is installed, if not, install it
+    if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+      Install-Module -Name PSWriteHTML -Force -Confirm:$false
+    }
         
-      # Export the results to an HTML file using the PSWriteHTML module
-      $LicenseDetails | Out-HtmlView
+    # Export the results to an HTML file using the PSWriteHTML module
+    $LicenseDetails | Out-HtmlView
   }
 }
 
@@ -2337,7 +2341,7 @@ function Copy-vts365MailToMailbox {
   Write-Host "Connecting to Exchange Online PowerShell..."
   if (-not(Get-ConnectionInformation)) {
     Connect-ExchangeOnline -ShowBanner:$false
-}
+  }
   Write-Host "Connecting to Security & Compliance PowerShell..."
   Connect-IPPSSession -ShowBanner:$false
 
@@ -2776,9 +2780,9 @@ function Get-vts365MailboxStatistics {
   Write-Host "Connecting to Exchange Online..."
   if (-not(Get-ConnectionInformation)) {
     Connect-ExchangeOnline -ShowBanner:$false
-}
+  }
 
-  if ($null -eq $EmailAddress){$EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName)}
+  if ($null -eq $EmailAddress) { $EmailAddress = $(get-mailbox | Select-Object -expand UserPrincipalName) }
 
   # Initialize results array
   $Results = @()
@@ -2829,7 +2833,7 @@ function Get-vts365MailboxStatistics {
 #>
 function Start-vtsScreenRecording {
   Set-ExecutionPolicy Unrestricted
-  if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")){
+  if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")) {
     Remove-item "C:\Windows\Temp\VTS\rc\start.ps1" -Force -Confirm:$false
   }
   if (-not (Test-Path "C:\Windows\Temp\VTS\rc")) {
@@ -2838,7 +2842,7 @@ function Start-vtsScreenRecording {
 
   # Set ACL and NTFS permissions for everyone to have full control
   $acl = Get-Acl "C:\Windows\Temp"
-  $permission = "Everyone","FullControl","Allow"
+  $permission = "Everyone", "FullControl", "Allow"
   $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
   $acl.SetAccessRule($accessRule)
   
@@ -2847,16 +2851,16 @@ function Start-vtsScreenRecording {
   
   # Apply to all child items
   Get-ChildItem "C:\Windows\Temp" -Recurse | ForEach-Object {
-      Set-Acl -Path $_.FullName -AclObject $acl
+    Set-Acl -Path $_.FullName -AclObject $acl
   }
 
-  if ((Get-ScheduledTask -TaskName "RecordSession")){Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false}
-# Create a new action that runs the PowerShell script with parameters
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
-# Set the trigger to logon
-$trigger = New-ScheduledTaskTrigger -AtLogon
-# Register the scheduled task with highest privileges as SYSTEM user
-Register-ScheduledTask -Action $action -Trigger $trigger -User "SYSTEM" -TaskName "RecordSession" -RunLevel Highest
+  if ((Get-ScheduledTask -TaskName "RecordSession")) { Unregister-ScheduledTask -TaskName "RecordSession" -Confirm:$false }
+  # Create a new action that runs the PowerShell script with parameters
+  $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File C:\Windows\Temp\VTS\rc\start.ps1"
+  # Set the trigger to logon
+  $trigger = New-ScheduledTaskTrigger -AtLogon
+  # Register the scheduled task with highest privileges as SYSTEM user
+  Register-ScheduledTask -Action $action -Trigger $trigger -User "SYSTEM" -TaskName "RecordSession" -RunLevel Highest
 
 @'
 $script:source = @"
@@ -3544,8 +3548,8 @@ SeDelegateSessionUserImpersonatePrivilege token."
 
 }
 '@ | Out-File -FilePath C:\Windows\Temp\VTS\rc\start.ps1 -Force -Encoding utf8
-Start-Sleep 5
-Start-ScheduledTask -TaskName "RecordSession"
+  Start-Sleep 5
+  Start-ScheduledTask -TaskName "RecordSession"
 }
 
 <#
@@ -3591,28 +3595,29 @@ This command will calculate the size of the Windows directory.
 File Management
 #>
 function Get-vtsDirectorySize {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$false)]
-        [string]$Path = (Get-Location).Path
-    )
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Path = (Get-Location).Path
+  )
 
-    try {
-        # Calculate the size of the directory
-        $size = (Get-ChildItem $Path -Recurse -ErrorAction Stop | Measure-Object -Property Length -Sum).Sum
-        $sizeInMB = "{0:N2}" -f ($size / 1MB)
-        $sizeInGB = "{0:N2}" -f ($size / 1GB)
+  try {
+    # Calculate the size of the directory
+    $size = (Get-ChildItem $Path -Recurse -ErrorAction Stop | Measure-Object -Property Length -Sum).Sum
+    $sizeInMB = "{0:N2}" -f ($size / 1MB)
+    $sizeInGB = "{0:N2}" -f ($size / 1GB)
 
-        # Output the size in MB or GB
-        if ($sizeInMB -gt 1024) {
-            Write-Output ("The size of $Path is " + $sizeInGB + " GB")
-        } else {
-            Write-Output ("The size of $Path is " + $sizeInMB + " MB")
-        }
+    # Output the size in MB or GB
+    if ($sizeInMB -gt 1024) {
+      Write-Output ("The size of $Path is " + $sizeInGB + " GB")
     }
-    catch {
-        Write-Error "An error occurred while calculating the size of the directory: $_"
+    else {
+      Write-Output ("The size of $Path is " + $sizeInMB + " MB")
     }
+  }
+  catch {
+    Write-Error "An error occurred while calculating the size of the directory: $_"
+  }
 }
 
 <#
@@ -3640,31 +3645,31 @@ function Get-vtsDirectorySize {
     M365
 #>
 function Add-vtsSharePointAdminToAllSites {
-    param (
-        [Parameter(Mandatory=$true, HelpMessage="Enter the SharePoint admin site URL in the format 'https://yourdomain-admin.sharepoint.com'")]
-        [string]$adminSiteUrl,
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the SharePoint admin site URL in the format 'https://yourdomain-admin.sharepoint.com'")]
+    [string]$adminSiteUrl,
 
-        [Parameter(Mandatory=$true, HelpMessage="Enter the username of the user to be made an admin in the format 'user@yourdomain.com'")]
-        [string]$userToMakeOwner
-    )
-    if (!(Get-InstalledModule Microsoft.Online.SharePoint.PowerShell)) {
-        Install-Module Microsoft.Online.SharePoint.PowerShell
-    }
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the username of the user to be made an admin in the format 'user@yourdomain.com'")]
+    [string]$userToMakeOwner
+  )
+  if (!(Get-InstalledModule Microsoft.Online.SharePoint.PowerShell)) {
+    Install-Module Microsoft.Online.SharePoint.PowerShell
+  }
 
-    Import-Module Microsoft.Online.SharePoint.PowerShell
+  Import-Module Microsoft.Online.SharePoint.PowerShell
 
-    Write-Host "Connecting to SharePoint Online..."
-    Connect-SPOService -Url $adminSiteUrl
+  Write-Host "Connecting to SharePoint Online..."
+  Connect-SPOService -Url $adminSiteUrl
 
-    Write-Host "Retrieving all site collections..."
-    $sites = Get-SPOSite -Limit All
+  Write-Host "Retrieving all site collections..."
+  $sites = Get-SPOSite -Limit All
 
-    foreach ($site in $sites) {
-        Write-Host "Adding owner to site: " $site.Url
-        Set-SPOUser -Site $site.Url -LoginName $userToMakeOwner -IsSiteCollectionAdmin $true
+  foreach ($site in $sites) {
+    Write-Host "Adding owner to site: " $site.Url
+    Set-SPOUser -Site $site.Url -LoginName $userToMakeOwner -IsSiteCollectionAdmin $true
 
-        Write-Host "Successfully added admin to site:" $site.Url
-    }
+    Write-Host "Successfully added admin to site:" $site.Url
+  }
 }
 
 <#
@@ -3692,25 +3697,25 @@ Additional information about the function.
 Log Management
 #>
 function Get-vtsSessionDisconnectTime {
-    param(
-        [int]$EventID = 24,
-        [string]$LogName = "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
-    )
+  param(
+    [int]$EventID = 24,
+    [string]$LogName = "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+  )
     
-    $events = Get-WinEvent -FilterHashtable @{LogName = $LogName; ID = $EventID }
-    $output = @()
-    foreach ($event in $events) {
-        $xml = [xml]$event.ToXml()
-        $eventUsername = $xml.Event.UserData.EventXML.User
-        $eventTime = $event.TimeCreated
+  $events = Get-WinEvent -FilterHashtable @{LogName = $LogName; ID = $EventID }
+  $output = @()
+  foreach ($event in $events) {
+    $xml = [xml]$event.ToXml()
+    $eventUsername = $xml.Event.UserData.EventXML.User
+    $eventTime = $event.TimeCreated
     
-        $output += [pscustomobject]@{
-            Username       = $eventUsername
-            DisconnectTime = $eventTime
-        }
+    $output += [pscustomobject]@{
+      Username       = $eventUsername
+      DisconnectTime = $eventTime
     }
+  }
     
-    return $output
+  return $output
 }
 
 <#
@@ -3734,26 +3739,26 @@ To stop the function, use the keyboard shortcut for stopping a running command i
 Device Management
 #>
 function Get-vtsDeviceChange {
-    while ($true) {
-        $FirstScan = Get-PnpDevice | Where-Object Present -eq True | Select-Object -expand FriendlyName
+  while ($true) {
+    $FirstScan = Get-PnpDevice | Where-Object Present -eq True | Select-Object -expand FriendlyName
 
-        Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 1
 
-        $SecondScan = Get-PnpDevice | Where-Object Present -eq True | Select-Object -expand FriendlyName
+    $SecondScan = Get-PnpDevice | Where-Object Present -eq True | Select-Object -expand FriendlyName
 
-        $Changes = Compare-Object $FirstScan $SecondScan
+    $Changes = Compare-Object $FirstScan $SecondScan
 
-        foreach ($Device in $Changes) {
-            if ($Device.SideIndicator -eq "=>") {
-                "`"$($Device.InputObject)`" connected."
-            }
-            if ($Device.SideIndicator -eq "<=") {
-                "`"$($Device.InputObject)`" removed."
-            }
-        }
-
-        $FirstScan = $SecondScan
+    foreach ($Device in $Changes) {
+      if ($Device.SideIndicator -eq "=>") {
+        "`"$($Device.InputObject)`" connected."
+      }
+      if ($Device.SideIndicator -eq "<=") {
+        "`"$($Device.InputObject)`" removed."
+      }
     }
+
+    $FirstScan = $SecondScan
+  }
 }
 
 
@@ -3779,51 +3784,51 @@ Starts a packet capture on the Ethernet interface, with the output saved to C:\t
 Network
 #>
 function Start-vtsPacketCapture {
-    param (
-        [string]$interface = (get-netadapter | Where-Object Name -like "*ethernet*" | Where-Object Status -eq Up | Select-Object -expand name),
-        [string]$output = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -f hhmm-MM-dd-yyyy)-capture.pcap"
-    )
+  param (
+    [string]$interface = (get-netadapter | Where-Object Name -like "*ethernet*" | Where-Object Status -eq Up | Select-Object -expand name),
+    [string]$output = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -f hhmm-MM-dd-yyyy)-capture.pcap"
+  )
 
-    Write-Host "Starting packet capture..."
+  Write-Host "Starting packet capture..."
 
-    if (!(Test-Path "C:\Program Files\Wireshark\tshark.exe")) {
-        Write-Host "Wireshark not found. Installing necessary components..."
+  if (!(Test-Path "C:\Program Files\Wireshark\tshark.exe")) {
+    Write-Host "Wireshark not found. Installing necessary components..."
 
-        #Install choco
-        Write-Host "Installing Chocolatey..."
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    #Install choco
+    Write-Host "Installing Chocolatey..."
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-        #Install Wireshark
-        Write-Host "Installing Wireshark..."
-        choco install wireshark -y
+    #Install Wireshark
+    Write-Host "Installing Wireshark..."
+    choco install wireshark -y
 
-        #Install npcap
-        Write-Host "Installing Npcap..."
-        mkdir C:\temp
-        Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.79.exe" -UseBasicParsing -OutFile "C:\temp\npcap-1.79.exe"
+    #Install npcap
+    Write-Host "Installing Npcap..."
+    mkdir C:\temp
+    Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.79.exe" -UseBasicParsing -OutFile "C:\temp\npcap-1.79.exe"
 
-        & "C:\temp\npcap-1.79.exe"
+    & "C:\temp\npcap-1.79.exe"
 
-        $wshell = New-Object -ComObject wscript.shell
-        Start-sleep -Milliseconds 250
-        $wshell.AppActivate('Npcap 1.79 Setup')
-        $wshell.SendKeys('%a');
-        Start-sleep -Milliseconds 250
-        $wshell.AppActivate('Npcap 1.79 Setup')
-        $wshell.SendKeys('%i');
-        Start-sleep -Milliseconds 250
-        $wshell.AppActivate('Npcap 1.79 Setup')
-        $wshell.SendKeys('%n');
-        Start-sleep -Milliseconds 250
-        $wshell.AppActivate('Npcap 1.79 Setup')
-        $wshell.SendKeys('{enter}');
-    }
+    $wshell = New-Object -ComObject wscript.shell
+    Start-sleep -Milliseconds 250
+    $wshell.AppActivate('Npcap 1.79 Setup')
+    $wshell.SendKeys('%a');
+    Start-sleep -Milliseconds 250
+    $wshell.AppActivate('Npcap 1.79 Setup')
+    $wshell.SendKeys('%i');
+    Start-sleep -Milliseconds 250
+    $wshell.AppActivate('Npcap 1.79 Setup')
+    $wshell.SendKeys('%n');
+    Start-sleep -Milliseconds 250
+    $wshell.AppActivate('Npcap 1.79 Setup')
+    $wshell.SendKeys('{enter}');
+  }
     
-    #Start packet capture using tshark on ethernet NIC
-    $tsharkPath = "C:\Program Files\Wireshark\tshark.exe"
+  #Start packet capture using tshark on ethernet NIC
+  $tsharkPath = "C:\Program Files\Wireshark\tshark.exe"
     
-    Write-Host "Starting packet capture on interface $interface, output to $output"
-    Start-Process -FilePath $tsharkPath -ArgumentList "-i $interface -w $output" -WindowStyle Hidden
+  Write-Host "Starting packet capture on interface $interface, output to $output"
+  Start-Process -FilePath $tsharkPath -ArgumentList "-i $interface -w $output" -WindowStyle Hidden
 }
 
 <#
@@ -3841,9 +3846,9 @@ Stops the currently running packet capture.
 Network
 #>
 function Stop-vtsPacketCapture {
-    Write-Host "Stopping packet capture..."
-    Get-Process tshark | Stop-Process -Confirm:$false
-    Write-Host "Packet capture stopped."
+  Write-Host "Stopping packet capture..."
+  Get-Process tshark | Stop-Process -Confirm:$false
+  Write-Host "Packet capture stopped."
 }
 
 <#
@@ -3867,8 +3872,8 @@ M365
 function Set-vts365MailboxArchive {
   [CmdletBinding()]
   param (
-      [Parameter(Mandatory = $true, HelpMessage = "Please enter the user in 'user@domain.com' format")]
-      $script:UserEmail
+    [Parameter(Mandatory = $true, HelpMessage = "Please enter the user in 'user@domain.com' format")]
+    $script:UserEmail
   )
 
   # Attempt to connect to Exchange Online
@@ -3879,112 +3884,112 @@ function Set-vts365MailboxArchive {
 
   # Function to view user retention policies
   function ViewUserRetentionPolicy {
-      Write-Host "Preparing to view user retention policies..."
-      $ViewUserRetentionPolicy = Read-Host "View user retention policies? (y/N)"
-      switch ($ViewUserRetentionPolicy) {
-          "y" { 
-              try {
-                  get-mailbox -ResultSize Unlimited | Select-Object displayname, UserPrincipalName, RetentionPolicy | Out-Host
-                  Write-Host "User retention policies viewed successfully."
-              }
-              catch {
-                  Write-Error "Failed to view user retention policies: $_"
-              }
-          }
-          Default {}
+    Write-Host "Preparing to view user retention policies..."
+    $ViewUserRetentionPolicy = Read-Host "View user retention policies? (y/N)"
+    switch ($ViewUserRetentionPolicy) {
+      "y" { 
+        try {
+          get-mailbox -ResultSize Unlimited | Select-Object displayname, UserPrincipalName, RetentionPolicy | Out-Host
+          Write-Host "User retention policies viewed successfully."
+        }
+        catch {
+          Write-Error "Failed to view user retention policies: $_"
+        }
       }
+      Default {}
+    }
   }
 
   # Function to view user archive details
   function ViewUserArchiveDetails {
-      Write-Host "Preparing to view user archive details..."
-      $ViewUserArchiveDetails = Read-Host "View user archive details? (y/N)"
-      switch ($ViewUserArchiveDetails) {
-          "y" { 
-              try {
-                  Get-Mailbox -ResultSize Unlimited | Select-Object DisplayName, ArchiveStatus, ArchiveDatabase, ArchiveDomain, ArchiveGuid, ArchiveName, ArchiveQuota, ArchiveRelease, ArchiveState, ArchiveStatusDescription, ArchiveWarningQuota | Out-Host
-                  Write-Host "User archive details viewed successfully."
-              }
-              catch {
-                  Write-Error "Failed to view user archive details: $_"
-              }
-          }
-          Default {}
+    Write-Host "Preparing to view user archive details..."
+    $ViewUserArchiveDetails = Read-Host "View user archive details? (y/N)"
+    switch ($ViewUserArchiveDetails) {
+      "y" { 
+        try {
+          Get-Mailbox -ResultSize Unlimited | Select-Object DisplayName, ArchiveStatus, ArchiveDatabase, ArchiveDomain, ArchiveGuid, ArchiveName, ArchiveQuota, ArchiveRelease, ArchiveState, ArchiveStatusDescription, ArchiveWarningQuota | Out-Host
+          Write-Host "User archive details viewed successfully."
+        }
+        catch {
+          Write-Error "Failed to view user archive details: $_"
+        }
       }
+      Default {}
+    }
   }
 
   # Function to enable archive
   function EnableArchive {
-      Write-Host "Preparing to enable archive..."
-      $EnableUserArchive = Read-Host "Enable Archive? (y/N)"
-      switch ($EnableUserArchive) {
-          "y" { 
-              foreach ($user in $UserEmail) {
-                  try {
-                      # Set the archive settings for the new user
-                      Set-Mailbox $user -ArchiveName "Archive"
-                      Enable-Mailbox $user -Archive
-                      Write-Host "Archive enabled successfully for $user."
-                  }
-                  catch {
-                      Write-Error "Failed to enable archive for $user`: $_"
-                  }
-              }
+    Write-Host "Preparing to enable archive..."
+    $EnableUserArchive = Read-Host "Enable Archive? (y/N)"
+    switch ($EnableUserArchive) {
+      "y" { 
+        foreach ($user in $UserEmail) {
+          try {
+            # Set the archive settings for the new user
+            Set-Mailbox $user -ArchiveName "Archive"
+            Enable-Mailbox $user -Archive
+            Write-Host "Archive enabled successfully for $user."
           }
-          Default {}
+          catch {
+            Write-Error "Failed to enable archive for $user`: $_"
+          }
+        }
       }
+      Default {}
+    }
   }
 
   # Function to enable auto archive
   function EnableAutoArchive {
-      Write-Host "Preparing to setup auto-archiving..."
-      $SetupAutoArchiving = Read-Host "Setup auto-archiving? (y/N)"
+    Write-Host "Preparing to setup auto-archiving..."
+    $SetupAutoArchiving = Read-Host "Setup auto-archiving? (y/N)"
 
-      switch ($SetupAutoArchiving) {
-          "y" { 
-              $RetentionLimit = Read-Host "Move to archive after this many days"
+    switch ($SetupAutoArchiving) {
+      "y" { 
+        $RetentionLimit = Read-Host "Move to archive after this many days"
 
-              # Check if the retention tag exists
-              Write-Host "Checking if retention tag exists..."
-              try {
-                  $RetentionTag = Get-RetentionPolicyTag -Identity "Archive after $RetentionLimit Days" -ErrorAction SilentlyContinue
-                  if ($null -eq $RetentionTag) {
-                      # Create a retention tag
-                      New-RetentionPolicyTag -Name "Archive after $RetentionLimit Days" -Type All -AgeLimitForRetention $RetentionLimit -RetentionAction MoveToArchive
-                      Write-Host "Retention tag created successfully."
-                  }
-              }
-              catch {
-                  Write-Error "Failed to create retention tag: $_"
-              }
-
-              # Check if the retention policy exists
-              Write-Host "Checking if retention policy exists..."
-              try {
-                  $RetentionPolicy = Get-RetentionPolicy -Identity "$RetentionLimit Day Retention Policy" -ErrorAction SilentlyContinue
-                  if ($null -eq $RetentionPolicy) {
-                      # Create a retention policy
-                      New-RetentionPolicy -Name "$RetentionLimit Day Retention Policy" -RetentionPolicyTagLinks "Archive after $RetentionLimit Days"
-                      Write-Host "Retention policy created successfully."
-                  }
-              }
-              catch {
-                  Write-Error "Failed to create retention policy: $_"
-              }
-
-              foreach ($user in $UserEmail) {
-                  try {
-                      # Apply the retention policy to a mailbox
-                      Set-Mailbox -Identity $user -RetentionPolicy "$RetentionLimit Day Retention Policy"
-                      Write-Host "Retention policy applied successfully to $user."
-                  }
-                  catch {
-                      Write-Error "Failed to apply retention policy to $user`: $_"
-                  }
-              }
+        # Check if the retention tag exists
+        Write-Host "Checking if retention tag exists..."
+        try {
+          $RetentionTag = Get-RetentionPolicyTag -Identity "Archive after $RetentionLimit Days" -ErrorAction SilentlyContinue
+          if ($null -eq $RetentionTag) {
+            # Create a retention tag
+            New-RetentionPolicyTag -Name "Archive after $RetentionLimit Days" -Type All -AgeLimitForRetention $RetentionLimit -RetentionAction MoveToArchive
+            Write-Host "Retention tag created successfully."
           }
-          Default {}
+        }
+        catch {
+          Write-Error "Failed to create retention tag: $_"
+        }
+
+        # Check if the retention policy exists
+        Write-Host "Checking if retention policy exists..."
+        try {
+          $RetentionPolicy = Get-RetentionPolicy -Identity "$RetentionLimit Day Retention Policy" -ErrorAction SilentlyContinue
+          if ($null -eq $RetentionPolicy) {
+            # Create a retention policy
+            New-RetentionPolicy -Name "$RetentionLimit Day Retention Policy" -RetentionPolicyTagLinks "Archive after $RetentionLimit Days"
+            Write-Host "Retention policy created successfully."
+          }
+        }
+        catch {
+          Write-Error "Failed to create retention policy: $_"
+        }
+
+        foreach ($user in $UserEmail) {
+          try {
+            # Apply the retention policy to a mailbox
+            Set-Mailbox -Identity $user -RetentionPolicy "$RetentionLimit Day Retention Policy"
+            Write-Host "Retention policy applied successfully to $user."
+          }
+          catch {
+            Write-Error "Failed to apply retention policy to $user`: $_"
+          }
+        }
       }
+      Default {}
+    }
   }
 
   # Call functions
@@ -4077,70 +4082,70 @@ The function will backup the existing permissions to C:\temp\CalendarPermissions
 M365
 #>
 function Set-vts365CalendarPermissions {
-    param(
-        [Parameter(Mandatory=$true, HelpMessage="Enter the email address of the user whose calendar permissions you want to modify. The format should be 'user@domain.com'")]
-        $user,
-        [Parameter(Mandatory=$true, HelpMessage="Enter the email address of the user to whom you want to grant or modify access to the calendar. The format should be 'user@domain.com'")]
-        $accessUser,
-        [Parameter(Mandatory=$true, HelpMessage="Enter the level of access rights you want to grant to the access user. Acceptable values are 'Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor'")]
-        [ValidateSet('Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor')]
-        [string]$accessRights
-    )
+  param(
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the email address of the user whose calendar permissions you want to modify. The format should be 'user@domain.com'")]
+    $user,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the email address of the user to whom you want to grant or modify access to the calendar. The format should be 'user@domain.com'")]
+    $accessUser,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the level of access rights you want to grant to the access user. Acceptable values are 'Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor'")]
+    [ValidateSet('Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor')]
+    [string]$accessRights
+  )
 
-    if (-not(Get-ConnectionInformation)) {
+  if (-not(Get-ConnectionInformation)) {
     Connect-ExchangeOnline -ShowBanner:$false
-}
+  }
 
-    # Identify the Calendar Path
-    $calendarPath = $user + ":\Calendar"
-    Write-Host "Identified Calendar Path: $calendarPath"
+  # Identify the Calendar Path
+  $calendarPath = $user + ":\Calendar"
+  Write-Host "Identified Calendar Path: $calendarPath"
 
-    if(-not(Test-Path -Path C:\temp)) {
-        New-Item -ItemType Directory -Path C:\temp
+  if (-not(Test-Path -Path C:\temp)) {
+    New-Item -ItemType Directory -Path C:\temp
+  }
+
+  # Backup Calendar Permissions
+  Write-Host "Backing up Calendar Permissions to C:\temp\CalendarPermissionsBackup.txt"
+  "Original Permissions" | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+  Get-Date | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+  $Permissions = Get-MailboxFolderPermission $calendarPath | Format-Table -AutoSize
+  $Permissions | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+    
+  # View Existing Calendar Permissions
+  Write-Host "Viewing Existing Calendar Permissions..."
+  $Permissions
+    
+  foreach ($member in $accessUser) {
+    # Add New Permissions
+    Write-Host "Adding New Permissions for $member with access rights $accessRights..."
+    try {
+      Add-MailboxFolderPermission $calendarPath -User $member -AccessRights $accessRights -ErrorAction Stop
+      Write-Host "New permissions for $member with access rights $accessRights added successfully."
     }
-
-    # Backup Calendar Permissions
-    Write-Host "Backing up Calendar Permissions to C:\temp\CalendarPermissionsBackup.txt"
-    "Original Permissions" | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
-    Get-Date | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
-    $Permissions = Get-MailboxFolderPermission $calendarPath | Format-Table -AutoSize
-    $Permissions | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
-    
-    # View Existing Calendar Permissions
-    Write-Host "Viewing Existing Calendar Permissions..."
-    $Permissions
-    
-    foreach ($member in $accessUser){
-        # Add New Permissions
-        Write-Host "Adding New Permissions for $member with access rights $accessRights..."
-        try {
-            Add-MailboxFolderPermission $calendarPath -User $member -AccessRights $accessRights -ErrorAction Stop
-            Write-Host "New permissions for $member with access rights $accessRights added successfully."
-        }
-        catch {
-            Write-Host "Error adding permissions for $member with access rights $accessRights`: $_"
-            # Modify Existing Permissions (Optional)
-            Write-Host "Attempting to Modify Existing Permissions for $member with access rights $accessRights..."
-            try {
-                Set-MailboxFolderPermission $calendarPath -User $member -AccessRights $accessRights -ErrorAction Stop
-                Write-Host "Permissions for $member with access rights $accessRights modified successfully."
-            }
-            catch {
-                Write-Host "Error setting permissions for $member with access rights $accessRights`: $_"
-            }
-        }
+    catch {
+      Write-Host "Error adding permissions for $member with access rights $accessRights`: $_"
+      # Modify Existing Permissions (Optional)
+      Write-Host "Attempting to Modify Existing Permissions for $member with access rights $accessRights..."
+      try {
+        Set-MailboxFolderPermission $calendarPath -User $member -AccessRights $accessRights -ErrorAction Stop
+        Write-Host "Permissions for $member with access rights $accessRights modified successfully."
+      }
+      catch {
+        Write-Host "Error setting permissions for $member with access rights $accessRights`: $_"
+      }
     }
+  }
     
-    # Backup Calendar Permissions
-    Write-Host "Backing up Calendar Permissions to C:\temp\CalendarPermissionsBackup.txt"
-    "Modified Permissions" | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
-    Get-Date | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
-    $Permissions = Get-MailboxFolderPermission $calendarPath | Format-Table -AutoSize
-    $Permissions | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+  # Backup Calendar Permissions
+  Write-Host "Backing up Calendar Permissions to C:\temp\CalendarPermissionsBackup.txt"
+  "Modified Permissions" | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+  Get-Date | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
+  $Permissions = Get-MailboxFolderPermission $calendarPath | Format-Table -AutoSize
+  $Permissions | Out-File -FilePath "C:\temp\CalendarPermissionsBackup.txt" -Force -Append
 
-    # Verify the Updated Permissions
-    Write-Host "Verifying the Updated Permissions for $calendarPath"
-    $Permissions
+  # Verify the Updated Permissions
+  Write-Host "Verifying the Updated Permissions for $calendarPath"
+  $Permissions
 }
 
 <#
@@ -4169,46 +4174,46 @@ Get-vtsAutotaskTicketDetails -TicketNumber "T20240214.0040" -ApiIntegrationCode 
 AutoTask API
 #>
 function Get-vtsAutotaskTicketDetails {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$TicketNumber,
-        [Parameter(Mandatory=$true)]
-        [string]$ApiIntegrationCode,
-        [Parameter(Mandatory=$true)]
-        [string]$UserName,
-        [Parameter(Mandatory=$true)]
-        [string]$Secret
+  param (
+    [Parameter(Mandatory = $true)]
+    [string]$TicketNumber,
+    [Parameter(Mandatory = $true)]
+    [string]$ApiIntegrationCode,
+    [Parameter(Mandatory = $true)]
+    [string]$UserName,
+    [Parameter(Mandatory = $true)]
+    [string]$Secret
+  )
+
+  # Define the base URI for Autotask's REST API
+  $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+
+  # Set the necessary headers for the API call
+  $headers = @{
+    "ApiIntegrationCode" = $ApiIntegrationCode
+    "UserName"           = $UserName
+    "Secret"             = $Secret
+  }
+
+  # Define the endpoint for retrieving ticket details
+  $endpoint = "/Tickets/query"
+
+  # Define the body for the API call
+  $body = @{
+    "Filter" = @(
+      @{
+        "field" = "ticketNumber"
+        "op"    = "eq"
+        "value" = $TicketNumber
+      }
     )
+  } | ConvertTo-Json
 
-    # Define the base URI for Autotask's REST API
-    $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+  # Make the API call to Autotask using the POST method
+  $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Post' -Headers $headers -Body $body -ContentType "application/json"
 
-    # Set the necessary headers for the API call
-    $headers = @{
-        "ApiIntegrationCode" = $ApiIntegrationCode
-        "UserName" = $UserName
-        "Secret" = $Secret
-    }
-
-    # Define the endpoint for retrieving ticket details
-    $endpoint = "/Tickets/query"
-
-    # Define the body for the API call
-    $body = @{
-        "Filter" = @(
-            @{
-                "field" = "ticketNumber"
-                "op" = "eq"
-                "value" = $TicketNumber
-            }
-        )
-    } | ConvertTo-Json
-
-    # Make the API call to Autotask using the POST method
-    $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Post' -Headers $headers -Body $body -ContentType "application/json"
-
-    # Output the response
-    $response | Select-Object -expand items
+  # Output the response
+  $response | Select-Object -expand items
 }
 
 <#
@@ -4237,55 +4242,55 @@ Get-vtsAutotaskTicketNotes -TicketNumber "T20240214.0040" -ApiIntegrationCode 't
 AutoTask API
 #>
 function Get-vtsAutotaskTicketNotes {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$TicketNumber,
-        [Parameter(Mandatory = $true)]
-        [string]$ApiIntegrationCode,
-        [Parameter(Mandatory = $true)]
-        [string]$UserName,
-        [Parameter(Mandatory = $true)]
-        [string]$Secret
+  param (
+    [Parameter(Mandatory = $true)]
+    [string]$TicketNumber,
+    [Parameter(Mandatory = $true)]
+    [string]$ApiIntegrationCode,
+    [Parameter(Mandatory = $true)]
+    [string]$UserName,
+    [Parameter(Mandatory = $true)]
+    [string]$Secret
+  )
+
+  # Define the base URI for Autotask's REST API
+  $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+
+  # Set the necessary headers for the API call
+  $headers = @{
+    "ApiIntegrationCode" = $ApiIntegrationCode
+    "UserName"           = $UserName
+    "Secret"             = $Secret
+  }
+
+  # Define the endpoint for retrieving ticket details
+  $endpoint = "/Tickets/query"
+
+  # Define the body for the API call
+  $body = @{
+    "Filter" = @(
+      @{
+        "field" = "TicketNumber"
+        "op"    = "eq"
+        "value" = $TicketNumber
+      }
     )
+  } | ConvertTo-Json
 
-    # Define the base URI for Autotask's REST API
-    $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+  # Make the API call to Autotask using the POST method to get the ticket ID
+  $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Post' -Headers $headers -Body $body -ContentType "application/json"
 
-    # Set the necessary headers for the API call
-    $headers = @{
-        "ApiIntegrationCode" = $ApiIntegrationCode
-        "UserName"           = $UserName
-        "Secret"             = $Secret
-    }
+  # Get the ID of the ticket
+  $TicketId = $response.items.id
 
-    # Define the endpoint for retrieving ticket details
-    $endpoint = "/Tickets/query"
+  # Define the endpoint for retrieving ticket notes
+  $endpoint = "/Tickets/$TicketId/notes"
 
-    # Define the body for the API call
-    $body = @{
-        "Filter" = @(
-            @{
-                "field" = "TicketNumber"
-                "op" = "eq"
-                "value" = $TicketNumber
-            }
-        )
-    } | ConvertTo-Json
+  # Make the API call to Autotask using the GET method to get the ticket notes
+  $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
 
-    # Make the API call to Autotask using the POST method to get the ticket ID
-    $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Post' -Headers $headers -Body $body -ContentType "application/json"
-
-    # Get the ID of the ticket
-    $TicketId = $response.items.id
-
-    # Define the endpoint for retrieving ticket notes
-    $endpoint = "/Tickets/$TicketId/notes"
-
-    # Make the API call to Autotask using the GET method to get the ticket notes
-    $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
-
-    # Output the response
-    $response | Select-Object -expand items
+  # Output the response
+  $response | Select-Object -expand items
 }
 
 <#
@@ -4315,35 +4320,35 @@ This example shows how to call the function with all required parameters.
 AutoTask API
 #>
 function Get-vtsAutoTaskContactNamebyID {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ContactID,
-        [Parameter(Mandatory = $true)]
-        [string]$ApiIntegrationCode,
-        [Parameter(Mandatory = $true)]
-        [string]$UserName,
-        [Parameter(Mandatory = $true)]
-        [string]$Secret
-    )
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$ContactID,
+    [Parameter(Mandatory = $true)]
+    [string]$ApiIntegrationCode,
+    [Parameter(Mandatory = $true)]
+    [string]$UserName,
+    [Parameter(Mandatory = $true)]
+    [string]$Secret
+  )
 
-    # Define the base URI for Autotask's REST API
-    $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+  # Define the base URI for Autotask's REST API
+  $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
         
-    # Set the necessary headers for the API call
-    $headers = @{
-        "ApiIntegrationCode" = $ApiIntegrationCode
-        "UserName"           = $UserName
-        "Secret"             = $Secret
-    }
+  # Set the necessary headers for the API call
+  $headers = @{
+    "ApiIntegrationCode" = $ApiIntegrationCode
+    "UserName"           = $UserName
+    "Secret"             = $Secret
+  }
         
-    # Define the endpoint for contact
-    $endpoint = "/Contacts/$ContactID"
+  # Define the endpoint for contact
+  $endpoint = "/Contacts/$ContactID"
         
-    # Make the API call to Autotask using the GET method to get the contact
-    $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
+  # Make the API call to Autotask using the GET method to get the contact
+  $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
         
-    # Return the first and last name of the contact
-    "$($response.item.firstName) $($response.item.lastName)"
+  # Return the first and last name of the contact
+  "$($response.item.firstName) $($response.item.lastName)"
 }
 
 <#
@@ -4373,35 +4378,35 @@ This example shows how to call the function with all required parameters.
 AutoTask API
 #>
 function Get-vtsAutoTaskResourceNamebyID {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ResourceID,
-        [Parameter(Mandatory = $true)]
-        [string]$ApiIntegrationCode,
-        [Parameter(Mandatory = $true)]
-        [string]$UserName,
-        [Parameter(Mandatory = $true)]
-        [string]$Secret
-    )
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$ResourceID,
+    [Parameter(Mandatory = $true)]
+    [string]$ApiIntegrationCode,
+    [Parameter(Mandatory = $true)]
+    [string]$UserName,
+    [Parameter(Mandatory = $true)]
+    [string]$Secret
+  )
 
-    # Define the base URI for Autotask's REST API
-    $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
+  # Define the base URI for Autotask's REST API
+  $baseUri = "https://webservices14.autotask.net/ATServicesRest/V1.0"
         
-    # Set the necessary headers for the API call
-    $headers = @{
-        "ApiIntegrationCode" = $ApiIntegrationCode
-        "UserName"           = $UserName
-        "Secret"             = $Secret
-    }
+  # Set the necessary headers for the API call
+  $headers = @{
+    "ApiIntegrationCode" = $ApiIntegrationCode
+    "UserName"           = $UserName
+    "Secret"             = $Secret
+  }
         
-    # Define the endpoint for resource
-    $endpoint = "/Resources/$ResourceID"
+  # Define the endpoint for resource
+  $endpoint = "/Resources/$ResourceID"
         
-    # Make the API call to Autotask using the GET method to get the resource
-    $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
+  # Make the API call to Autotask using the GET method to get the resource
+  $response = Invoke-RestMethod -Uri "$baseUri$endpoint" -Method 'Get' -Headers $headers -ContentType "application/json"
         
-    # Return the first and last name of the resource
-    "$($response.item.firstName) $($response.item.lastName)"
+  # Return the first and last name of the resource
+  "$($response.item.firstName) $($response.item.lastName)"
 }
 
 <#
@@ -4422,72 +4427,72 @@ M365
 #>
 function Get-vts365DistributionListRecipients {
 
-    if (-not(Get-ConnectionInformation)) {
+  if (-not(Get-ConnectionInformation)) {
     Connect-ExchangeOnline -ShowBanner:$false
-}
+  }
 
-    # Get all dynamic distribution groups and suppress error output
-    $distributionGroups = Get-DynamicDistributionGroup | Select-Object -ExpandProperty Name 2>$null
+  # Get all dynamic distribution groups and suppress error output
+  $distributionGroups = Get-DynamicDistributionGroup | Select-Object -ExpandProperty Name 2>$null
   
-    # Initialize an empty array for the group table
-    $GroupTable = @()
-    $key = 1
+  # Initialize an empty array for the group table
+  $GroupTable = @()
+  $key = 1
 
-    # Populate the group table with group names and corresponding keys
-    foreach ($group in $distributionGroups) {
-        $GroupTable += [pscustomobject]@{
-            Key   = $key
-            Group = $group
-        }
-        $key++
+  # Populate the group table with group names and corresponding keys
+  foreach ($group in $distributionGroups) {
+    $GroupTable += [pscustomobject]@{
+      Key   = $key
+      Group = $group
     }
+    $key++
+  }
   
-    # Check if the current user is system authority
-    if ($(whoami) -eq "nt authority\system") {
-        $GroupTable | Out-Host
-        $userInput = Read-Host "Please input the group numbers you wish to query, separated by commas. Alternatively, input '*' to search all groups."
-        if ("$userInput" -eq '*') {
-            Write-Host "Searching all available groups..."
-            $SelectedGroups = $GroupTable.Group
-        }
-        else {
-            Write-Host "Searching selected groups..."
-            $SelectedGroups = $GroupTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Group
-        }
+  # Check if the current user is system authority
+  if ($(whoami) -eq "nt authority\system") {
+    $GroupTable | Out-Host
+    $userInput = Read-Host "Please input the group numbers you wish to query, separated by commas. Alternatively, input '*' to search all groups."
+    if ("$userInput" -eq '*') {
+      Write-Host "Searching all available groups..."
+      $SelectedGroups = $GroupTable.Group
     }
     else {
-        $SelectedGroups = $GroupTable | Out-GridView -OutputMode Multiple | Select-Object -ExpandProperty Group
+      Write-Host "Searching selected groups..."
+      $SelectedGroups = $GroupTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Group
     }
+  }
+  else {
+    $SelectedGroups = $GroupTable | Out-GridView -OutputMode Multiple | Select-Object -ExpandProperty Group
+  }
 
-    # Get recipients based on the selected groups and output their details
-    $Results = foreach ($group in $SelectedGroups) {
-        $DDLGroup = Get-DynamicDistributionGroup -Identity $group
-        Get-Recipient -ResultSize Unlimited -RecipientPreviewFilter ($DDLGroup.RecipientFilter) | ForEach-Object {
-            [pscustomobject]@{
-                GroupName   = $DDLGroup
-                DisplayName = $_.DisplayName
-                Email       = $_.PrimarySmtpAddress
-                PositionID  = $_.notes
-                Title       = $_.title
-                Office      = $_.office
-            }
-        } | Sort-Object DisplayName, Office, Title
-    }
+  # Get recipients based on the selected groups and output their details
+  $Results = foreach ($group in $SelectedGroups) {
+    $DDLGroup = Get-DynamicDistributionGroup -Identity $group
+    Get-Recipient -ResultSize Unlimited -RecipientPreviewFilter ($DDLGroup.RecipientFilter) | ForEach-Object {
+      [pscustomobject]@{
+        GroupName   = $DDLGroup
+        DisplayName = $_.DisplayName
+        Email       = $_.PrimarySmtpAddress
+        PositionID  = $_.notes
+        Title       = $_.title
+        Office      = $_.office
+      }
+    } | Sort-Object DisplayName, Office, Title
+  }
 
-    $Results | Format-Table -AutoSize | Out-Host
+  $Results | Format-Table -AutoSize | Out-Host
 
-    # Ask user if they want to export a report
-    $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
+  # Ask user if they want to export a report
+  $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
   
-    if ($exportReport -eq "Y" -or $exportReport -eq "y") {
-        # Check if PSWriteHTML module is installed, if not, install it
-        if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
-            Install-Module -Name PSWriteHTML -Force -Confirm:$false
-        }
-        
-        # Export the results to an HTML file using the PSWriteHTML module
-        $Results | Out-HtmlView
+  if ($exportReport -eq "Y" -or $exportReport -eq "y") {
+    # Check if PSWriteHTML module is installed, if not, install it
+    if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+      Install-Module -Name PSWriteHTML -Force -Confirm:$false
     }
+        
+    # Export the results to an HTML file using the PSWriteHTML module
+    $Results | Out-HtmlView
+  }
 }
 
 <#
@@ -4521,38 +4526,38 @@ This example searches for the word "error" in all files in the "C:\Users\Usernam
 Utilities
 #>
 function Get-vtsFileContentMatch {
-    param (
-        [Parameter(Mandatory=$true, HelpMessage="Please provide the path to the directory.")]
-        [string]$Path,
-        [Parameter(Mandatory=$true, HelpMessage="Please provide the pattern or word to match.")]
-        [string]$Pattern,
-        [Parameter(Mandatory=$false, HelpMessage="Please provide the file types to exclude. Default is '*.exe', '*.dll'.")]
-        [string[]]$Exclude = @("*.exe", "*.dll"),
-        [Parameter(Mandatory=$false, HelpMessage="Please indicate if you want to export the results to a CSV file.")]
-        [bool]$ExportToCsv = $false,
-        [Parameter(Mandatory=$false, HelpMessage="Please provide the path to the CSV file.")]
-        [string]$CsvPath = "C:\temp\$(Get-Date -f yyyy-MM-dd-HH-mm)-$($env:COMPUTERNAME)-FilesIncluding-$Pattern.csv"
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Please provide the path to the directory.")]
+    [string]$Path,
+    [Parameter(Mandatory = $true, HelpMessage = "Please provide the pattern or word to match.")]
+    [string]$Pattern,
+    [Parameter(Mandatory = $false, HelpMessage = "Please provide the file types to exclude. Default is '*.exe', '*.dll'.")]
+    [string[]]$Exclude = @("*.exe", "*.dll"),
+    [Parameter(Mandatory = $false, HelpMessage = "Please indicate if you want to export the results to a CSV file.")]
+    [bool]$ExportToCsv = $false,
+    [Parameter(Mandatory = $false, HelpMessage = "Please provide the path to the CSV file.")]
+    [string]$CsvPath = "C:\temp\$(Get-Date -f yyyy-MM-dd-HH-mm)-$($env:COMPUTERNAME)-FilesIncluding-$Pattern.csv"
+  )
 
-    $Results = @()
-    Get-ChildItem -Path $Path -Recurse -File -Exclude $Exclude | ForEach-Object {
-        $filePath = $_.FullName
-        Get-Content -Path $filePath | ForEach-Object {
-            if ($_ -match $Pattern) {
-                $Result = [pscustomobject]@{
-                    FilePath = $filePath
-                    Match = $_
-                }
-                $Result | Format-List
-                $Results += $Result
-            }
+  $Results = @()
+  Get-ChildItem -Path $Path -Recurse -File -Exclude $Exclude | ForEach-Object {
+    $filePath = $_.FullName
+    Get-Content -Path $filePath | ForEach-Object {
+      if ($_ -match $Pattern) {
+        $Result = [pscustomobject]@{
+          FilePath = $filePath
+          Match    = $_
         }
+        $Result | Format-List
+        $Results += $Result
+      }
     }
+  }
 
-    if ($ExportToCsv) {
-        $Results | Export-Csv -Path $CsvPath -NoTypeInformation -Force
-        if ($?){Write-Host "Results exported to $CsvPath" -ForegroundColor Yellow}
-    }
+  if ($ExportToCsv) {
+    $Results | Export-Csv -Path $CsvPath -NoTypeInformation -Force
+    if ($?) { Write-Host "Results exported to $CsvPath" -ForegroundColor Yellow }
+  }
 }
 
 <#
@@ -4581,51 +4586,51 @@ Still in Development
 
 #>
 function Revoke-vts365EmailMessage {
-    param(
-        # [Parameter(Mandatory = $true)]
-        [string]$TicketNumber = "TEST4",
-        [array]$From,
-        [array]$To = "Zach.Koscoe@completehealth.com"
-    )
+  param(
+    # [Parameter(Mandatory = $true)]
+    [string]$TicketNumber = "TEST4",
+    [array]$From,
+    [array]$To = "Zach.Koscoe@completehealth.com"
+  )
     
-    Write-Host "Connecting to Exchange Online and IPPS Session..."
-    if (-not(Get-ConnectionInformation)) {
-      Connect-ExchangeOnline -ShowBanner:$false
-    }
-    # Connect-IPPSSession
+  Write-Host "Connecting to Exchange Online and IPPS Session..."
+  if (-not(Get-ConnectionInformation)) {
+    Connect-ExchangeOnline -ShowBanner:$false
+  }
+  # Connect-IPPSSession
 
-    Write-Host "Getting message trace..."
-    if (($From -ne $null) -and ($To -ne $null)) {
-        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To -SenderAddress $From | Out-GridView -OutputMode Multiple
-    }
+  Write-Host "Getting message trace..."
+  if (($From -ne $null) -and ($To -ne $null)) {
+    $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To -SenderAddress $From | Out-GridView -OutputMode Multiple
+  }
     
-    if (($To -ne $null) -and ($From -eq $null)) {
-        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To | Out-GridView -OutputMode Multiple
-    }
+  if (($To -ne $null) -and ($From -eq $null)) {
+    $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -RecipientAddress $To | Out-GridView -OutputMode Multiple
+  }
     
-    if (($To -eq $null) -and ($From -ne $null)) {
-        $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -SenderAddress $From | Out-GridView -OutputMode Multiple
-    }
+  if (($To -eq $null) -and ($From -ne $null)) {
+    $Message = Get-MessageTrace -StartDate (Get-Date).AddDays(-10) -EndDate (Get-Date) -SenderAddress $From | Out-GridView -OutputMode Multiple
+  }
     
-    Write-Host "Starting compliance search..."
-    New-ComplianceSearch -Name $TicketNumber -ExchangeLocation $($Message.RecipientAddress) -ContentMatchQuery "(c:c)(from=$($Message.SenderAddress))(subjecttitle=""$($Message.subject)"")" | Start-ComplianceSearch
+  Write-Host "Starting compliance search..."
+  New-ComplianceSearch -Name $TicketNumber -ExchangeLocation $($Message.RecipientAddress) -ContentMatchQuery "(c:c)(from=$($Message.SenderAddress))(subjecttitle=""$($Message.subject)"")" | Start-ComplianceSearch
     
-    Write-Host "Waiting for the search to complete..."
-    do {
-        Start-Sleep -Seconds 60
-        $searchStatus = (Get-ComplianceSearch -Identity $TicketNumber).Status
-    } while ($searchStatus -ne 'Completed')
+  Write-Host "Waiting for the search to complete..."
+  do {
+    Start-Sleep -Seconds 60
+    $searchStatus = (Get-ComplianceSearch -Identity $TicketNumber).Status
+  } while ($searchStatus -ne 'Completed')
     
-    Write-Host "Purging and deleting the email instances..."
-    New-ComplianceSearchAction -SearchName $TicketNumber -Purge -PurgeType HardDelete
+  Write-Host "Purging and deleting the email instances..."
+  New-ComplianceSearchAction -SearchName $TicketNumber -Purge -PurgeType HardDelete
     
-    Write-Host "Checking the status of the search action..."
-    do {
-        Start-Sleep -Seconds 60
-        $actionStatus = Get-ComplianceSearchAction | Where-Object Name -eq "$($TicketNumber)_Purge" | Select-Object -expand Status
-    } while ($actionStatus -ne 'Completed')
+  Write-Host "Checking the status of the search action..."
+  do {
+    Start-Sleep -Seconds 60
+    $actionStatus = Get-ComplianceSearchAction | Where-Object Name -eq "$($TicketNumber)_Purge" | Select-Object -expand Status
+  } while ($actionStatus -ne 'Completed')
 
-    Write-Host "Operation completed."
+  Write-Host "Operation completed."
 }
 
 <#
@@ -4646,13 +4651,13 @@ The DISM restore health process can help fix Windows corruption errors. The Syst
 Utilities
 #>
 function Start-vtsRepair {
-    Write-Host "Starting DISM restore health process..."
-    dism /online /cleanup-image /restorehealth
-    Write-Host "DISM restore health process completed."
+  Write-Host "Starting DISM restore health process..."
+  dism /online /cleanup-image /restorehealth
+  Write-Host "DISM restore health process completed."
 
-    Write-Host "Starting System File Checker scan now..."
-    sfc /scannow
-    Write-Host "System File Checker scan completed."
+  Write-Host "Starting System File Checker scan now..."
+  sfc /scannow
+  Write-Host "System File Checker scan completed."
 }
 
 <#
@@ -4681,26 +4686,26 @@ This example creates a new document library named "NewLibrary" in the "test" sit
 SharePoint Online
 #>
 function New-vtsSPOnlineDocumentLibrary {
-    param (
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the organization name. Example: contoso")]
-        [string]$orgName,
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the site name. Example: https://contoso.sharepoint.com/sites/test")]
-        [string]$siteUrl,
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the name of the new document library.")]
-        [string]$libraryName
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the organization name. Example: contoso")]
+    [string]$orgName,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the site name. Example: https://contoso.sharepoint.com/sites/test")]
+    [string]$siteUrl,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the name of the new document library.")]
+    [string]$libraryName
+  )
 
-    if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
-        Install-Module -Name PnP.PowerShell -Scope CurrentUser
-    }
+  if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
+    Install-Module -Name PnP.PowerShell -Scope CurrentUser
+  }
 
-    Import-Module PnP.PowerShell
+  Import-Module PnP.PowerShell
 
-    # Connect to SharePoint Online
-    Connect-PnPOnline -Url $siteUrl -UseWebLogin
+  # Connect to SharePoint Online
+  Connect-PnPOnline -Url $siteUrl -UseWebLogin
 
-    # Create a new document library
-    New-PnPList -Title $libraryName -Template DocumentLibrary -Url $libraryName
+  # Create a new document library
+  New-PnPList -Title $libraryName -Template DocumentLibrary -Url $libraryName
 }
 
 <#
@@ -4726,27 +4731,27 @@ This example retrieves all folders in the "LibraryName" document library on the 
 SharePoint Online
 #>
 function Get-vtsSPOnlineDocumentLibraryFolders {
-    param (
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the site URL. Example: https://contoso.sharepoint.com/sites/test")]
-        [string]$siteUrl,
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the document library name.")]
-        [string]$libraryName
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the site URL. Example: https://contoso.sharepoint.com/sites/test")]
+    [string]$siteUrl,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the document library name.")]
+    [string]$libraryName
+  )
 
-    if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
-        Install-Module -Name PnP.PowerShell -Scope CurrentUser
-    }
+  if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
+    Install-Module -Name PnP.PowerShell -Scope CurrentUser
+  }
 
-    Import-Module PnP.PowerShell
+  Import-Module PnP.PowerShell
 
-    # Connect to SharePoint Online
-    Connect-PnPOnline -Url $siteUrl -UseWebLogin
+  # Connect to SharePoint Online
+  Connect-PnPOnline -Url $siteUrl -UseWebLogin
 
-    # Get all folders in the document library
-    $folders = Get-PnPFolderItem -FolderSiteRelativeUrl $libraryName -ItemType Folder
+  # Get all folders in the document library
+  $folders = Get-PnPFolderItem -FolderSiteRelativeUrl $libraryName -ItemType Folder
 
-    # Return the folder names
-    return $folders.Name
+  # Return the folder names
+  return $folders.Name
 }
 
 <#
@@ -4805,51 +4810,51 @@ Active Directory
 #>
 function Suspend-vtsADUser {
 
-    $users = Get-ADUser -Filter * -Property DisplayName, PhysicalDeliveryOfficeName, Manager | Select-Object DisplayName, PhysicalDeliveryOfficeName, @{Name = 'Manager'; Expression = { (Get-ADUser $_.Manager).Name } }, SamAccountName | Sort-Object DisplayName
+  $users = Get-ADUser -Filter * -Property DisplayName, PhysicalDeliveryOfficeName, Manager | Select-Object DisplayName, PhysicalDeliveryOfficeName, @{Name = 'Manager'; Expression = { (Get-ADUser $_.Manager).Name } }, SamAccountName | Sort-Object DisplayName
     
-    $selectedUser = $users | Out-GridView -Title "Select a User to Manage" -PassThru
+  $selectedUser = $users | Out-GridView -Title "Select a User to Manage" -PassThru
     
-    if ($null -ne $selectedUser) {
-        $days = Read-Host "Enter the number of days after which to reactivate the user (Leave empty to disable the user)"
+  if ($null -ne $selectedUser) {
+    $days = Read-Host "Enter the number of days after which to reactivate the user (Leave empty to disable the user)"
         
-        $verificationUser = Read-Host "Please type $($selectedUser.SamAccountName) to confirm suspension."
+    $verificationUser = Read-Host "Please type $($selectedUser.SamAccountName) to confirm suspension."
 
-        if ($verificationUser -ne $selectedUser.SamAccountName) {
-            Write-Host "Verification failed. Exiting..." -ForegroundColor Red
-            break
-        }
+    if ($verificationUser -ne $selectedUser.SamAccountName) {
+      Write-Host "Verification failed. Exiting..." -ForegroundColor Red
+      break
+    }
 
-        if ([string]::IsNullOrWhiteSpace($days)) {
-            Disable-ADAccount -Identity $selectedUser.SamAccountName
-            Write-Host "User $($selectedUser.SamAccountName) has been disabled."
-        }
-        else {
-            try {
-                $days = [int]$days
-                Disable-ADAccount -Identity $selectedUser.SamAccountName
-                
-                $action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"Enable-ADAccount -Identity $($selectedUser.SamAccountName)`""
-                $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddDays($days).Date
-                $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
-                $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-            
-                $taskName = "EnableADUser_" + $selectedUser.SamAccountName
-                Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description "Re-enable AD user $($selectedUser.SamAccountName) after $days days. Task created $(Get-Date) by $($env:USERNAME)" | Out-Null
-                
-                if ($?){
-                    Write-Host "`nUser $($selectedUser.SamAccountName) has been disabled. A task has been scheduled to re-enable the account after $days days at:"
-                    Write-Host "`n$((Get-Date).AddDays($days).Date)`n" -ForegroundColor Yellow
-                }
-            }
-            catch {
-                Write-Host "An error occurred: $_"
-            }
-        }
-        
+    if ([string]::IsNullOrWhiteSpace($days)) {
+      Disable-ADAccount -Identity $selectedUser.SamAccountName
+      Write-Host "User $($selectedUser.SamAccountName) has been disabled."
     }
     else {
-        Write-Host "No user was selected."
+      try {
+        $days = [int]$days
+        Disable-ADAccount -Identity $selectedUser.SamAccountName
+                
+        $action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"Enable-ADAccount -Identity $($selectedUser.SamAccountName)`""
+        $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddDays($days).Date
+        $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+            
+        $taskName = "EnableADUser_" + $selectedUser.SamAccountName
+        Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description "Re-enable AD user $($selectedUser.SamAccountName) after $days days. Task created $(Get-Date) by $($env:USERNAME)" | Out-Null
+                
+        if ($?) {
+          Write-Host "`nUser $($selectedUser.SamAccountName) has been disabled. A task has been scheduled to re-enable the account after $days days at:"
+          Write-Host "`n$((Get-Date).AddDays($days).Date)`n" -ForegroundColor Yellow
+        }
+      }
+      catch {
+        Write-Host "An error occurred: $_"
+      }
     }
+        
+  }
+  else {
+    Write-Host "No user was selected."
+  }
 
 }
 
@@ -4880,52 +4885,52 @@ function Suspend-vtsADUser {
 function Get-vtsPrinterByPortAddress {
   # Define parameters
   param (
-      # PrinterHostAddress is not mandatory
-      [Parameter(Mandatory = $false)]
-      [string]$PrinterHostAddress
+    # PrinterHostAddress is not mandatory
+    [Parameter(Mandatory = $false)]
+    [string]$PrinterHostAddress
   )
 
   # If PrinterHostAddress is provided
   if ($PrinterHostAddress) {
-      # Get the port names of the printer
-      $PortNames = Get-PrinterPort | Where-Object { $_.PrinterHostAddress -eq "$PrinterHostAddress" } | Select-Object -ExpandProperty Name
-      # Initialize an array to store printers
-      $Printers = @()
-      # Loop through each port name
-      foreach ($PortName in $PortNames){
-          # Get the printer with the port name and add it to the printers array
-          $Printers += Get-Printer | Where-Object { $_.PortName -eq "$PortName" } | Sort-Object Name
+    # Get the port names of the printer
+    $PortNames = Get-PrinterPort | Where-Object { $_.PrinterHostAddress -eq "$PrinterHostAddress" } | Select-Object -ExpandProperty Name
+    # Initialize an array to store printers
+    $Printers = @()
+    # Loop through each port name
+    foreach ($PortName in $PortNames) {
+      # Get the printer with the port name and add it to the printers array
+      $Printers += Get-Printer | Where-Object { $_.PortName -eq "$PortName" } | Sort-Object Name
+    }
+    # If printers are found
+    if ($Printers.Name) {
+      # Create a custom object to store the printer host address and the printers
+      $Result = [PSCustomObject]@{
+        PrinterHostAddress = $PrinterHostAddress
+        Printers           = $Printers.Name -join ", "
       }
-      # If printers are found
-      if ($Printers.Name) {
-          # Create a custom object to store the printer host address and the printers
-          $Result = [PSCustomObject]@{
-              PrinterHostAddress = $PrinterHostAddress
-              Printers           = $Printers.Name -join ", "
-          }
-          # Return the result
-          $Result
-      }
+      # Return the result
+      $Result
+    }
   }
   # If PrinterHostAddress is not provided
   else {
-      # Get all printer ports
-      Get-PrinterPort | ForEach-Object {
-          # Get the port name
-          $PortName = $_.Name
-          # Get the printer with the port name
-          $Printers = Get-Printer | Where-Object { $_.PortName -eq "$PortName" } | Sort-Object Name
-          # If printers are found
-          if ($Printers.Name) {
-              # Create a custom object to store the printer host address and the printers
-              $Result = [PSCustomObject]@{
-                  PrinterHostAddress = $_.PrinterHostAddress
-                  Printers           = $Printers.Name -join ", "
-              }
-              # Return the result
-              $Result
-          }
+    # Get all printer ports
+    Get-PrinterPort | ForEach-Object {
+      # Get the port name
+      $PortName = $_.Name
+      # Get the printer with the port name
+      $Printers = Get-Printer | Where-Object { $_.PortName -eq "$PortName" } | Sort-Object Name
+      # If printers are found
+      if ($Printers.Name) {
+        # Create a custom object to store the printer host address and the printers
+        $Result = [PSCustomObject]@{
+          PrinterHostAddress = $_.PrinterHostAddress
+          Printers           = $Printers.Name -join ", "
+        }
+        # Return the result
+        $Result
       }
+    }
   }
 }
 
@@ -4960,9 +4965,9 @@ File Management
 #>
 function Compare-vtsFiles {
   param (
-      [string]$SourceFolder,
-      [string]$DestinationFolder,
-      [string]$ReportPath = "$env:TEMP\VTS\$(Get-Date -f yyyy-MM-dd-hhmmss)_Hashes.csv"
+    [string]$SourceFolder,
+    [string]$DestinationFolder,
+    [string]$ReportPath = "$env:TEMP\VTS\$(Get-Date -f yyyy-MM-dd-hhmmss)_Hashes.csv"
   )
 
   # Initialize a new list to store the results
@@ -4970,17 +4975,17 @@ function Compare-vtsFiles {
 
   # Define a script block to process each file
   $sb = {
-      process {
-          # Ignore 'Thumbs.db' files
-          if ($_.Name -eq 'Thumbs.db') { return }
+    process {
+      # Ignore 'Thumbs.db' files
+      if ($_.Name -eq 'Thumbs.db') { return }
 
-          # Create a custom object with file properties
-          [PSCustomObject]@{
-              h  = (Get-FileHash $_.FullName -Algorithm SHA1).Hash # File hash
-              n  = $_.Name # File name
-              fn = $_.fullname # Full file path
-          }
+      # Create a custom object with file properties
+      [PSCustomObject]@{
+        h  = (Get-FileHash $_.FullName -Algorithm SHA1).Hash # File hash
+        n  = $_.Name # File name
+        fn = $_.fullname # Full file path
       }
+    }
   }
 
   # Get all files from the source and destination folders
@@ -4989,34 +4994,35 @@ function Compare-vtsFiles {
 
   # Process each file in the source folder
   foreach ($file in $sourceFiles) {
-      # If the file exists in the destination folder
-      if ($destinationFile = $destinationFiles | Where-Object { $_.n -eq $file.n }) {
-          # Create a custom object with source and target file properties
-          $comparisonResult = [PSCustomObject]@{
-              SourceFilePath = $file.fn
-              SourceFileHash = $file.h
-              TargetFilePath = $destinationFile.fn
-              TargetFileHash = $destinationFile.h
-              Status         = if ($file.h -eq $destinationFile.h) { 'Hashes Match' } else { 'Hashes Do Not Match' }
-          }
-      } else {
-          # If the file does not exist in the destination folder
-          $comparisonResult = [PSCustomObject]@{
-              SourceFilePath = $file.fn
-              SourceFileHash = $file.h
-              TargetFilePath = $null
-              TargetFileHash = $null
-              Status         = 'File not found in destination'
-          }
+    # If the file exists in the destination folder
+    if ($destinationFile = $destinationFiles | Where-Object { $_.n -eq $file.n }) {
+      # Create a custom object with source and target file properties
+      $comparisonResult = [PSCustomObject]@{
+        SourceFilePath = $file.fn
+        SourceFileHash = $file.h
+        TargetFilePath = $destinationFile.fn
+        TargetFileHash = $destinationFile.h
+        Status         = if ($file.h -eq $destinationFile.h) { 'Hashes Match' } else { 'Hashes Do Not Match' }
       }
+    }
+    else {
+      # If the file does not exist in the destination folder
+      $comparisonResult = [PSCustomObject]@{
+        SourceFilePath = $file.fn
+        SourceFileHash = $file.h
+        TargetFilePath = $null
+        TargetFileHash = $null
+        Status         = 'File not found in destination'
+      }
+    }
 
-      # Add the comparison result to the result list
-      $result.Add($comparisonResult)
+    # Add the comparison result to the result list
+    $result.Add($comparisonResult)
   }
 
   $ReportDirectory = Split-Path -Path $ReportPath -Parent
   if (!(Test-Path -Path $ReportDirectory)) {
-      New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
+    New-Item -ItemType Directory -Path $ReportDirectory -Force | Out-Null
   }
 
   # Output the result list in a table format
@@ -5048,51 +5054,52 @@ Network
 #>
 function Connect-vtsWiFi {
   param (
-      [Parameter(Mandatory=$false)]
-      [string]$SSID,
+    [Parameter(Mandatory = $false)]
+    [string]$SSID,
       
-      [Parameter(Mandatory=$false)]
-      [SecureString]$Password
+    [Parameter(Mandatory = $false)]
+    [SecureString]$Password
   )
 
   Write-Host "`nChecking for wifiprofilemanagement module..."
   if (-not (Get-Module -ListAvailable -Name wifiprofilemanagement)) {
-      Write-Host "`nInstalling wifiprofilemanagement module..."
-      Install-Module -Name wifiprofilemanagement -Force -Scope CurrentUser
+    Write-Host "`nInstalling wifiprofilemanagement module..."
+    Install-Module -Name wifiprofilemanagement -Force -Scope CurrentUser
   }
 
   if (-not $SSID) {
-      Write-Host "`nFetching available networks...`n"
+    Write-Host "`nFetching available networks...`n"
 
-      $networks = (netsh wlan show networks | sls ^SSID) -replace "SSID . : " | sort
+    $networks = (netsh wlan show networks | sls ^SSID) -replace "SSID . : " | sort
 
-      $i = 1
-      $networkList = @()
-      foreach ($network in $networks) {
-          Write-Host "$i`: $network"
-          $networkList += $network
-          $i++
-      }
-      $selection = Read-Host -Prompt "`nPlease select a network by number"
-      $SSID = ($networkList[$selection - 1]).Trim()
+    $i = 1
+    $networkList = @()
+    foreach ($network in $networks) {
+      Write-Host "$i`: $network"
+      $networkList += $network
+      $i++
+    }
+    $selection = Read-Host -Prompt "`nPlease select a network by number"
+    $SSID = ($networkList[$selection - 1]).Trim()
   }
 
   if (-not $Password) {
-      $Password = Read-Host -Prompt "Please enter the password for $SSID" -AsSecureString
+    $Password = Read-Host -Prompt "Please enter the password for $SSID" -AsSecureString
   }
 
   Write-Host "`nChecking for existing WiFi profile..."
   if (Get-WiFiProfile -ProfileName $SSID 2>$null) {
-      $userChoice = Read-Host -Prompt "WiFi profile for $SSID already exists. Do you want to remove the old profile and replace it? (y/n)"
-      if ($userChoice -eq "y") {
-          Write-Host "`nRemoving old WiFi profile..."
-          Remove-WiFiProfile -ProfileName $SSID
-          Write-Host "`nCreating new WiFi profile..."
-          New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $Password -Encryption AES
-      }
-  } else {
+    $userChoice = Read-Host -Prompt "WiFi profile for $SSID already exists. Do you want to remove the old profile and replace it? (y/n)"
+    if ($userChoice -eq "y") {
+      Write-Host "`nRemoving old WiFi profile..."
+      Remove-WiFiProfile -ProfileName $SSID
       Write-Host "`nCreating new WiFi profile..."
       New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $Password -Encryption AES
+    }
+  }
+  else {
+    Write-Host "`nCreating new WiFi profile..."
+    New-WiFiProfile -ProfileName $SSID -ConnectionMode auto -Authentication WPA2PSK -Password $Password -Encryption AES
   }
   Write-Host "`nConnecting to WiFi profile..."
   Connect-WiFiProfile -ProfileName $SSID
@@ -5341,7 +5348,7 @@ function ai3 {
     $context += "Human: $userInput`n"
   }
 
-  if (-not($skip)){
+  if (-not($skip)) {
     Write-Host "Generating follow up questions..."
   
     LineAcrossScreen -Color Yellow
@@ -5407,19 +5414,20 @@ Utilities
 #>
 function Invoke-vtsFastDownload {
   param (
-      [string]$DownloadPath = "C:\temp",
-      [Parameter(Mandatory=$true)]
-      [string]$URL,
-      [Parameter(Mandatory=$true)]
-      [string]$FileName
+    [string]$DownloadPath = "C:\temp",
+    [Parameter(Mandatory = $true)]
+    [string]$URL,
+    [Parameter(Mandatory = $true)]
+    [string]$FileName
   )
 
   Write-Host "Checking if the download path $DownloadPath exists..."
   if (!(Test-Path $DownloadPath)) {
-      Write-Host "Download path does not exist. Creating it now..."
-      New-Item -ItemType Directory -Force -Path $DownloadPath
-  } else {
-      Write-Host "Download path exists. Proceeding with the download..."
+    Write-Host "Download path does not exist. Creating it now..."
+    New-Item -ItemType Directory -Force -Path $DownloadPath
+  }
+  else {
+    Write-Host "Download path exists. Proceeding with the download..."
   }
 
   Write-Host "Setting the current location to $DownloadPath..."
@@ -5462,33 +5470,33 @@ function Invoke-vtsFastDownload {
     File Management
 #>
 function Get-vtsFilePathCharacterCount {
-    param (
-        [Parameter(Mandatory=$true, HelpMessage="Please enter the directory path in the format 'C:\path\to\directory'")]
-        [string]$directoryPath,
-        [Parameter(Mandatory=$true, HelpMessage="Please enter the output file path in the format 'C:\path\to\outputfile.csv'")]
-        [string]$outputFilePath
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Please enter the directory path in the format 'C:\path\to\directory'")]
+    [string]$directoryPath,
+    [Parameter(Mandatory = $true, HelpMessage = "Please enter the output file path in the format 'C:\path\to\outputfile.csv'")]
+    [string]$outputFilePath
+  )
 
-    Write-Host "Starting to get file character count from directory: $directoryPath"
+  Write-Host "Starting to get file character count from directory: $directoryPath"
 
-    $items = Get-ChildItem -Path $directoryPath -Recurse
+  $items = Get-ChildItem -Path $directoryPath -Recurse
 
-    Write-Host "Found $($items.Count) items in the directory"
+  Write-Host "Found $($items.Count) items in the directory"
 
-    $output = @()
+  $output = @()
 
-    foreach ($item in $items) {
-        $output += New-Object PSObject -Property @{
-            "Fullname" = $item.FullName
-            "Number of characters in Fullname" = $item.FullName.Length
-        }
+  foreach ($item in $items) {
+    $output += New-Object PSObject -Property @{
+      "Fullname"                         = $item.FullName
+      "Number of characters in Fullname" = $item.FullName.Length
     }
+  }
 
-    Write-Host "Processed all items, now exporting to CSV file: $outputFilePath"
+  Write-Host "Processed all items, now exporting to CSV file: $outputFilePath"
 
-    $output | Export-Csv -Path $outputFilePath -NoTypeInformation
+  $output | Export-Csv -Path $outputFilePath -NoTypeInformation
 
-    Write-Host "Export completed successfully"
+  Write-Host "Export completed successfully"
 }
 
 <#
@@ -5526,37 +5534,37 @@ function Get-vtsFilePathCharacterCount {
 #>
 function Reset-vtsPrintersandDrivers {
   param (
-      [string]$driverPath = "C:\Windows\System32\spool\drivers",
-      [string]$printProcessorRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors",
-      [string]$driverRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers",
-      [string]$printProcessorName = "winprint",
-      [string]$printProcessorDll = "winprint.dll"
+    [string]$driverPath = "C:\Windows\System32\spool\drivers",
+    [string]$printProcessorRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors",
+    [string]$driverRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers",
+    [string]$printProcessorName = "winprint",
+    [string]$printProcessorDll = "winprint.dll"
   )
 
   Write-Host "Starting Reset-vtsPrintersandDrivers function..."
 
   $userConfirmation = Read-Host -Prompt "This is a destructive process and should be used as a last resort. Are you sure you want to proceed? (yes/no)"
   if ($userConfirmation -ne 'yes') {
-      Write-Host "Operation cancelled by user."
-      return
+    Write-Host "Operation cancelled by user."
+    return
   }
 
   Write-Host "Checking for RunAsUser module..."
   if (!(Get-Module -ListAvailable -Name RunAsUser)) {
-      Write-Host "Installing RunAsUser module..."
-      Install-Module RunAsUser -Force
+    Write-Host "Installing RunAsUser module..."
+    Install-Module RunAsUser -Force
   }
 
   Invoke-AsCurrentUser {
-      Write-Host "Getting network printers..."
-      $printers = Get-Printer "\\*" | Select-Object -ExpandProperty Name
-      $tempPath = "C:\temp"
-      if (!(Test-Path $tempPath)) {
-          Write-Host "Creating temp directory..."
-          New-Item -ItemType Directory -Path $tempPath
-      }
-      $printers | Out-File "$tempPath\printers.txt" -Append
-      Write-Host "Network printers saved to $tempPath\printers.txt" -ForegroundColor Yellow
+    Write-Host "Getting network printers..."
+    $printers = Get-Printer "\\*" | Select-Object -ExpandProperty Name
+    $tempPath = "C:\temp"
+    if (!(Test-Path $tempPath)) {
+      Write-Host "Creating temp directory..."
+      New-Item -ItemType Directory -Path $tempPath
+    }
+    $printers | Out-File "$tempPath\printers.txt" -Append
+    Write-Host "Network printers saved to $tempPath\printers.txt" -ForegroundColor Yellow
   }
 
   Write-Host "Attempting to remove driver and registry paths with spooler running..."
@@ -5581,89 +5589,89 @@ function Reset-vtsPrintersandDrivers {
   Get-PrinterDriver | Remove-PrinterDriver -Confirm:$false
 
   if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-      Write-Host "Please run PowerShell as an Administrator."
-      return
+    Write-Host "Please run PowerShell as an Administrator."
+    return
   }
 
   Try {
-      Write-Host "Checking for existing Print Processor..."
-      if (Test-Path "$printProcessorRegPath\$printProcessorName") {
-          Write-Host "Print Processor '$printProcessorName' already exists. Consider updating existing registry entries instead."
-      }
+    Write-Host "Checking for existing Print Processor..."
+    if (Test-Path "$printProcessorRegPath\$printProcessorName") {
+      Write-Host "Print Processor '$printProcessorName' already exists. Consider updating existing registry entries instead."
+    }
 
-      Write-Host "Creating new registry entries for Print Processor..."
-      New-Item -Path "$printProcessorRegPath\$printProcessorName" -Force | Out-Null
-      New-ItemProperty -Path "$printProcessorRegPath\$printProcessorName" -Name "Driver" -Value $printProcessorDll -PropertyType String -Force | Out-Null
-      $path = "HKLM:\SYSTEM\CURRENTCONTROLSET\CONTROL\PRINT\ENVIRONMENTS\WINDOWS X64\PRINT PROCESSORS\winprint"
-      if (!(Test-Path $path)) {
-          New-Item -Path $path -Force | Out-Null
-      }
-      Set-ItemProperty -Path $path -Name "Driver" -Value "winprint.dll" | Out-Null
+    Write-Host "Creating new registry entries for Print Processor..."
+    New-Item -Path "$printProcessorRegPath\$printProcessorName" -Force | Out-Null
+    New-ItemProperty -Path "$printProcessorRegPath\$printProcessorName" -Name "Driver" -Value $printProcessorDll -PropertyType String -Force | Out-Null
+    $path = "HKLM:\SYSTEM\CURRENTCONTROLSET\CONTROL\PRINT\ENVIRONMENTS\WINDOWS X64\PRINT PROCESSORS\winprint"
+    if (!(Test-Path $path)) {
+      New-Item -Path $path -Force | Out-Null
+    }
+    Set-ItemProperty -Path $path -Name "Driver" -Value "winprint.dll" | Out-Null
 
-      Write-Host "Registry entries for Print Processor '$printProcessorName' have been (re)created successfully."
+    Write-Host "Registry entries for Print Processor '$printProcessorName' have been (re)created successfully."
   }
   Catch {
-      Write-Error "An error occurred while recreating registry entries for Print Processor '$printProcessorName': $_"
+    Write-Error "An error occurred while recreating registry entries for Print Processor '$printProcessorName': $_"
   }
 
   # Define the registry keys and values
   $registryKeys = @(
-      @{
-          Path  = "HKLM:\Software\Policies\Microsoft\Windows\DriverInstall\Restrictions"
-          Name  = "AllowUserDeviceClasses"
-          Value = 1
-      },
-      @{
-          Path  = "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"
-          Name  = "RestrictDriverInstallationToAdministrators"
-          Value = 0
-      }
+    @{
+      Path  = "HKLM:\Software\Policies\Microsoft\Windows\DriverInstall\Restrictions"
+      Name  = "AllowUserDeviceClasses"
+      Value = 1
+    },
+    @{
+      Path  = "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"
+      Name  = "RestrictDriverInstallationToAdministrators"
+      Value = 0
+    }
   )
 
   # Loop through each registry key
   foreach ($registryKey in $registryKeys) {
-      # Check if the registry key exists
-      if (!(Test-Path $registryKey.Path)) {
-          # If the registry key doesn't exist, create it
-          New-Item -Path $registryKey.Path -Force | Out-Null
-          Write-Host "Created registry key $($registryKey.Path)"
+    # Check if the registry key exists
+    if (!(Test-Path $registryKey.Path)) {
+      # If the registry key doesn't exist, create it
+      New-Item -Path $registryKey.Path -Force | Out-Null
+      Write-Host "Created registry key $($registryKey.Path)"
+    }
+
+    try {
+      # Get the current value of the registry key
+      $property = Get-ItemProperty -Path $registryKey.Path -ErrorAction SilentlyContinue
+      $currentValue = $property.($registryKey.Name)
+
+      if ($currentValue -eq $registryKey.Value) {
+        # If the current value is the same as the desired value, print a message and continue to the next iteration
+        Write-Host "Registry key $($registryKey.Path)\$($registryKey.Name) is already set to $($registryKey.Value). No change was made."
       }
 
-      try {
-          # Get the current value of the registry key
-          $property = Get-ItemProperty -Path $registryKey.Path -ErrorAction SilentlyContinue
-          $currentValue = $property.($registryKey.Name)
-
-          if ($currentValue -eq $registryKey.Value) {
-              # If the current value is the same as the desired value, print a message and continue to the next iteration
-              Write-Host "Registry key $($registryKey.Path)\$($registryKey.Name) is already set to $($registryKey.Value). No change was made."
-          }
-
-          # Check if the property exists
-          if ($null -eq $currentValue) {
-              # If the property doesn't exist, create it
-              New-ItemProperty -Path $registryKey.Path -Name $registryKey.Name -Value $registryKey.Value -PropertyType DWORD -Force | Out-Null
-              Write-Host "Created property $($registryKey.Name) with value $($registryKey.Value) in $($registryKey.Path)"
-          }
-          else {
-              # If the property exists, set its value
-              Set-ItemProperty -Path $registryKey.Path -Name $registryKey.Name -Value $registryKey.Value -ErrorAction Stop
-              Write-Host "Successfully set $($registryKey.Name) to $($registryKey.Value) in $($registryKey.Path)"
-          }
+      # Check if the property exists
+      if ($null -eq $currentValue) {
+        # If the property doesn't exist, create it
+        New-ItemProperty -Path $registryKey.Path -Name $registryKey.Name -Value $registryKey.Value -PropertyType DWORD -Force | Out-Null
+        Write-Host "Created property $($registryKey.Name) with value $($registryKey.Value) in $($registryKey.Path)"
       }
-      catch {
-          # Catch any errors
-          Write-Host "Failed to set $($registryKey.Name) to $($registryKey.Value) in $($registryKey.Path): $_"
+      else {
+        # If the property exists, set its value
+        Set-ItemProperty -Path $registryKey.Path -Name $registryKey.Name -Value $registryKey.Value -ErrorAction Stop
+        Write-Host "Successfully set $($registryKey.Name) to $($registryKey.Value) in $($registryKey.Path)"
       }
+    }
+    catch {
+      # Catch any errors
+      Write-Host "Failed to set $($registryKey.Name) to $($registryKey.Value) in $($registryKey.Path): $_"
+    }
   }
 
   Invoke-AsCurrentUser {
-      Write-Host "Restoring network printers..."
-      $printers = Get-Content "C:\temp\printers.txt" | Select-Object -Unique
-      foreach ($p in $printers) {
-          Write-Host "Adding printer $p..."
-          Add-Printer -ConnectionName "$p"
-      }
+    Write-Host "Restoring network printers..."
+    $printers = Get-Content "C:\temp\printers.txt" | Select-Object -Unique
+    foreach ($p in $printers) {
+      Write-Host "Adding printer $p..."
+      Add-Printer -ConnectionName "$p"
+    }
   }
 
   Write-Host "Reset-vtsPrintersandDrivers function completed."
@@ -5689,26 +5697,26 @@ function Reset-vtsPrintersandDrivers {
     Utilities
 #>
 function Get-vtsScreenshot {
-    param (
-        [string]$Path = "$env:temp\$(Get-Date -f yyyy-MM-dd-HH-mm)-Screenshot.png"
-    )
+  param (
+    [string]$Path = "$env:temp\$(Get-Date -f yyyy-MM-dd-HH-mm)-Screenshot.png"
+  )
 
-    Add-Type -AssemblyName System.Windows.Forms
-    Add-Type -AssemblyName System.Drawing
+  Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Drawing
 
-    $Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
-    $Width  = $Screen.Width
-    $Height = $Screen.Height
-    $Left   = $Screen.Left
-    $Top    = $Screen.Top
+  $Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+  $Width = $Screen.Width
+  $Height = $Screen.Height
+  $Left = $Screen.Left
+  $Top = $Screen.Top
 
-    $bitmap  = New-Object System.Drawing.Bitmap $Width, $Height
-    $graphic = [System.Drawing.Graphics]::FromImage($bitmap)
-    $graphic.CopyFromScreen($Left, $Top, 0, 0, $bitmap.Size)
+  $bitmap = New-Object System.Drawing.Bitmap $Width, $Height
+  $graphic = [System.Drawing.Graphics]::FromImage($bitmap)
+  $graphic.CopyFromScreen($Left, $Top, 0, 0, $bitmap.Size)
 
-    $bitmap.Save($Path)
+  $bitmap.Save($Path)
 
-    Write-Host "Screenshot saved at $Path"
+  Write-Host "Screenshot saved at $Path"
 }
 
 <#
@@ -5740,17 +5748,17 @@ Utilities
 #>
 function Convert-vtsScreenToAscii {
   param (
-      [string]$ImageDirectory = "$env:temp\",
-      [int]$NumOfImages = 100,
-      [int]$SleepInterval = 0
+    [string]$ImageDirectory = "$env:temp\",
+    [int]$NumOfImages = 100,
+    [int]$SleepInterval = 0
   )
 
   if ((whoami) -eq "nt authority\system") {
-      Write-Error "Must run script as logged in user. Running as system doesn't work."
+    Write-Error "Must run script as logged in user. Running as system doesn't work."
   }
   else {
-      # Define the ImageToAscii class
-      Add-Type -TypeDefinition @"
+    # Define the ImageToAscii class
+    Add-Type -TypeDefinition @"
 using System;
 using System.Drawing;
 public class ImageToAscii {
@@ -5783,48 +5791,48 @@ public class ImageToAscii {
 }
 "@ -ReferencedAssemblies System.Drawing *>$null -ErrorAction SilentlyContinue
 
-      try {
-          if (!(Test-Path -Path $ImageDirectory)) {
-              New-Item -ItemType Directory -Force -Path $ImageDirectory
-          }
+    try {
+      if (!(Test-Path -Path $ImageDirectory)) {
+        New-Item -ItemType Directory -Force -Path $ImageDirectory
+      }
     
     
-          for ($i = 1; $i -le $NumOfImages; $i++) {
-              $imagePath = Join-Path -Path $ImageDirectory -ChildPath "image_$i.png"
-              Get-vtsScreenshot -Path $imagePath *>$null
+      for ($i = 1; $i -le $NumOfImages; $i++) {
+        $imagePath = Join-Path -Path $ImageDirectory -ChildPath "image_$i.png"
+        Get-vtsScreenshot -Path $imagePath *>$null
     
           
-              # Convert the image to ASCII art
-              $asciiArt = [ImageToAscii]::ConvertImageToAscii($imagePath, 100) # Adjust the width for ASCII character aspect ratio
+        # Convert the image to ASCII art
+        $asciiArt = [ImageToAscii]::ConvertImageToAscii($imagePath, 100) # Adjust the width for ASCII character aspect ratio
           
-              # Print the ASCII art to the host a chunk at a time
-              $lines = $asciiArt -split "\\n"
+        # Print the ASCII art to the host a chunk at a time
+        $lines = $asciiArt -split "\\n"
           
-              foreach ($line in $lines) {
-                  if ($line.Length -gt 100) {
-                      # If the line is longer than 100 characters, split it into chunks
-                      $chunks = $line -split "(.{100})", -1, 'RegexMatch'
-                      Clear-Host
-                      foreach ($chunk in $chunks) {
-                          if ($chunk -ne "") {
-                              Write-Host $chunk
-                          }
-                      }
-                  }
-                  else {
-                      # If the line is not longer than 100 characters, just print it
-                      Write-Host $line
-                  }
-    
+        foreach ($line in $lines) {
+          if ($line.Length -gt 100) {
+            # If the line is longer than 100 characters, split it into chunks
+            $chunks = $line -split "(.{100})", -1, 'RegexMatch'
+            Clear-Host
+            foreach ($chunk in $chunks) {
+              if ($chunk -ne "") {
+                Write-Host $chunk
               }
-              Start-Sleep $SleepInterval
+            }
+          }
+          else {
+            # If the line is not longer than 100 characters, just print it
+            Write-Host $line
           }
     
+        }
+        Start-Sleep $SleepInterval
       }
-      finally {
-          <#Do this after the try block regardless of whether an exception occurred or not#>
-          Remove-Item "$ImageDirectory\image_*.png" -Recurse -Force -Confirm:$false
-      }
+    
+    }
+    finally {
+      <#Do this after the try block regardless of whether an exception occurred or not#>
+      Remove-Item "$ImageDirectory\image_*.png" -Recurse -Force -Confirm:$false
+    }
 
   }
 
@@ -5855,7 +5863,7 @@ public class ImageToAscii {
 #>
 function Get-vts365TeamsMembershipReport {
   if (-not (Get-Module -ListAvailable -Name MicrosoftTeams)) {
-      Install-Module -Name MicrosoftTeams
+    Install-Module -Name MicrosoftTeams
   }
   import-module MicrosoftTeams
   Connect-MicrosoftTeams
@@ -5865,33 +5873,33 @@ function Get-vts365TeamsMembershipReport {
   $report = @()
 
   foreach ($team in $teamsToAudit) {
-      $owners = $team | Get-TeamUser -Role Owner | Select-Object -ExpandProperty User
-      $members = $team | Get-TeamUser -Role Member | Select-Object -ExpandProperty User
-      $guests = $team | Get-TeamUser -Role Guest | Select-Object -ExpandProperty User
-      $report += "====================`n"
-      $report += "Team Name: $($team.Displayname)`n"
-      $report += "`nOwners:`n"
-      foreach ($owner in $owners) {
-          $report += "`t• $owner`n"
+    $owners = $team | Get-TeamUser -Role Owner | Select-Object -ExpandProperty User
+    $members = $team | Get-TeamUser -Role Member | Select-Object -ExpandProperty User
+    $guests = $team | Get-TeamUser -Role Guest | Select-Object -ExpandProperty User
+    $report += "====================`n"
+    $report += "Team Name: $($team.Displayname)`n"
+    $report += "`nOwners:`n"
+    foreach ($owner in $owners) {
+      $report += "`t• $owner`n"
+    }
+    $report += "`nMembers:`n"
+    if ($members) {
+      foreach ($member in $members) {
+        $report += "`t• $member`n"
       }
-      $report += "`nMembers:`n"
-      if ($members) {
-          foreach ($member in $members) {
-              $report += "`t• $member`n"
-          }
+    }
+    else {
+      $report += "`tNo Members`n"
+    }
+    $report += "`nGuests:`n"
+    if ($guests) {
+      foreach ($guest in $guests) {
+        $report += "`t• $guest`n"
       }
-      else {
-          $report += "`tNo Members`n"
-      }
-      $report += "`nGuests:`n"
-      if ($guests) {
-          foreach ($guest in $guests) {
-              $report += "`t• $guest`n"
-          }
-      }
-      else {
-          $report += "`tNo Guests`n"
-      }
+    }
+    else {
+      $report += "`tNo Guests`n"
+    }
   }
 
   $report | Set-Clipboard
@@ -5923,53 +5931,90 @@ function Get-vts365TeamsMembershipReport {
     Network
 #>
 function Ping-vtsList {
-    param (
-        [Parameter(Mandatory = $true, HelpMessage = "Enter the full path to the file containing the target IP addresses / hostnames.")]
-        $TargetIPAddressFile,
-        $ReportTitle = "Ping Report"
-    )
+  param (
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the full path to the file containing the target IP addresses / hostnames.")]
+    $TargetIPAddressFile,
+    $ReportTitle = "Ping Report"
+  )
 
-    $IPList = Get-Content $TargetIPAddressFile
+  $PowerShellVersion = $PSVersionTable.PSVersion.Major
 
-    $Report = @()
+  if ($PowerShellVersion -lt 7) {
+    Write-Warning "For enhanced performance through parallel pinging, please consider upgrading to PowerShell 7+."
+  }
 
-    foreach ($IP in $IPList) {
-        Clear-Variable Ping
+  $global:IPList = Get-Content $TargetIPAddressFile
+
+  $global:Report = @()
+
+  switch ($PowerShellVersion) {
+    7 { 
+      $global:Report = $global:IPList | ForEach-Object -Parallel  {
+        Clear-Variable Ping -ErrorAction SilentlyContinue
         try {
-            $Ping = Test-Connection $IP -Count 1 -ErrorAction Stop
-        
+          $Ping = Test-Connection $_ -Count 1 -ErrorAction Stop
+            
         }
         catch {
-            $PingError = $_.Exception.Message
+          $PingError = $_.Exception.Message
         }
         if ((($Ping).StatusCode -eq 0) -or (($Ping).Status -eq "Success")) {
-            $Report += [pscustomobject]@{
-                Target       = $IP
-                Status       = "OK"
-                ResponseTime = if ($Ping.ResponseTime){$Ping.ResponseTime} elseif ($Ping.Latency){$Ping.Latency}
-            }
+          [pscustomobject]@{
+            Target       = $_
+            Status       = "OK"
+            ResponseTime = if ($Ping.ResponseTime) { $Ping.ResponseTime } elseif ($Ping.Latency) { $Ping.Latency }
+          }
+        } else {
+          [pscustomobject]@{
+            Target       = $_
+            Status       = if ($PingError) { $PingError } else { "Failed" }
+            ResponseTime = "n/a"
+          }
+            
         }
-        else {
-            $Report += [pscustomobject]@{
-                Target       = $IP
-                Status       = if ($PingError){$PingError} else {"Failed"}
-                ResponseTime = "n/a"
-            }
-        
-        }
+      }
+            
     }
+    Default {
+      foreach ($IP in $global:IPList) {
+        Clear-Variable Ping
+        try {
+          $Ping = Test-Connection $IP -Count 1 -ErrorAction Stop
+            
+        }
+        catch {
+          $PingError = $_.Exception.Message
+        }
+        if ((($Ping).StatusCode -eq 0) -or (($Ping).Status -eq "Success")) {
+          $global:Report += [pscustomobject]@{
+            Target       = $IP
+            Status       = "OK"
+            ResponseTime = if ($Ping.ResponseTime) { $Ping.ResponseTime } elseif ($Ping.Latency) { $Ping.Latency }
+          }
+        } else {
+          $global:Report += [pscustomobject]@{
+            Target       = $IP
+            Status       = if ($PingError) { $PingError } else { "Failed" }
+            ResponseTime = "n/a"
+          }
+            
+        }
+      }
 
-    $Report | Out-Host
+    }
+  }
 
-    $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
+  $global:Report | Out-Host
+
+  $exportReport = Read-Host -Prompt "Do you want to export a report? (Y/N)"
   
-    if ($exportReport -eq "Y" -or $exportReport -eq "y") {
-        # Check if PSWriteHTML module is installed, if not, install it
-        if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
-            Install-Module -Name PSWriteHTML -Force -Confirm:$false
-        }
-        
-        # Export the results to an HTML file using the PSWriteHTML module
-        $Report | Out-HtmlView -Title $ReportTitle
+  if ($exportReport -eq "Y" -or $exportReport -eq "y") {
+    # Check if PSWriteHTML module is installed, if not, install it
+    if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
+      Install-Module -Name PSWriteHTML -Force -Confirm:$false
     }
+        
+    # Export the results to an HTML file using the PSWriteHTML module
+    $global:Report | Out-HtmlView -Title $ReportTitle
+  }
 }
