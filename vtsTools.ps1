@@ -6064,12 +6064,13 @@ function Start-vtsPathPing {
 
   # Loop through each server
   $ServerCount = $Servers.Count
+  $StartTime = Get-Date
 
   for ($i=0; $i -lt $ServerCount; $i++) {
       $Server = $Servers[$i]
       $Progress = [math]::Round((($i / $ServerCount) * 100), 2)
-      $EstimatedTimeRemaining = [math]::Round((($ServerCount - $i) * 10), 2)
-      Write-Progress -Activity "Running pathping test on target $(($i+1)) of $ServerCount" -Status "Current Target: $Server, Estimated Time Remaining: $EstimatedTimeRemaining minutes" -PercentComplete $Progress
+      $EstimatedFinishTime = $StartTime.AddMinutes(10 * ($ServerCount - $i)).ToShortTimeString()
+      Write-Progress -Activity "Running pathping test on target $(($i+1)) of $ServerCount" -Status "Current Target: $Server, Estimated Completion Time: $EstimatedFinishTime (~$(10 * ($ServerCount - $i)) min)" -PercentComplete $Progress
       Write-Host "Starting pathping test on target: $Server"
       (Get-Date) | Out-File -Append -FilePath "$($Logdir)\$($Timestamp)-pathping.txt"
       PATHPING.EXE $Server >> "$($Logdir)\$($Timestamp)-pathping.txt"
