@@ -6075,7 +6075,6 @@ function Start-vtsPathPing {
       (Get-Date) | Out-File -Append -FilePath "$($Logdir)\$($Timestamp)-pathping.txt"
       PATHPING.EXE $Server >> "$($Logdir)\$($Timestamp)-pathping.txt"
       Write-Host "Completed pathping for $Server"
-      "----------------------------------------------------------------------------------------"
   }
 
   # Clear the progress bar
