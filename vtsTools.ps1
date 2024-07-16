@@ -6064,9 +6064,9 @@ function Start-vtsPathPing {
 
   # Loop through each server
   $ServerCount = $Servers.Count
-  $StartTime = Get-Date
-
+  
   for ($i=0; $i -lt $ServerCount; $i++) {
+    $StartTime = Get-Date
       $Server = $Servers[$i]
       $Progress = [math]::Round((($i / $ServerCount) * 100), 2)
       $EstimatedFinishTime = $StartTime.AddMinutes(7 * ($ServerCount - $i)).ToShortTimeString()
