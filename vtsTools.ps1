@@ -4695,14 +4695,19 @@ function New-vtsSPOnlineDocumentLibrary {
     [string]$libraryName
   )
 
-  if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
-    Install-Module -Name PnP.PowerShell -Scope CurrentUser
+  $PnPConnected = Get-PnPConnection
+
+  if (-not($PnPConnected)){
+    if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
+      Install-Module -Name PnP.PowerShell -Scope CurrentUser
+    }
+  
+    Import-Module PnP.PowerShell
+  
+    # Connect to SharePoint Online
+    # Connect-PnPOnline -Url $siteUrl -UseWebLogin
+    Connect-PnPOnline -Url $siteUrl -Interactive
   }
-
-  Import-Module PnP.PowerShell
-
-  # Connect to SharePoint Online
-  Connect-PnPOnline -Url $siteUrl -UseWebLogin
 
   # Create a new document library
   New-PnPList -Title $libraryName -Template DocumentLibrary -Url $libraryName
@@ -4735,21 +4740,30 @@ function Get-vtsSPOnlineDocumentLibraryFolders {
     [Parameter(Mandatory = $true, HelpMessage = "Enter the site URL. Example: https://contoso.sharepoint.com/sites/test")]
     [string]$siteUrl,
     [Parameter(Mandatory = $true, HelpMessage = "Enter the document library name.")]
-    [string]$libraryName
+    [string]$libraryName,
+    [switch]$Recursive
   )
 
-  if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
-    Install-Module -Name PnP.PowerShell -Scope CurrentUser
+  $PnPConnected = Get-PnPConnection
+
+  if (-not($PnPConnected)){
+    if (-not(Get-Module PnP.PowerShell -ListAvailable)) {
+      Install-Module -Name PnP.PowerShell -Scope CurrentUser
+    }
+  
+    Import-Module PnP.PowerShell
+  
+    # Connect to SharePoint Online
+    # Connect-PnPOnline -Url $siteUrl -UseWebLogin
+    Connect-PnPOnline -Url $siteUrl -Interactive
   }
 
-  Import-Module PnP.PowerShell
-
-  # Connect to SharePoint Online
-  Connect-PnPOnline -Url $siteUrl -UseWebLogin
-
   # Get all folders in the document library
-  $folders = Get-PnPFolderItem -FolderSiteRelativeUrl $libraryName -ItemType Folder
-
+  if ($Recursive){
+    $folders = Get-PnPFolderItem -FolderSiteRelativeUrl $libraryName -ItemType Folder -Recursive
+  } else {
+    $folders = Get-PnPFolderItem -FolderSiteRelativeUrl $libraryName -ItemType Folder
+  }
   # Return the folder names
   return $folders.Name
 }
