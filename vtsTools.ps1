@@ -6165,3 +6165,157 @@ function Start-vtsConsole {
   Write-Host "Executing plink.exe with the serial communication port: $COMPORT"
   & $PlinkPath -serial $COMPORT
 }
+
+<#
+.SYNOPSIS
+Creates new Microsoft 365 users from a CSV file.
+
+.DESCRIPTION
+The New-vts365User function creates new Microsoft 365 users with the specified domain and usage location. It requires a CSV file path as input, which should contain the user details. The function also allows setting a password length.
+
+.PARAMETER CsvPath
+The path to the CSV file containing user information to be imported.
+
+.PARAMETER Domain
+The domain for the new user. For example, 'contoso.com'.
+
+.PARAMETER UsageLocation
+The usage location for the new user. Default is 'US'.
+
+.PARAMETER PasswordLength
+The length of the password to be generated for the new user. Default is 16 characters.
+
+.EXAMPLE
+New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com"
+
+This command creates new users from the specified CSV file with the domain 'contoso.com' and the default usage location and password length.
+
+.EXAMPLE
+New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com" -UsageLocation "GB" -PasswordLength 20
+
+This command creates new users with the domain 'contoso.com', sets the usage location to 'GB', and generates passwords with a length of 20 characters.
+
+.NOTES
+Requires the MSOnline and AzureAD modules.
+
+.LINK
+M365
+
+#>
+function New-vts365User {
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory=$true)]
+      [ValidateScript({
+          if (Test-Path $_ -PathType Leaf) {
+              $true
+          } else {
+              throw "File not found or not a valid file: $_"
+          }
+      })]
+      [string]$CsvPath,
+      
+      [Parameter(Mandatory=$true, HelpMessage="Enter the domain for the new user. For example, 'contoso.com'.")]
+      [ValidatePattern('^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]
+      [string]$Domain,
+      
+      [Parameter(Mandatory=$false)]
+      [ValidateSet("US", "CA", "MX", "GB", "DE", "FR", "JP", "AU", "BR", "IN")]
+      [string]$UsageLocation = "US",
+
+      [Parameter(Mandatory=$false)]
+      [ValidateRange(12, 32)]
+      [int]$PasswordLength = 16
+  )
+
+  # Check and install required modules
+  $requiredModules = @("MSOnline", "AzureAD")
+  foreach ($module in $requiredModules) {
+      if (!(Get-Module -ListAvailable -Name $module)) {
+          Write-Verbose "Installing $module module..."
+          Install-Module -Name $module -Force -Scope CurrentUser
+      }
+      Import-Module $module
+  }
+
+  # Connect to Microsoft 365
+  try {
+      Connect-MsolService
+      Connect-AzureAD
+  }
+  catch {
+      Write-Error "Failed to connect to Microsoft 365 or Azure AD. Error: $_"
+      return
+  }
+
+  # Function to create a random password
+  function Get-RandomPassword {
+      param ([int]$Length = 16)
+      $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=[]{}|;:,.<>?'.ToCharArray()
+      $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
+      $bytes = New-Object byte[]($Length)
+      $rng.GetBytes($bytes)
+  
+      $result = New-Object char[]($Length)
+      for ($i = 0 ; $i -lt $Length ; $i++) {
+          $result[$i] = $charSet[$bytes[$i] % $charSet.Length]
+      }
+      return (-join $result)
+  }
+
+  # Import and validate CSV data
+  try {
+      $users = Import-Csv $CsvPath
+      $requiredColumns = @("FirstName", "LastName", "PrimaryEmail", "RecoveryPhone", "RecoveryEmail")
+      $missingColumns = $requiredColumns | Where-Object { $_ -notin $users[0].PSObject.Properties.Name }
+      if ($missingColumns) {
+          throw "CSV is missing required columns: $($missingColumns -join ', ')"
+      }
+  }
+  catch {
+      Write-Error "Failed to parse CSV data: $_"
+      return
+  }
+
+  foreach ($user in $users) {
+      $displayName = "$($user.FirstName) $($user.LastName)"
+      $userPrincipalName = "$($user.FirstName.ToLower()).$($user.LastName.ToLower())@$Domain"
+      $password = Get-RandomPassword -Length $PasswordLength
+
+      try {
+          # Create new user
+          New-MsolUser -DisplayName $displayName `
+                       -FirstName $user.FirstName `
+                       -LastName $user.LastName `
+                       -UserPrincipalName $userPrincipalName `
+                       -UsageLocation $UsageLocation `
+                       -Password $password
+
+          # Set primary email address
+          Set-MsolUserPrincipalName -UserPrincipalName $userPrincipalName -NewUserPrincipalName $user.PrimaryEmail
+
+          # Add alias
+          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
+
+          # Add phone number
+          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -PhoneNumber $user.RecoveryPhone
+
+          # Add recovery email
+          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -AlternateEmailAddresses @($user.RecoveryEmail)
+
+          Write-Verbose "User $displayName created successfully"
+          Write-Output "User created: $displayName ($($user.PrimaryEmail))"
+      }
+      catch {
+          Write-Error "Failed to create or configure user $displayName. Error: $_"
+      }
+  }
+
+  Write-Verbose "All users have been processed."
+
+  # Disconnect from services
+  Disconnect-MsolService
+  Disconnect-AzureAD
+
+  Write-Verbose "Disconnected from Microsoft 365 and Azure AD services."
+}
