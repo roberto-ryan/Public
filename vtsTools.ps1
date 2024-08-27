@@ -2444,10 +2444,20 @@ function Add-vts365UserLicense {
     $UserList
   )
 
+  # Static variable to track if the connection has already been established
+  if (-not ([bool]::TryParse($script:graphApiConnected, [ref]$false))) {
+    $script:graphApiConnected = $false
+  }
+
+  # Split the user list and trim whitespace
   $UserList = ($UserList -split ",").Trim()
 
-  Write-Host "Connecting to Graph API..."
-  Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
+  # Connect to Graph API only if not already connected
+  if (-not $script:graphApiConnected) {
+    Write-Host "Connecting to Graph API..."
+    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
+    $script:graphApiConnected = $true
+  }
 
   Write-Host "Getting available SKUs..."
   $SKUs = Get-MgSubscribedSku
@@ -2481,8 +2491,6 @@ function Add-vts365UserLicense {
   foreach ($Sku in $SelectedLicenses) {
     $FormattedSKUs += @{SkuId = $Sku }
   }
-  
-  $FormattedSKUs
   
   Write-Host "Adding licenses to users..."
   foreach ($User in $UserList) {
