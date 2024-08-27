@@ -6279,7 +6279,9 @@ function New-vts365User {
 
   foreach ($user in $users) {
       $displayName = "$($user.FirstName) $($user.LastName)"
-      $userPrincipalName = "$($user.FirstName.ToLower()).$($user.LastName.ToLower())@$Domain"
+      $lastNameParts = $user.LastName -split ' '
+      $lastNameForUsername = $lastNameParts -join ''
+      $userPrincipalName = "$($user.FirstName.ToLower()).$($lastNameForUsername.ToLower())@$Domain"
       $password = Get-RandomPassword -Length $PasswordLength
 
       try {
