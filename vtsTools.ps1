@@ -6228,22 +6228,21 @@ function New-vts365User {
   )
 
   # Check and install required modules
-  $requiredModules = @("MSOnline", "AzureAD")
+  $requiredModules = @("MSOnline", "Microsoft.Graph")
   foreach ($module in $requiredModules) {
       if (!(Get-Module -ListAvailable -Name $module)) {
           Write-Verbose "Installing $module module..."
           Install-Module -Name $module -Force -Scope CurrentUser
       }
-      Import-Module $module
   }
 
-  # Connect to Microsoft 365
+  # Connect to Microsoft 365 and Microsoft Graph
   try {
       Connect-MsolService
-      Connect-AzureAD
+      Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All"
   }
   catch {
-      Write-Error "Failed to connect to Microsoft 365 or Azure AD. Error: $_"
+      Write-Error "Failed to connect to Microsoft 365 or Microsoft Graph. Error: $_"
       return
   }
 
@@ -6281,42 +6280,84 @@ function New-vts365User {
       $lastNameParts = $user.LastName -split ' '
       $lastNameForUsername = $lastNameParts -join ''
       $userPrincipalName = "$($user.FirstName.ToLower()).$($lastNameForUsername.ToLower())@$Domain"
-      $password = Get-RandomPassword -Length $PasswordLength
 
       try {
-          # Create new user
-          New-MsolUser -DisplayName $displayName `
-                       -FirstName $user.FirstName `
-                       -LastName $user.LastName `
-                       -UserPrincipalName $userPrincipalName `
-                       -UsageLocation $UsageLocation `
-                       -Password $password
+          # Check if user exists in Microsoft Graph
+          $existingUser = Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue
 
-          # Set primary email address
-          Set-MsolUserPrincipalName -UserPrincipalName $userPrincipalName -NewUserPrincipalName $user.PrimaryEmail
+          if ($existingUser) {
+              Write-Verbose "User $($user.PrimaryEmail) already exists. Updating details..."
+              
+              # Update existing user in Microsoft Graph
+              Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
 
-          # Add alias
-          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
+              # Update phone authentication method
+              $phoneParams = @{
+                  PhoneNumber = $user.RecoveryPhone
+                  PhoneType = "mobile"
+              }
+              New-MgUserAuthenticationPhoneMethod -UserId $existingUser.Id -BodyParameter $phoneParams
 
-          # Add phone number
-          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -PhoneNumber $user.RecoveryPhone
+              # Update email authentication method
+              $emailParams = @{
+                  EmailAddress = $user.RecoveryEmail
+              }
+              New-MgUserAuthenticationEmailMethod -UserId $existingUser.Id -BodyParameter $emailParams
 
-          # Add recovery email
-          Set-MsolUser -UserPrincipalName $user.PrimaryEmail -AlternateEmailAddresses @($user.RecoveryEmail)
+              # Update aliases (still using MSOnline as Graph doesn't have a direct equivalent)
+              $currentAliases = Get-MsolUser -UserPrincipalName $user.PrimaryEmail | Select-Object -ExpandProperty ProxyAddresses
+              if ($currentAliases -notcontains "smtp:$userPrincipalName") {
+                  Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($currentAliases + "smtp:$userPrincipalName")
+              }
 
-          Write-Verbose "User $displayName created successfully"
-          Write-Output "User created: $displayName ($($user.PrimaryEmail))"
+              Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
+          }
+          else {
+              Write-Verbose "Creating new user: $displayName"
+              $password = Get-RandomPassword -Length $PasswordLength
+              $PasswordProfile = @{
+                  Password = $password
+                  ForceChangePasswordNextSignIn = $true
+              }
+
+              # Create new user in Microsoft Graph
+              $newUser = New-MgUser -DisplayName $displayName `
+                                    -GivenName $user.FirstName `
+                                    -Surname $user.LastName `
+                                    -UserPrincipalName $user.PrimaryEmail `
+                                    -UsageLocation $UsageLocation `
+                                    -PasswordProfile $PasswordProfile `
+                                    -AccountEnabled:$true `
+                                    -MailNickname ($user.FirstName.ToLower())
+
+              # Set phone authentication method
+              $phoneParams = @{
+                  PhoneNumber = $user.RecoveryPhone
+                  PhoneType = "mobile"
+              }
+              New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
+
+              # Set email authentication method
+              $emailParams = @{
+                  EmailAddress = $user.RecoveryEmail
+              }
+              New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
+
+              # Add alias (still using MSOnline)
+              Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
+
+              Write-Output "User created: $displayName ($($user.PrimaryEmail))"
+          }
       }
       catch {
-          Write-Error "Failed to create or configure user $displayName. Error: $_"
+          Write-Error "Failed to create or update user $displayName. Error: $_"
       }
   }
 
   Write-Verbose "All users have been processed."
 
   # Disconnect from services
-  Disconnect-MsolService
-  Disconnect-AzureAD
+  # Disconnect-MgGraph
 
-  Write-Verbose "Disconnected from Microsoft 365 and Azure AD services."
+  Write-Verbose "Disconnected from Microsoft 365 and Microsoft Graph services."
 }
