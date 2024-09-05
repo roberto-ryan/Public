@@ -2427,25 +2427,40 @@ function Copy-vts365MailToMailbox {
 This function adds licenses to a list of users.
 
 .DESCRIPTION
-The function Add-vts365UserLicense connects to the Graph API and adds licenses to a list of users. The user list is passed as a parameter to the function. The function also allows the user to select which licenses to add.
+The function Add-vts365UserLicense connects to the Graph API and adds licenses to a list of users. If no user list is specified, it connects to Exchange Online and allows the user to select mailboxes dynamically. The function also allows the user to select which licenses to add.
 
 .PARAMETER UserList
-A single string or comma separated email addresses to which the licenses are to be added.
+An optional parameter. A single string or comma separated email addresses to which the licenses are to be added. If not specified, the user will be prompted to select from a list of all mailboxes.
 
 .EXAMPLE
 Add-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
+
+.EXAMPLE
+Add-vts365UserLicense
+
+This example prompts the user to select from a list of all mailboxes and then adds licenses to the selected users.
 
 .LINK
 M365
 #>
 function Add-vts365UserLicense {
   param (
-    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    [Parameter(HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
   )
 
-  # Split the user list and trim whitespace
-  $UserList = ($UserList -split ",").Trim()
+  if (-not $UserList) {
+    Write-Host "Connecting to Exchange Online to retrieve mailboxes..."
+    Connect-ExchangeOnline | Out-Null
+    $UserList = Get-Mailbox | Select-Object -ExpandProperty PrimarySmtpAddress | Out-GridView -OutputMode Multiple
+    if (-not $UserList) {
+      Write-Host "No users selected or no mailboxes available." -ForegroundColor Red
+      return
+    }
+  } else {
+    # Split the user list and trim whitespace
+    $UserList = ($UserList -split ",").Trim()
+  }
 
   Write-Host "Connecting to Graph API..."
   Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All -Device
