@@ -4478,6 +4478,9 @@ function Get-vts365DistributionListRecipients {
     } | Sort-Object DisplayName, Office, Title
   }
 
+  # Filter out results where PositionID, Title, or Office properties are null
+  $Results = $Results | Where-Object { ![string]::IsNullOrWhiteSpace($_.PositionID) -and ![string]::IsNullOrWhiteSpace($_.Title) -and ![string]::IsNullOrWhiteSpace($_.Office) }
+
   $Results | Format-Table -AutoSize | Out-Host
 
   # Ask user if they want to export a report
