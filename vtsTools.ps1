@@ -2452,7 +2452,7 @@ function Add-vts365UserLicense {
   if (-not $UserList) {
     Write-Host "Connecting to Exchange Online to retrieve mailboxes..."
     Connect-ExchangeOnline | Out-Null
-    $UserList = Get-Mailbox | Select-Object -ExpandProperty PrimarySmtpAddress | Out-GridView -OutputMode Multiple
+    $UserList = get-user | Where UserPrincipalName -notlike "*.onmicrosoft.com*" | sort DisplayName | select DisplayName, UserPrincipalName | Out-GridView -OutputMode Multiple | Select -expand UserPrincipalName
     if (-not $UserList) {
       Write-Host "No users selected or no mailboxes available." -ForegroundColor Red
       return
