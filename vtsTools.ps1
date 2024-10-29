@@ -6304,6 +6304,16 @@ function New-vts365User {
     }
 
       $userPrincipalName = $user.PrimaryEmail
+      
+      if ($CustomPassword){
+        $password = $CustomPassword
+      } else {
+        $password = Get-RandomPassword -Length $PasswordLength
+      }
+      $PasswordProfile = @{
+          Password = $password
+          ForceChangePasswordNextSignIn = $true
+      }
 
       try {
           # Check if user exists in Microsoft Graph
@@ -6312,12 +6322,23 @@ function New-vts365User {
           if ($existingUser) {
               Write-Verbose "User $($user.PrimaryEmail) already exists. Updating details..."
               
-              if ($user.LastName){
-                Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
+              if ($CustomPassword){
+                if ($user.LastName){
+                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
+  
+                } else {
+                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
+                }
 
               } else {
-                Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation
+                if ($user.LastName){
+                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
+  
+                } else {
+                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation
+                }
               }
+
 
               if ($user.RecoveryPhone){
                 # Update phone authentication method
@@ -6345,15 +6366,6 @@ function New-vts365User {
               Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
             } else {
               Write-Verbose "Creating new user: $displayName"
-              if ($CustomPassword){
-                $password = $CustomPassword
-              } else {
-                $password = Get-RandomPassword -Length $PasswordLength
-              }
-              $PasswordProfile = @{
-                  Password = $password
-                  ForceChangePasswordNextSignIn = $true
-              }
 
               if ($user.LastName){
                 # Create new user in Microsoft Graph
