@@ -6242,7 +6242,10 @@ function New-vts365User {
 
       [Parameter(Mandatory=$false)]
       [ValidateRange(12, 32)]
-      [int]$PasswordLength = 16
+      [int]$PasswordLength = 16,
+
+      [Parameter(Mandatory=$false)]
+      [string]$CustomPassword
   )
 
   # Check and install required modules
@@ -6309,18 +6312,22 @@ function New-vts365User {
               # Update existing user in Microsoft Graph
               Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
 
-              # Update phone authentication method
-              $phoneParams = @{
-                  PhoneNumber = $user.RecoveryPhone
-                  PhoneType = "mobile"
+              if ($user.RecoveryPhone){
+                # Update phone authentication method
+                $phoneParams = @{
+                PhoneNumber = $user.RecoveryPhone
+                PhoneType = "mobile"
               }
               New-MgUserAuthenticationPhoneMethod -UserId $existingUser.Id -BodyParameter $phoneParams
+              }
 
-              # Update email authentication method
-              $emailParams = @{
-                  EmailAddress = $user.RecoveryEmail
+              if ($user.RecoveryEmail){
+                # Update email authentication method
+                $emailParams = @{
+                EmailAddress = $user.RecoveryEmail
               }
               New-MgUserAuthenticationEmailMethod -UserId $existingUser.Id -BodyParameter $emailParams
+              }
 
               # Update aliases (still using MSOnline as Graph doesn't have a direct equivalent)
               $currentAliases = Get-MsolUser -UserPrincipalName $user.PrimaryEmail | Select-Object -ExpandProperty ProxyAddresses
@@ -6329,10 +6336,13 @@ function New-vts365User {
               }
 
               Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
-          }
-          else {
+            } else {
               Write-Verbose "Creating new user: $displayName"
-              $password = Get-RandomPassword -Length $PasswordLength
+              if ($CustomPassword){
+                $password = $CustomPassword
+              } else {
+                $password = Get-RandomPassword -Length $PasswordLength
+              }
               $PasswordProfile = @{
                   Password = $password
                   ForceChangePasswordNextSignIn = $true
@@ -6348,18 +6358,22 @@ function New-vts365User {
                                     -AccountEnabled:$true `
                                     -MailNickname ($user.FirstName.ToLower())
 
-              # Set phone authentication method
-              $phoneParams = @{
-                  PhoneNumber = $user.RecoveryPhone
-                  PhoneType = "mobile"
+              if ($user.RecoveryPhone){
+                # Set phone authentication method
+                $phoneParams = @{
+                    PhoneNumber = $user.RecoveryPhone
+                    PhoneType = "mobile"
+                }
+                New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
               }
-              New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
 
-              # Set email authentication method
-              $emailParams = @{
+              if ($user.RecoveryEmail){
+                # Set email authentication method
+                $emailParams = @{
                   EmailAddress = $user.RecoveryEmail
+                }
+                New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
               }
-              New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
 
               # Add alias (still using MSOnline)
               Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
