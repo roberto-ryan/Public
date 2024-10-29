@@ -6297,10 +6297,13 @@ function New-vts365User {
   }
 
   foreach ($user in $users) {
+    if ($user.LastName){
       $displayName = "$($user.FirstName) $($user.LastName)"
-      $lastNameParts = $user.LastName -split ' '
-      $lastNameForUsername = $lastNameParts -join ''
-      $userPrincipalName = "$($user.FirstName.ToLower()).$($lastNameForUsername.ToLower())@$Domain"
+    } else {
+      $displayName = $user.FirstName
+    }
+
+      $userPrincipalName = $user.PrimaryEmail
 
       try {
           # Check if user exists in Microsoft Graph
@@ -6309,8 +6312,12 @@ function New-vts365User {
           if ($existingUser) {
               Write-Verbose "User $($user.PrimaryEmail) already exists. Updating details..."
               
-              # Update existing user in Microsoft Graph
-              Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
+              if ($user.LastName){
+                Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
+
+              } else {
+                Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation
+              }
 
               if ($user.RecoveryPhone){
                 # Update phone authentication method
@@ -6348,15 +6355,26 @@ function New-vts365User {
                   ForceChangePasswordNextSignIn = $true
               }
 
-              # Create new user in Microsoft Graph
-              $newUser = New-MgUser -DisplayName $displayName `
-                                    -GivenName $user.FirstName `
-                                    -Surname $user.LastName `
-                                    -UserPrincipalName $user.PrimaryEmail `
-                                    -UsageLocation $UsageLocation `
-                                    -PasswordProfile $PasswordProfile `
-                                    -AccountEnabled:$true `
-                                    -MailNickname ($user.FirstName.ToLower())
+              if ($user.LastName){
+                # Create new user in Microsoft Graph
+                $newUser = New-MgUser -DisplayName $displayName `
+                                      -GivenName $user.FirstName `
+                                      -Surname $user.LastName `
+                                      -UserPrincipalName $user.PrimaryEmail `
+                                      -UsageLocation $UsageLocation `
+                                      -PasswordProfile $PasswordProfile `
+                                      -AccountEnabled:$true `
+                                      -MailNickname ($user.FirstName.ToLower())
+              } else {
+                # Create new user in Microsoft Graph
+                $newUser = New-MgUser -DisplayName $displayName `
+                                      -GivenName $user.FirstName `
+                                      -UserPrincipalName $user.PrimaryEmail `
+                                      -UsageLocation $UsageLocation `
+                                      -PasswordProfile $PasswordProfile `
+                                      -AccountEnabled:$true `
+                                      -MailNickname ($user.FirstName.ToLower())
+              }
 
               if ($user.RecoveryPhone){
                 # Set phone authentication method
