@@ -6260,7 +6260,7 @@ function New-vts365User {
   # Connect to Microsoft 365 and Microsoft Graph
   try {
       Connect-MsolService
-      Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" -Device
+      Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All", "Directory.AccessAsUser.All", "Directory.ReadWrite.All" -Device
   }
   catch {
       Write-Error "Failed to connect to Microsoft 365 or Microsoft Graph. Error: $_"
