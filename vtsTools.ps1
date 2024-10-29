@@ -6339,7 +6339,7 @@ function New-vts365User {
               # Update aliases (still using MSOnline as Graph doesn't have a direct equivalent)
               $currentAliases = Get-MsolUser -UserPrincipalName $user.PrimaryEmail | Select-Object -ExpandProperty ProxyAddresses
               if ($currentAliases -notcontains "smtp:$userPrincipalName") {
-                  Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($currentAliases + "smtp:$userPrincipalName")
+                  #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($currentAliases + "smtp:$userPrincipalName")
               }
 
               Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
@@ -6394,7 +6394,7 @@ function New-vts365User {
               }
 
               # Add alias (still using MSOnline)
-              Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
+              #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
 
               Write-Output "User created: $displayName ($($user.PrimaryEmail))"
           }
