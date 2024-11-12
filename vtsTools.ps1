@@ -2101,7 +2101,8 @@ function Add-vtsPrinterDriver {
   param(
     $WorkingDir = "C:\temp\PrinterDrivers",
     [Parameter(Mandatory = $true)]
-    $DriverURL
+    $DriverURL,
+    $LogPath = "C:\temp\PrinterDrivers\DriverDownload.log"
   )
   
   try {
@@ -2123,13 +2124,21 @@ function Add-vtsPrinterDriver {
       New-Item -ItemType Directory -Path $WorkingDir -Force | Out-Null
       if ($?) { Write-Host "✔ Successfully created $WorkingDir`n" -ForegroundColor Green }
     }
-          
+
     # Download Driver
     Write-Host "`n➜ Downloading Driver..."
-    Invoke-vtsFastDownload -DownloadPath "$WorkingDir" -URL "$DriverURL" -FileName "$FileName"
-    #Invoke-WebRequest -Uri "$DriverURL" -OutFile "$WorkingDir\$FileName"
-    if ($?) { Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green }
-  
+
+    switch -Regex ($DriverURL) {
+      "^http" { 
+      Invoke-vtsFastDownload -DownloadPath "$WorkingDir" -URL "$DriverURL" -FileName "$FileName" 
+      if ($?) { Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green }
+      }
+      "^\\\\" { 
+      Robocopy.exe "$DriverURL" "$WorkingDir\$FileName" /E /XO /MT:8 /R:3 /W:10 /LOG:"$Logpath" 
+      if ($?) { Write-Host "✔ Successfully Downloaded Driver`n" -ForegroundColor Green }
+      }
+      Default { Write-Host "Link is invalid" }
+    }
           
     # Remove Chocolatey folder if choco.exe doesn't exist
     if (!(Test-Path "C:\ProgramData\chocolatey\choco.exe")) {
