@@ -4462,6 +4462,10 @@ function Get-vts365DistributionListRecipients {
     Connect-ExchangeOnline -ShowBanner:$false
   }
 
+  if((Get-ConnectionInformation).TenantID -eq "7941ba55-d4b3-484f-9f10-60fee3d75013"){
+    $IncludeOfficeInfo = $true
+  }
+
   # Get all dynamic distribution groups and suppress error output
   $distributionGroups = Get-DynamicDistributionGroup | Select-Object -ExpandProperty Name 2>$null
   
@@ -4485,19 +4489,18 @@ function Get-vts365DistributionListRecipients {
     if ("$userInput" -eq '*') {
       Write-Host "Searching all available groups..."
       $SelectedGroups = $GroupTable.Group
-    }
-    else {
+    } else {
       Write-Host "Searching selected groups..."
       $SelectedGroups = $GroupTable | Where-Object Key -in ("$userInput" -split ",") | Select-Object -ExpandProperty Group
     }
-  }
-  else {
+  } else {
     $SelectedGroups = $GroupTable | Out-GridView -OutputMode Multiple | Select-Object -ExpandProperty Group
   }
 
   # Get recipients based on the selected groups and output their details
   $Results = foreach ($group in $SelectedGroups) {
     $DDLGroup = Get-DynamicDistributionGroup -Identity $group
+    if($IncludeOfficeInfo){
     Get-Recipient -ResultSize Unlimited -RecipientPreviewFilter ($DDLGroup.RecipientFilter) | ForEach-Object {
       [pscustomobject]@{
         GroupName   = $DDLGroup
@@ -4507,11 +4510,21 @@ function Get-vts365DistributionListRecipients {
         Title       = $_.title
         Office      = $_.office
       }
-    } | Sort-Object DisplayName, Office, Title
+    } | Sort-Object DisplayName, Office, Title} else{
+      Get-Recipient -ResultSize Unlimited -RecipientPreviewFilter ($DDLGroup.RecipientFilter) | ForEach-Object {
+        [pscustomobject]@{
+          GroupName   = $DDLGroup
+          DisplayName = $_.DisplayName
+          Email       = $_.PrimarySmtpAddress
+        }
+      } | Sort-Object DisplayName
+    }
   }
 
-  # Filter out results where PositionID, Title, or Office properties are null
-  $Results = $Results | Where-Object { ![string]::IsNullOrWhiteSpace($_.PositionID) -and ![string]::IsNullOrWhiteSpace($_.Title) -and ![string]::IsNullOrWhiteSpace($_.Office) }
+  if($IncludeOfficeInfo){
+    # Filter out results where PositionID, Title, or Office properties are null
+    $Results = $Results | Where-Object { ![string]::IsNullOrWhiteSpace($_.PositionID) -and ![string]::IsNullOrWhiteSpace($_.Title) -and ![string]::IsNullOrWhiteSpace($_.Office) }
+  }
 
   $Results | Format-Table -AutoSize | Out-Host
 
