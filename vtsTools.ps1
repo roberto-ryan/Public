@@ -6728,3 +6728,129 @@ function Set-vtsDirectoryOwnership {
     Write-Error "An error occurred while updating ownership and permissions: $_"
   }
 }
+
+<#
+.SYNOPSIS
+Retrieves shortcut (.lnk) file information from specified paths.
+
+.DESCRIPTION
+The Get-vtsShortcut function retrieves detailed information about Windows shortcut files (.lnk), including their target paths, hotkeys, arguments, and icon locations. If no path is specified, it searches both the current user's and all users' Start Menu folders.
+
+.PARAMETER path
+Optional. The path to search for shortcut files. If not specified, searches Start Menu folders.
+
+.EXAMPLE
+PS> Get-vtsShortcut
+Returns all shortcuts from user and system Start Menu folders.
+
+.EXAMPLE
+PS> Get-vtsShortcut -path "C:\Users\Username\Desktop"
+Returns all shortcuts from the specified desktop folder.
+
+.LINK
+File Management
+#>
+function Get-vtsShortcut {
+  param(
+    $path = $null
+  )
+  
+  $obj = New-Object -ComObject WScript.Shell
+
+  if ($path -eq $null) {
+    $pathUser = [System.Environment]::GetFolderPath('StartMenu')
+    $pathCommon = $obj.SpecialFolders.Item('AllUsersStartMenu')
+    $path = Get-ChildItem $pathUser, $pathCommon -Filter *.lnk -Recurse 
+  }
+  if ($path -is [string]) {
+    $path = Get-ChildItem $path -Filter *.lnk
+  }
+  $path | ForEach-Object { 
+    if ($_ -is [string]) {
+      $_ = Get-ChildItem $_ -Filter *.lnk
+    }
+    if ($_) {
+      $link = $obj.CreateShortcut($_.FullName)
+
+      $info = @{}
+      $info.Hotkey = $link.Hotkey
+      $info.TargetPath = $link.TargetPath
+      $info.LinkPath = $link.FullName
+      $info.Arguments = $link.Arguments
+      $info.Target = try { Split-Path $info.TargetPath -Leaf } catch { 'n/a' }
+      $info.Link = try { Split-Path $info.LinkPath -Leaf } catch { 'n/a' }
+      $info.WindowStyle = $link.WindowStyle
+      $info.IconLocation = $link.IconLocation
+
+      New-Object PSObject -Property $info
+    }
+  }
+}
+
+<#
+.SYNOPSIS
+Modifies properties of an existing Windows shortcut file.
+
+.DESCRIPTION
+The Set-vtsShortcut function allows modification of Windows shortcut (.lnk) file properties including the target path, hotkey, arguments, and icon location. It accepts input from the pipeline or direct parameters.
+
+.PARAMETER LinkPath
+The full path to the shortcut file to modify.
+
+.PARAMETER Hotkey
+The keyboard shortcut to assign to the shortcut file.
+
+.PARAMETER IconLocation 
+The path to the icon file and icon index to use.
+
+.PARAMETER Arguments
+The command-line arguments to pass to the target application.
+
+.PARAMETER TargetPath
+The path to the target file that the shortcut will launch.
+
+.EXAMPLE
+PS> Get-vtsShortcut "C:\shortcut.lnk" | Set-vtsShortcut -TargetPath "C:\NewTarget.exe"
+Modifies the target path of an existing shortcut.
+
+.EXAMPLE
+PS> Set-vtsShortcut -LinkPath "C:\shortcut.lnk" -Hotkey "CTRL+ALT+F"
+Sets a keyboard shortcut for an existing shortcut file.
+
+.EXAMPLE
+Get-ChildItem -Path "C:\Path\To\Your\Directory" -Include *.lnk -Recurse -file | 
+Select-Object -expand fullname |
+ForEach-Object { 
+  Get-vtsShortcut $_ | 
+  Where-Object TargetPath -like "*192.168.1.220*" | 
+  ForEach-Object {
+    Set-vtsShortcut -LinkPath "$($_.LinkPath)" -IconLocation "$($_.IconLocation)" -TargetPath "$(($_.TargetPath) -replace '192.168.1.220','192.168.5.220')"
+  }
+}
+Recursively searches for all `.lnk` (shortcut) files in a specified directory. It then filters these shortcuts to find those whose target path contains the IP address `192.168.1.220`. For each matching shortcut, it updates the target path to replace `192.168.1.220` with `192.168.5.220`, while preserving the original link path and icon location.
+
+.LINK
+File Management
+#>
+function Set-vtsShortcut {
+  param(
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
+    $LinkPath,
+    $Hotkey,
+    $IconLocation,
+    $Arguments,
+    $TargetPath
+  )
+  begin {
+    $shell = New-Object -ComObject WScript.Shell
+  }
+  
+  process {
+    $link = $shell.CreateShortcut($LinkPath)
+
+    $PSCmdlet.MyInvocation.BoundParameters.GetEnumerator() |
+    Where-Object { $_.key -ne 'LinkPath' } |
+    ForEach-Object { $link.$($_.key) = $_.value }
+    $link.Save()
+  }
+}
