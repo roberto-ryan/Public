@@ -2234,9 +2234,23 @@ M365
 #>
 function Get-vts365UserLicense {
   param (
-    [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    [Parameter(Mandatory = $false, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
   )
+
+  if (-not $UserList) {
+    $UserList = get-user | 
+    Where UserPrincipalName -notlike "*.onmicrosoft.com*" | 
+    sort DisplayName | 
+    select DisplayName, UserPrincipalName | 
+    Out-GridView -Title "Select users to manage licenses for" -OutputMode Multiple | 
+    Select -expand UserPrincipalName
+  }
+
+  if (-not $UserList) {
+    Write-Host "No users selected." -ForegroundColor Red
+    return
+  }
 
   Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All
 
@@ -6870,21 +6884,27 @@ Set-vts365UserLicense
 M365
 #>
 function Set-vts365UserLicense {
-  Write-Host "Connecting to Exchange Online to retrieve mailboxes..."
-  Connect-ExchangeOnline | Out-Null
-  
-  $UserList = get-user | 
-      Where UserPrincipalName -notlike "*.onmicrosoft.com*" | 
-      sort DisplayName | 
-      select DisplayName, UserPrincipalName | 
-      Out-GridView -Title "Select users to manage licenses for" -OutputMode Multiple | 
-      Select -expand UserPrincipalName
-  
+  param (
+    [Parameter(Mandatory = $false, HelpMessage = "Enter a single email or a comma separated list of emails.")]
+    $UserList
+  )
+
   if (-not $UserList) {
-      Write-Host "No users selected." -ForegroundColor Red
-      return
+    Write-Host "Connecting to Exchange Online to retrieve mailboxes..."
+    Connect-ExchangeOnline | Out-Null
+    $UserList = get-user | 
+    Where UserPrincipalName -notlike "*.onmicrosoft.com*" | 
+    sort DisplayName | 
+    select DisplayName, UserPrincipalName | 
+    Out-GridView -Title "Select users to manage licenses for" -OutputMode Multiple | 
+    Select -expand UserPrincipalName
   }
 
+  if (-not $UserList) {
+    Write-Host "No users selected." -ForegroundColor Red
+    return
+  }
+  
   Write-Host "Connecting to Graph API..."
   Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All -Device
 
