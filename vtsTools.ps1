@@ -2542,18 +2542,18 @@ function Add-vts365UserLicense {
 This function removes all licenses from a list of users.
 
 .DESCRIPTION
-The function Remove-vts365UserLicense connects to the Graph API and removes all licenses from a list of users. The user list is passed as a parameter to the function.
+The function Remove-vtsALL365UserLicense connects to the Graph API and removes all licenses from a list of users. The user list is passed as a parameter to the function.
 
 .PARAMETER UserList
 A single string or comma separated email addresses from which the licenses are to be removed.
 
 .EXAMPLE
-Remove-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
+Remove-vtsALL365UserLicense -UserList "user1@domain.com, user2@domain.com"
 
 .LINK
 M365
 #>
-function Remove-vts365UserLicense {
+function Remove-vtsALL365UserLicense {
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
