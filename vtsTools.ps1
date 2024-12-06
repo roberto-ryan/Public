@@ -6291,10 +6291,6 @@ function New-vts365User {
       })]
     [string]$CsvPath,
       
-    [Parameter(Mandatory = $true, HelpMessage = "Enter the domain for the new user. For example, 'contoso.com'.")]
-    [ValidatePattern('^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]
-    [string]$Domain,
-      
     [Parameter(Mandatory = $false)]
     [ValidateSet("US", "CA", "MX", "GB", "DE", "FR", "JP", "AU", "BR", "IN")]
     [string]$UsageLocation = "US",
@@ -6353,7 +6349,7 @@ foreach ($module in $requiredModules) {
 # Connect to Microsoft 365 and Microsoft Graph
 try {
   Connect-MsolService
-  Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All", "Directory.AccessAsUser.All", "Directory.ReadWrite.All" -Device
+  Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All", "Directory.AccessAsUser.All", "Directory.ReadWrite.All" -UseDeviceAuthentication -ForceRefresh
 }
 catch {
   Write-Error "Failed to connect to Microsoft 365 or Microsoft Graph. Error: $_"
@@ -6489,20 +6485,22 @@ foreach ($user in $users) {
       }
 
       if ($user.RecoveryPhone) {
+        $id = (Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue).Id
         # Set phone authentication method
         $phoneParams = @{
           PhoneNumber = $user.RecoveryPhone
           PhoneType   = "mobile"
         }
-        New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
+        New-MgUserAuthenticationPhoneMethod -UserId $Id -BodyParameter $phoneParams
       }
 
       if ($user.RecoveryEmail) {
+        $id = (Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue).Id
         # Set email authentication method
         $emailParams = @{
           EmailAddress = $user.RecoveryEmail
         }
-        New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
+        New-MgUserAuthenticationEmailMethod -UserId $Id -BodyParameter $emailParams
       }
 
       # Add alias (still using MSOnline)
