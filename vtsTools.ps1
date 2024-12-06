@@ -6234,6 +6234,14 @@ Creates new Microsoft 365 users from a CSV file.
 .DESCRIPTION
 The New-vts365User function creates new Microsoft 365 users with the specified domain and usage location. It requires a CSV file path as input, which should contain the user details. The function also allows setting a password length.
 
+The CSV file must contain the following columns:
+"FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
+
+Example CSV content:
+"FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
+"John","Doe","john.doe@contoso.com","+1234567890","john.recovery@email.com"
+"Jane","Smith","jane.smith@contoso.com","+1987654321","jane.recovery@email.com"
+
 .PARAMETER CsvPath
 The path to the CSV file containing user information to be imported.
 
@@ -6245,6 +6253,12 @@ The usage location for the new user. Default is 'US'.
 
 .PARAMETER PasswordLength
 The length of the password to be generated for the new user. Default is 16 characters.
+
+.PARAMETER CreateTemplate
+Switch to create a CSV template for user input.
+
+.PARAMETER CustomPassword
+Specifies a custom password for the new user. If not provided, a random password will be generated.
 
 .EXAMPLE
 New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com"
@@ -6266,206 +6280,248 @@ M365
 function New-vts365User {
   [CmdletBinding()]
   param (
-      [Parameter(Mandatory=$true)]
-      [ValidateScript({
-          if (Test-Path $_ -PathType Leaf) {
-              $true
-          } else {
-              throw "File not found or not a valid file: $_"
-          }
+    [Parameter(Mandatory = $false)]
+    [ValidateScript({
+        if (Test-Path $_ -PathType Leaf) {
+          $true
+        }
+        else {
+          throw "File not found or not a valid file: $_"
+        }
       })]
-      [string]$CsvPath,
+    [string]$CsvPath,
       
-      [Parameter(Mandatory=$true, HelpMessage="Enter the domain for the new user. For example, 'contoso.com'.")]
-      [ValidatePattern('^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]
-      [string]$Domain,
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the domain for the new user. For example, 'contoso.com'.")]
+    [ValidatePattern('^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]
+    [string]$Domain,
       
-      [Parameter(Mandatory=$false)]
-      [ValidateSet("US", "CA", "MX", "GB", "DE", "FR", "JP", "AU", "BR", "IN")]
-      [string]$UsageLocation = "US",
+    [Parameter(Mandatory = $false)]
+    [ValidateSet("US", "CA", "MX", "GB", "DE", "FR", "JP", "AU", "BR", "IN")]
+    [string]$UsageLocation = "US",
 
-      [Parameter(Mandatory=$false)]
-      [ValidateRange(12, 32)]
-      [int]$PasswordLength = 16,
+    [Parameter(Mandatory = $false)]
+    [ValidateRange(12, 32)]
+    [int]$PasswordLength = 16,
 
-      [Parameter(Mandatory=$false)]
-      [string]$CustomPassword
+    [Parameter(Mandatory = $false)]
+    [string]$CustomPassword,
+
+    [switch]$CreateTemplate
   )
 
-  # Check and install required modules
-  $requiredModules = @("MSOnline", "Microsoft.Graph")
-  foreach ($module in $requiredModules) {
-      if (!(Get-Module -ListAvailable -Name $module)) {
-          Write-Verbose "Installing $module module..."
-          Install-Module -Name $module -Force -Scope CurrentUser
+  if (-not($CsvPath) -and -not($CreateTemplate)) {
+    Write-Error "Please provide a CSV file path or use the -CreateTemplate switch to generate a template CSV file."
+    return
+  }
+
+  if ($CreateTemplate) {
+    $templatePath = Join-Path $env:USERPROFILE "Documents\$(Get-Date -f MMddyy)_M365NewUser.csv"
+    $templateData = @(
+      [PSCustomObject]@{
+        FirstName     = ""
+        LastName      = ""
+        PrimaryEmail  = ""
+        RecoveryPhone = ""
+        RecoveryEmail = ""
       }
-  }
-
-  # Connect to Microsoft 365 and Microsoft Graph
-  try {
-      Connect-MsolService
-      Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All", "Directory.AccessAsUser.All", "Directory.ReadWrite.All" -Device
-  }
-  catch {
-      Write-Error "Failed to connect to Microsoft 365 or Microsoft Graph. Error: $_"
-      return
-  }
-
-  # Function to create a random password
-  function Get-RandomPassword {
-      param ([int]$Length = 16)
-      $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=[]{}|;:,.<>?'.ToCharArray()
-      $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
-      $bytes = New-Object byte[]($Length)
-      $rng.GetBytes($bytes)
-  
-      $result = New-Object char[]($Length)
-      for ($i = 0 ; $i -lt $Length ; $i++) {
-          $result[$i] = $charSet[$bytes[$i] % $charSet.Length]
-      }
-      return (-join $result)
-  }
-
-  # Import and validate CSV data
-  try {
-      $users = Import-Csv $CsvPath
-      $requiredColumns = @("FirstName", "LastName", "PrimaryEmail", "RecoveryPhone", "RecoveryEmail")
-      $missingColumns = $requiredColumns | Where-Object { $_ -notin $users[0].PSObject.Properties.Name }
-      if ($missingColumns) {
-          throw "CSV is missing required columns: $($missingColumns -join ', ')"
-      }
-  }
-  catch {
-      Write-Error "Failed to parse CSV data: $_"
-      return
-  }
-
-  foreach ($user in $users) {
-    if ($user.LastName){
-      $displayName = "$($user.FirstName) $($user.LastName)"
-    } else {
-      $displayName = $user.FirstName
+    )
+    
+    try {
+      $templateData | Export-Csv -Path $templatePath -NoTypeInformation
+      Invoke-Item $templatePath
+      Write-Output "Enter the user details in the new csv template. Once finished, save the template, then type 'next' to proceed."
+      do {
+        $response = Read-Host
+      } while ($response -ne "next")
+      $CsvPath = $templatePath
     }
-
-      $userPrincipalName = $user.PrimaryEmail
-      
-      if ($CustomPassword){
-        $password = $CustomPassword
-      } else {
-        $password = Get-RandomPassword -Length $PasswordLength
-      }
-      $PasswordProfile = @{
-          Password = $password
-          ForceChangePasswordNextSignIn = $true
-      }
-
-      try {
-          # Check if user exists in Microsoft Graph
-          $existingUser = Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue
-
-          if ($existingUser) {
-              Write-Verbose "User $($user.PrimaryEmail) already exists. Updating details..."
-              
-              if ($CustomPassword){
-                if ($user.LastName){
-                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
-  
-                } else {
-                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
-                }
-
-              } else {
-                if ($user.LastName){
-                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
-  
-                } else {
-                  Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation
-                }
-              }
-
-
-              if ($user.RecoveryPhone){
-                # Update phone authentication method
-                $phoneParams = @{
-                PhoneNumber = $user.RecoveryPhone
-                PhoneType = "mobile"
-              }
-              New-MgUserAuthenticationPhoneMethod -UserId $existingUser.Id -BodyParameter $phoneParams
-              }
-
-              if ($user.RecoveryEmail){
-                # Update email authentication method
-                $emailParams = @{
-                EmailAddress = $user.RecoveryEmail
-              }
-              New-MgUserAuthenticationEmailMethod -UserId $existingUser.Id -BodyParameter $emailParams
-              }
-
-              # Update aliases (still using MSOnline as Graph doesn't have a direct equivalent)
-              $currentAliases = Get-MsolUser -UserPrincipalName $user.PrimaryEmail | Select-Object -ExpandProperty ProxyAddresses
-              if ($currentAliases -notcontains "smtp:$userPrincipalName") {
-                  #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($currentAliases + "smtp:$userPrincipalName")
-              }
-
-              Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
-            } else {
-              Write-Verbose "Creating new user: $displayName"
-
-              if ($user.LastName){
-                # Create new user in Microsoft Graph
-                $newUser = New-MgUser -DisplayName $displayName `
-                                      -GivenName $user.FirstName `
-                                      -Surname $user.LastName `
-                                      -UserPrincipalName $user.PrimaryEmail `
-                                      -UsageLocation $UsageLocation `
-                                      -PasswordProfile $PasswordProfile `
-                                      -AccountEnabled:$true `
-                                      -MailNickname ($user.FirstName.ToLower())
-              } else {
-                # Create new user in Microsoft Graph
-                $newUser = New-MgUser -DisplayName $displayName `
-                                      -GivenName $user.FirstName `
-                                      -UserPrincipalName $user.PrimaryEmail `
-                                      -UsageLocation $UsageLocation `
-                                      -PasswordProfile $PasswordProfile `
-                                      -AccountEnabled:$true `
-                                      -MailNickname ($user.FirstName.ToLower())
-              }
-
-              if ($user.RecoveryPhone){
-                # Set phone authentication method
-                $phoneParams = @{
-                    PhoneNumber = $user.RecoveryPhone
-                    PhoneType = "mobile"
-                }
-                New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
-              }
-
-              if ($user.RecoveryEmail){
-                # Set email authentication method
-                $emailParams = @{
-                  EmailAddress = $user.RecoveryEmail
-                }
-                New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
-              }
-
-              # Add alias (still using MSOnline)
-              #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
-
-              Write-Output "User created: $displayName ($($user.PrimaryEmail))"
-          }
-      }
-      catch {
-          Write-Error "Failed to create or update user $displayName. Error: $_"
-      }
+    catch {
+      Write-Error "Failed to create template CSV file: $_"
+      return
+    }
   }
 
-  Write-Verbose "All users have been processed."
+# Check and install required modules
+$requiredModules = @("MSOnline", "Microsoft.Graph")
+foreach ($module in $requiredModules) {
+  if (!(Get-Module -ListAvailable -Name $module)) {
+    Write-Verbose "Installing $module module..."
+    Install-Module -Name $module -Force -Scope CurrentUser
+  }
+}
 
-  # Disconnect from services
-  # Disconnect-MgGraph
+# Connect to Microsoft 365 and Microsoft Graph
+try {
+  Connect-MsolService
+  Connect-MgGraph -Scopes "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All", "Directory.AccessAsUser.All", "Directory.ReadWrite.All" -Device
+}
+catch {
+  Write-Error "Failed to connect to Microsoft 365 or Microsoft Graph. Error: $_"
+  return
+}
 
-  Write-Verbose "Disconnected from Microsoft 365 and Microsoft Graph services."
+# Function to create a random password
+function Get-RandomPassword {
+  param ([int]$Length = 16)
+  $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=[]{}|;:,.<>?'.ToCharArray()
+  $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
+  $bytes = New-Object byte[]($Length)
+  $rng.GetBytes($bytes)
+  
+  $result = New-Object char[]($Length)
+  for ($i = 0 ; $i -lt $Length ; $i++) {
+    $result[$i] = $charSet[$bytes[$i] % $charSet.Length]
+  }
+  return (-join $result)
+}
+
+# Import and validate CSV data
+try {
+  $users = Import-Csv $CsvPath
+  $requiredColumns = @("FirstName", "LastName", "PrimaryEmail", "RecoveryPhone", "RecoveryEmail")
+  $missingColumns = $requiredColumns | Where-Object { $_ -notin $users[0].PSObject.Properties.Name }
+  if ($missingColumns) {
+    throw "CSV is missing required columns: $($missingColumns -join ', ')"
+  }
+}
+catch {
+  Write-Error "Failed to parse CSV data: $_"
+  return
+}
+
+foreach ($user in $users) {
+  if ($user.LastName) {
+    $displayName = "$($user.FirstName) $($user.LastName)"
+  }
+  else {
+    $displayName = $user.FirstName
+  }
+
+  $userPrincipalName = $user.PrimaryEmail
+      
+  if ($CustomPassword) {
+    $password = $CustomPassword
+  }
+  else {
+    $password = Get-RandomPassword -Length $PasswordLength
+  }
+  $PasswordProfile = @{
+    Password                      = $password
+    ForceChangePasswordNextSignIn = $true
+  }
+
+  try {
+    # Check if user exists in Microsoft Graph
+    $existingUser = Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue
+
+    if ($existingUser) {
+      Write-Verbose "User $($user.PrimaryEmail) already exists. Updating details..."
+              
+      if ($CustomPassword) {
+        if ($user.LastName) {
+          Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
+  
+        }
+        else {
+          Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation -PasswordProfile $PasswordProfile
+        }
+
+      }
+      else {
+        if ($user.LastName) {
+          Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -Surname $user.LastName -UsageLocation $UsageLocation
+  
+        }
+        else {
+          Update-MgUser -UserId $existingUser.Id -DisplayName $displayName -GivenName $user.FirstName -UsageLocation $UsageLocation
+        }
+      }
+
+
+      if ($user.RecoveryPhone) {
+        # Update phone authentication method
+        $phoneParams = @{
+          PhoneNumber = $user.RecoveryPhone
+          PhoneType   = "mobile"
+        }
+        New-MgUserAuthenticationPhoneMethod -UserId $existingUser.Id -BodyParameter $phoneParams
+      }
+
+      if ($user.RecoveryEmail) {
+        # Update email authentication method
+        $emailParams = @{
+          EmailAddress = $user.RecoveryEmail
+        }
+        New-MgUserAuthenticationEmailMethod -UserId $existingUser.Id -BodyParameter $emailParams
+      }
+
+      # Update aliases (still using MSOnline as Graph doesn't have a direct equivalent)
+      $currentAliases = Get-MsolUser -UserPrincipalName $user.PrimaryEmail | Select-Object -ExpandProperty ProxyAddresses
+      if ($currentAliases -notcontains "smtp:$userPrincipalName") {
+        #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($currentAliases + "smtp:$userPrincipalName")
+      }
+
+      Write-Output "User updated: $displayName ($($user.PrimaryEmail))"
+    }
+    else {
+      Write-Verbose "Creating new user: $displayName"
+
+      if ($user.LastName) {
+        # Create new user in Microsoft Graph
+        $newUser = New-MgUser -DisplayName $displayName `
+          -GivenName $user.FirstName `
+          -Surname $user.LastName `
+          -UserPrincipalName $user.PrimaryEmail `
+          -UsageLocation $UsageLocation `
+          -PasswordProfile $PasswordProfile `
+          -AccountEnabled:$true `
+          -MailNickname ($user.FirstName.ToLower())
+      }
+      else {
+        # Create new user in Microsoft Graph
+        $newUser = New-MgUser -DisplayName $displayName `
+          -GivenName $user.FirstName `
+          -UserPrincipalName $user.PrimaryEmail `
+          -UsageLocation $UsageLocation `
+          -PasswordProfile $PasswordProfile `
+          -AccountEnabled:$true `
+          -MailNickname ($user.FirstName.ToLower())
+      }
+
+      if ($user.RecoveryPhone) {
+        # Set phone authentication method
+        $phoneParams = @{
+          PhoneNumber = $user.RecoveryPhone
+          PhoneType   = "mobile"
+        }
+        New-MgUserAuthenticationPhoneMethod -UserId $newUser.Id -BodyParameter $phoneParams
+      }
+
+      if ($user.RecoveryEmail) {
+        # Set email authentication method
+        $emailParams = @{
+          EmailAddress = $user.RecoveryEmail
+        }
+        New-MgUserAuthenticationEmailMethod -UserId $newUser.Id -BodyParameter $emailParams
+      }
+
+      # Add alias (still using MSOnline)
+      #Set-MsolUser -UserPrincipalName $user.PrimaryEmail -EmailAddresses @($user.PrimaryEmail, "smtp:$userPrincipalName")
+
+      Write-Output "User created: $displayName ($($user.PrimaryEmail))"
+    }
+  }
+  catch {
+    Write-Error "Failed to create or update user $displayName. Error: $_"
+  }
+}
+
+Write-Verbose "All users have been processed."
+
+# Disconnect from services
+# Disconnect-MgGraph
+
+Write-Verbose "Disconnected from Microsoft 365 and Microsoft Graph services."
 }
 
 <#
