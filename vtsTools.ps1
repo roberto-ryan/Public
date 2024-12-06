@@ -6299,8 +6299,16 @@ function New-vts365User {
     [Parameter(Mandatory = $false)]
     [string]$CustomPassword,
 
-    [switch]$CreateTemplate
+    [switch]$CreateTemplate,
+
+    [switch]$UseLast4PhoneDigitsAsPassword,
+
+    $keyPath = "$($env:USERPROFILE)\Documents\$(Get-Date -f MMddyymmss)_temp.txt"
   )
+
+  if($UseLast4PhoneDigitsAsPassword){
+    $codeword = Read-Host "Enter a code word to use for generating passwords"
+  }
 
   # Function to retry operations
   function Invoke-WithRetry {
@@ -6435,9 +6443,23 @@ function New-vts365User {
 
       if ($CustomPassword) {
         $password = $CustomPassword
+        "$($user.PrimaryEmail) $password" | out-file -filepath $keypath -Append -Force
+      } elseif ($UseLast4PhoneDigitsAsPassword) {
+        do {
+          $last4 = ($user.RecoveryPhone -replace "[^0-9]", "")[-4..-1] -join ""
+          if (-not($last4)){
+            $last4 = Get-RandomPassword -Length 4
+          }
+          $password = $codeword+$last4
+
+        } until (
+          $password.Length -ge 12
+        )
+        "$($user.PrimaryEmail) $password" | out-file -filepath $keypath -Append -Force
       }
       else {
         $password = Get-RandomPassword -Length $PasswordLength
+        "$($user.PrimaryEmail) $password" | out-file -filepath $keypath -Append -Force
       }
       $PasswordProfile = @{
         Password                      = $password
@@ -6570,6 +6592,7 @@ function New-vts365User {
   Process-Users -Users $users
   Disconnect-Services
   Write-Verbose "All users have been processed."
+  ii $keyPath
 }
 
 <#
