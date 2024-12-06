@@ -6448,7 +6448,7 @@ function New-vts365User {
         do {
           $last4 = ($user.RecoveryPhone -replace "[^0-9]", "")[-4..-1] -join ""
           if (-not($last4)){
-            $last4 = Get-RandomPassword -Length 4
+            $last4 = 1234
           }
           $password = $codeword+$last4
 
