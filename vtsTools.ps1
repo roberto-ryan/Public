@@ -6315,7 +6315,7 @@ function New-vts365User {
   }
 
   if ($CreateTemplate) {
-    $templatePath = Join-Path $env:USERPROFILE "Documents\$(Get-Date -f MMddyy)_M365NewUser.csv"
+    $templatePath = Join-Path $env:USERPROFILE "Documents\$(Get-Date -f MMddyymmss)_M365NewUser.csv"
     $templateData = @(
       [PSCustomObject]@{
         FirstName     = ""
