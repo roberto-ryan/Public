@@ -6329,7 +6329,7 @@ function New-vts365User {
     try {
       $templateData | Export-Csv -Path $templatePath -NoTypeInformation
       Invoke-Item $templatePath
-      Write-Output "Enter the user details in the new csv template. Once finished, save the template, then type 'next' to proceed."
+      Write-Output "The csv template is being created, and will be automatically opened momentarily. Enter the user details in the new csv template. Once finished, save the template, then type 'next' to proceed."
       do {
         $response = Read-Host
       } while ($response -ne "next")
