@@ -6437,7 +6437,7 @@ foreach ($user in $users) {
       if ($user.RecoveryPhone) {
         # Update phone authentication method
         $phoneParams = @{
-          PhoneNumber = $user.RecoveryPhone
+          PhoneNumber = "$($user.RecoveryPhone)"
           PhoneType   = "mobile"
         }
         New-MgUserAuthenticationPhoneMethod -UserId $existingUser.Id -BodyParameter $phoneParams
@@ -6488,7 +6488,7 @@ foreach ($user in $users) {
         $id = (Get-MgUser -Filter "userPrincipalName eq '$($user.PrimaryEmail)'" -ErrorAction SilentlyContinue).Id
         # Set phone authentication method
         $phoneParams = @{
-          PhoneNumber = $user.RecoveryPhone
+          PhoneNumber = "$($user.RecoveryPhone)"
           PhoneType   = "mobile"
         }
         New-MgUserAuthenticationPhoneMethod -UserId $Id -BodyParameter $phoneParams
