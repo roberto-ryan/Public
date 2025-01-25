@@ -7579,6 +7579,6 @@ function Get-vts365DistributionListRecipients {
         if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
             Install-Module -Name PSWriteHTML -Force -Confirm:$false
         }
-        $Results | Out-HtmlView
+        $Results | Out-HtmlView -Title "Distribution List Recipients Report - $(Get-Date -f "dddd MM-dd-yyyy HH:mm")" -Filepath "C:\Reports\Distribution List Recipients Report - $(Get-Date -f MM_dd_yyyy).html"
     }
 }
