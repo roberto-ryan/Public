@@ -6722,7 +6722,7 @@ function Get-vtsReadablePermissions {
         }
         
         # Export the results to an HTML file using the PSWriteHTML module
-        $FilteredPermissions | Out-HtmlView -Title "Permission Report - $(Get-Date -f "dddd MM-dd-yyyy HH:mm")" -Filepath "$Filepath\Permission Report - $(Get-Date -f MM_dd_yyyy).html"
+        $FilteredPermissions | Out-HtmlView -Title "Permission Report - $(Get-Date -f "dddd MM-dd-yyyy HHmm")" -Filepath "$Filepath\Permission Report - $(Get-Date -f MM_dd_yyyy).html"
     }
 }
 <#
@@ -7486,7 +7486,7 @@ function Get-vts365DynamicDistributionListRecipients {
     }
         
     # Export the results to an HTML file using the PSWriteHTML module
-    $Results | Out-HtmlView -Title "Dynamic Distribution List Recipients Report - $(Get-Date -f "dddd MM-dd-yyyy HH:mm")" -Filepath "C:\Reports\Dynamic Distribution List Recipients Report - $(Get-Date -f MM_dd_yyyy).html"
+    $Results | Out-HtmlView -Title "Dynamic Distribution List Recipients Report - $(Get-Date -f "dddd MM-dd-yyyy HHmm")" -Filepath "C:\Reports\Dynamic Distribution List Recipients Report - $(Get-Date -f MM_dd_yyyy).html"
   }
 }
 
@@ -7613,6 +7613,6 @@ function Get-vts365DistributionListRecipients {
       if (!(Get-InstalledModule -Name PSWriteHTML 2>$null)) {
           Install-Module -Name PSWriteHTML -Force -Confirm:$false
       }
-      $Results | Out-HtmlView -Title "Distribution List Recipients Report - $(Get-Date -f "dddd MM-dd-yyyy HH:mm")" -Filepath "C:\Reports\Distribution List Recipients Report - $(Get-Date -f MM_dd_yyyy).html"
+      $Results | Out-HtmlView -Title "Distribution List Recipients Report - $(Get-Date -f "dddd MM-dd-yyyy HHmm")" -Filepath "C:\Reports\Distribution List Recipients Report - $(Get-Date -f MM_dd_yyyy).html"
   }
 }
