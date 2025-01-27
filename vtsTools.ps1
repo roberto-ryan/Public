@@ -7772,156 +7772,110 @@ M365 Migration Scripts
 function Import-vts365DistributionListConfig {
   [CmdletBinding()]
   param (
+      [Parameter(Mandatory)]
+      [String]$FilePath,
       [Parameter()]
-      [String]
-      $FilePath,
+      [String]$AppendToDisplayName,
       [Parameter()]
-      [switch]
-      $Test
+      [String]$DefaultDomain
   )
 
-  if (-not($Test)){
-      Write-Host "`n`nThis script is not ready for production use. Please use the -Test switch to test the script." -ForegroundColor Red
-      Write-Host "`nThings that need to be done:`n" -ForegroundColor Yellow
-      Write-Host "    - Add members to distribution groups (this doesn't work because the users domain isn't verified on the tenant yet, so may need to add the @completehealth.com address, but need to make spreadsheet with the associations between the old and new email addresses first)"
-      Exit
+  if (-not($AppendToDisplayName)) {
+      $AppendToDisplayName = Read-Host "Enter Company Abbreviation to Append to DisplayName (so we can find the groups later.)"
   }
 
-  if (-not $FilePath) {
-      Write-Host "Please provide the path to the CSV file." -ForegroundColor Red
-      Write-Host "Usage: Import-vts365DistributionListConfig -FilePath <Path to CSV file>" -ForegroundColor Yellow
-      Exit
-  }
-
-  # Import CSV file
+  # Import CSV and get default domain
   $GroupsData = Import-Csv $FilePath
-  $DefaultDomain = Get-AcceptedDomain | Where-Object Default -eq $True | Select-Object -ExpandProperty DomainName
+  if(-not($DefaultDomain)){
+      $DefaultDomain = Get-AcceptedDomain | Where-Object Default -eq $True | Select-Object -ExpandProperty DomainName
+  }
 
-  # Connect Exchange Online
-  # Connect-ExchangeOnline
-
-  # Iterate through each row of the CSV file
   foreach ($GroupData in $GroupsData) {
-      # Extract local part of email (before @)
-      $LocalPart = ("C-" + $GroupData.PrimarySmtpAddress) -replace '@.*$'
+      $LocalPart = ($GroupData.PrimarySmtpAddress) -replace '@.*$'
+      $DisplayName = $GroupData.DisplayName + " - $AppendToDisplayName"
       
-      # Check if the distribution group already exists
-      $ExistingGroup = Get-DistributionGroup -Identity ("C-" + $GroupData.DisplayName) -ErrorAction SilentlyContinue
-
+      # Check if group exists
+      $ExistingGroup = Get-DistributionGroup -Identity $DisplayName -ErrorAction SilentlyContinue
       if ($ExistingGroup) {
-          Write-Host "Distribution group $($ExistingGroup.DisplayName) already exists." -ForegroundColor Yellow
-      }
-      else {
-          if ($GroupData.RecipientTypeDetails -eq "MailUniversalSecurityGroup") {
-              # Construct parameters for New-DistributionGroup cmdlet
-              $NewGroupParams = @{
-                  DisplayName        = "C-" + $GroupData.DisplayName
-                  Name               = "C-" + $GroupData.Name
-                  Alias              = "C-" + $GroupData.Alias
-                  PrimarySMTPAddress = "$LocalPart@$DefaultDomain"
-                  Type               = "Security"
-              }
-
-              # Create a new distribution group
-              $NewGroup = New-DistributionGroup @NewGroupParams
-
-              # Construct parameters for Set-DistributionGroup cmdlet
-              $SetGroupParams = @{
-                  Identity                           = $NewGroup.DisplayName
-                  HiddenFromAddressListsEnabled      = $True
-                  MemberJoinRestriction              = $GroupData.MemberJoinRestriction
-                  MemberDepartRestriction            = $GroupData.MemberDepartRestriction
-                  RequireSenderAuthenticationEnabled = [System.Convert]::ToBoolean($GroupData.RequireSenderAuthenticationEnabled)
-                  Description                        = if (-not [string]::IsNullOrWhiteSpace($GroupData.Notes)) { $GroupData.Notes } else { $null }
-                  ManagedBy                          = $GroupData.ManagedBy -split ','
-              }
-
-              # Set additional properties
-              Set-DistributionGroup @SetGroupParams
-
-              # Display success message
-              Write-Host "Distribution group $($NewGroup.DisplayName) created successfully." -ForegroundColor Green
-          }
-          elseif ($GroupData.RecipientTypeDetails -eq "MailUniversalDistributionGroup") {
-              # Construct parameters for New-DistributionGroup cmdlet
-              $NewGroupParams = @{
-                  DisplayName        = "C-" + $GroupData.DisplayName
-                  Name               = "C-" + $GroupData.Name
-                  Alias              = "C-" + $GroupData.Alias
-                  PrimarySMTPAddress = "$LocalPart@$DefaultDomain"
-              }
-
-              # Create a new distribution group
-              $NewGroup = New-DistributionGroup @NewGroupParams
-
-              # Construct parameters for Set-DistributionGroup cmdlet
-              $SetGroupParams = @{
-                  Identity                           = $NewGroup.DisplayName
-                  HiddenFromAddressListsEnabled      = $True
-                  MemberJoinRestriction              = $GroupData.MemberJoinRestriction
-                  MemberDepartRestriction            = $GroupData.MemberDepartRestriction
-                  RequireSenderAuthenticationEnabled = [System.Convert]::ToBoolean($GroupData.RequireSenderAuthenticationEnabled)
-                  Description                        = if (-not [string]::IsNullOrWhiteSpace($GroupData.Notes)) { $GroupData.Notes } else { $null }
-                  ManagedBy                          = $GroupData.ManagedBy -split ','
-              }
-
-              # Set additional properties
-              Set-DistributionGroup @SetGroupParams
-
-              # Display success message
-              Write-Host "Distribution group $($NewGroup.DisplayName) created successfully." -ForegroundColor Green
-          }
-          elseif ($GroupData.RecipientTypeDetails -eq "RoomList") {
-              # Construct parameters for New-DistributionGroup cmdlet
-              $NewGroupParams = @{
-                  DisplayName        = "C-" + $GroupData.DisplayName
-                  Name               = "C-" + $GroupData.Name
-                  Alias              = "C-" + $GroupData.Alias
-                  PrimarySMTPAddress = "$LocalPart@$DefaultDomain"
-                  Roomlist           = $True
-              }
-
-              # Create a new distribution group
-              $NewGroup = New-DistributionGroup @NewGroupParams
-
-              # Construct parameters for Set-DistributionGroup cmdlet
-              $SetGroupParams = @{
-                  Identity                           = $NewGroup.DisplayName
-                  HiddenFromAddressListsEnabled      = $True
-                  MemberJoinRestriction              = $GroupData.MemberJoinRestriction
-                  MemberDepartRestriction            = $GroupData.MemberDepartRestriction
-                  RequireSenderAuthenticationEnabled = [System.Convert]::ToBoolean($GroupData.RequireSenderAuthenticationEnabled)
-                  Description                        = if (-not [string]::IsNullOrWhiteSpace($GroupData.Notes)) { $GroupData.Notes } else { $null }
-                  ManagedBy                          = $GroupData.ManagedBy -split ','
-              }
-
-              # Set additional properties
-              Set-DistributionGroup @SetGroupParams
-
-              # Display success message
-              Write-Host "Distribution group $($NewGroup.DisplayName) created successfully." -ForegroundColor Green
-          }
+          Write-Host "Group exists: $DisplayName" -ForegroundColor Yellow
+          continue
       }
 
-      # Check if MemberPrimarySmtpAddress is provided and not empty
-      if (-not [string]::IsNullOrEmpty($GroupData.MembersPrimarySmtpAddress)) {
-          # Split the member email addresses if there are multiple addresses
-          $Members = $GroupData.MembersPrimarySmtpAddress -split ","
-          foreach ($Member in $Members) {
-              # Trim whitespace from each member's email address
-              $Member = $Member.Trim()
+      try {
+          Write-Host "Creating group: $DisplayName" -ForegroundColor Cyan
+          
+          # Create group first without owners
+          $NewGroupParams = @{
+              DisplayName = $DisplayName
+              Name = $GroupData.Name
+              Alias = $GroupData.Alias
+              PrimarySMTPAddress = "$LocalPart@$DefaultDomain"
+          }
 
-              Write-Host "Attempting to add member $Member to $($ExistingGroup.DisplayName)." -ForegroundColor Cyan
+          # Add type-specific parameters
+          switch ($GroupData.RecipientTypeDetails) {
+              "MailUniversalSecurityGroup" { 
+                  $NewGroupParams.Type = "Security" 
+              }
+              "RoomList" { 
+                  $NewGroupParams.Roomlist = $true 
+              }
+          }
+
+          # Create the group
+          $NewGroup = New-DistributionGroup @NewGroupParams
+
+          # Set basic properties
+          $SetGroupParams = @{
+              Identity = $NewGroup.DisplayName
+              # HiddenFromAddressListsEnabled = $True
+              MemberJoinRestriction = $GroupData.MemberJoinRestriction
+              MemberDepartRestriction = $GroupData.MemberDepartRestriction
+              RequireSenderAuthenticationEnabled = [System.Convert]::ToBoolean($GroupData.RequireSenderAuthenticationEnabled)
+          }
+
+          if (-not [string]::IsNullOrWhiteSpace($GroupData.Notes)) {
+              $SetGroupParams.Description = $GroupData.Notes
+          }
+
+          Set-DistributionGroup @SetGroupParams
+
+          # Add owners separately
+          if (-not [string]::IsNullOrWhiteSpace($GroupData.ManagedBy)) {
+              $Owners = $GroupData.ManagedBy -split ',' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() }
+              Write-Host "Adding owners..." -ForegroundColor Cyan
               
-              # Add member to the distribution group
-              try {
-                  Add-DistributionGroupMember -Identity $ExistingGroup.PrimarySmtpAddress -Member $Member -BypassSecurityGroupManagerCheck -ErrorAction Stop
-                  Write-Host "Member $Member added to $($ExistingGroup.DisplayName)." -ForegroundColor Green
-              }
-              catch {
-                  Write-Host "Failed to add member $Member to $($ExistingGroup.DisplayName). $_" -ForegroundColor Red
+              foreach ($Owner in $Owners) {
+                  try {
+                      Set-DistributionGroup -Identity $NewGroup.DisplayName -ManagedBy @{Add=$Owner} -ErrorAction Stop
+                      Write-Host "Added owner: $Owner" -ForegroundColor Green
+                  }
+                  catch {
+                      Write-Host "Failed to add owner $Owner : $_" -ForegroundColor Yellow
+                  }
               }
           }
+
+          Start-Sleep -Seconds 5
+
+          # Add members
+          if (-not [string]::IsNullOrWhiteSpace($GroupData.MembersPrimarySmtpAddress)) {
+              $Members = $GroupData.MembersPrimarySmtpAddress -split ',' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim() }
+              foreach ($Member in $Members) {
+                  try {
+                      Add-DistributionGroupMember -Identity $NewGroup.PrimarySmtpAddress -Member $Member -BypassSecurityGroupManagerCheck -ErrorAction Stop
+                      Write-Host "Added member: $Member" -ForegroundColor Green
+                  }
+                  catch {
+                      Write-Host "Failed to add member $Member : $_" -ForegroundColor Red
+                  }
+              }
+          }
+
+          Write-Host "Distribution group $DisplayName created successfully." -ForegroundColor Green
+      }
+      catch {
+          Write-Host "Failed to create group $DisplayName : $_" -ForegroundColor Red
       }
   }
 }
