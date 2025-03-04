@@ -1,21 +1,21 @@
-<#
-.Description
-Searches the last 500 System and Application logs using a term.
-.EXAMPLE
-PS> Search-vtsEventLog <term>
-.EXAMPLE
-PS> Search-vtsEventLog "driver"
-
-Output:
-TimeGenerated : 9/13/2022 9:14:30 AM
-Message       : Media disconnected on NIC /DEVICE/{90E7B0EA-AE78-4836-8CBC-B73F1BCD5894} (Friendly Name: Microsoft
-                Network Adapter Multiplexor Driver).
-Log           : System
-
-.LINK
-Log Management
-#>
 function Search-vtsEventLog {
+  <#
+  .Description
+  Searches the last 500 System and Application logs using a term.
+  .EXAMPLE
+  PS> Search-vtsEventLog <term>
+  .EXAMPLE
+  PS> Search-vtsEventLog "driver"
+  
+  Output:
+  TimeGenerated : 9/13/2022 9:14:30 AM
+  Message       : Media disconnected on NIC /DEVICE/{90E7B0EA-AE78-4836-8CBC-B73F1BCD5894} (Friendly Name: Microsoft
+                  Network Adapter Multiplexor Driver).
+  Log           : System
+  
+  .LINK
+  Log Management
+  #>
   [CmdletBinding()]
   Param(
     [Parameter(Position = 0, Mandatory,
@@ -51,23 +51,23 @@ function Search-vtsEventLog {
   $result | Sort-Object TimeGenerated | Format-List
 }
 
-<#
-.Description
-Displays Mapped Drives information from the Windows Registry.
-.EXAMPLE
-PS> Get-vtsMappedDrive
-
-Output:
-Username            : VTS-ROBERTO\rober
-DriveLetter         : Y
-RemotePath          : https://live.sysinternals.com
-ConnectWithUsername : rober
-SID                 : S-1-5-21-376445358-2603134888-3166729622-1001
-
-.LINK
-Drive Management
-#>
 function Get-vtsMappedDrive {
+  <#
+  .Description
+  Displays Mapped Drives information from the Windows Registry.
+  .EXAMPLE
+  PS> Get-vtsMappedDrive
+  
+  Output:
+  Username            : VTS-ROBERTO\rober
+  DriveLetter         : Y
+  RemotePath          : https://live.sysinternals.com
+  ConnectWithUsername : rober
+  SID                 : S-1-5-21-376445358-2603134888-3166729622-1001
+  
+  .LINK
+  Drive Management
+  #>
   # This is required for Verbose to work correctly.
   # If you don't want the Verbose message, remove "-Verbose" from the Parameters field.
   [CmdletBinding()]
@@ -107,32 +107,32 @@ function Get-vtsMappedDrive {
   }
 }
 
-<#
-.Description
-Continuous Ping Report. Tracks failed ping times and outputs data to a logfile.
-.EXAMPLE
-PS> Start-vtsPingReport google.com
-.EXAMPLE
-PS> Start-vtsPingReport 8.8.8.8
-
-Output:
-Start Time : 09/14/2022 10:31:20
-
-Ping Target: 8.8.8.8
-
-Total Ping Count     : 10
-Successful Ping Count: 10
-Failed Ping Count    : 0
-
-Last Successful Ping : 09/14/2022 10:31:30
-
-Press Ctrl-C to exit
-logfile saved to C:\temp\PingResults-8.8.8.8.log
-
-.LINK
-Network
-#>
 function Start-vtsPingReport {
+  <#
+  .Description
+  Continuous Ping Report. Tracks failed ping times and outputs data to a logfile.
+  .EXAMPLE
+  PS> Start-vtsPingReport google.com
+  .EXAMPLE
+  PS> Start-vtsPingReport 8.8.8.8
+  
+  Output:
+  Start Time : 09/14/2022 10:31:20
+  
+  Ping Target: 8.8.8.8
+  
+  Total Ping Count     : 10
+  Successful Ping Count: 10
+  Failed Ping Count    : 0
+  
+  Last Successful Ping : 09/14/2022 10:31:30
+  
+  Press Ctrl-C to exit
+  logfile saved to C:\temp\PingResults-8.8.8.8.log
+  
+  .LINK
+  Network
+  #>
   Param(
     [Parameter(
       Mandatory = $true,
@@ -199,27 +199,27 @@ function Start-vtsPingReport {
   }
 }
 
-<#
-.Description
-Generates a random 12 character password and copies it to the clipboard.
-If the -Easy switch is specified, generates a password using two random words, a random number and a random symbol.
-Now, it also adds a random preposition between the two words for the Easy password.
-.EXAMPLE
-PS> New-vtsRandomPassword
-
-Output:
-Random Password Copied to Clipboard
-
-.EXAMPLE
-PS> New-vtsRandomPassword -Easy -WordListPath "C:\path\to\wordlist.csv"
-
-Output:
-Easy Random Password Copied to Clipboard
-
-.LINK
-Utilities
-#>
 function New-vtsRandomPassword {
+  <#
+  .Description
+  Generates a random 12 character password and copies it to the clipboard.
+  If the -Easy switch is specified, generates a password using two random words, a random number and a random symbol.
+  Now, it also adds a random preposition between the two words for the Easy password.
+  .EXAMPLE
+  PS> New-vtsRandomPassword
+  
+  Output:
+  Random Password Copied to Clipboard
+  
+  .EXAMPLE
+  PS> New-vtsRandomPassword -Easy -WordListPath "C:\path\to\wordlist.csv"
+  
+  Output:
+  Easy Random Password Copied to Clipboard
+  
+  .LINK
+  Utilities
+  #>
   param(
     [switch]$Easy,
     [string]$WordListPath = "$env:temp\wordlist.csv"
@@ -260,30 +260,30 @@ function New-vtsRandomPassword {
   }
 }
 
-<#
-.Description
-Converts strings to the phonetic alphabet.
-.EXAMPLE
-PS> "RandomString" | Out-vtsPhoneticAlphabet
-
-Output:
-ROMEO
-alfa
-november
-delta
-oscar
-mike
-SIERRA
-tango
-romeo
-india
-november
-golf
-
-.LINK
-Utilities
-#>
 function Out-vtsPhoneticAlphabet {
+  <#
+  .Description
+  Converts strings to the phonetic alphabet.
+  .EXAMPLE
+  PS> "RandomString" | Out-vtsPhoneticAlphabet
+  
+  Output:
+  ROMEO
+  alfa
+  november
+  delta
+  oscar
+  mike
+  SIERRA
+  tango
+  romeo
+  india
+  november
+  golf
+  
+  .LINK
+  Utilities
+  #>
   [CmdletBinding()]
   [OutputType([String])]
   Param
@@ -362,20 +362,20 @@ function Out-vtsPhoneticAlphabet {
   $result
 }
 
-<#
-.Description
-Displays monitor connection type (HDMI, DisplayPort, etc.)
-.EXAMPLE
-PS> Get-vtsDisplayConnectionType
-
-Output:
-GSM M2362D (DisplayPort (external))
-GSM M2362D (HDMI)
-
-.LINK
-System Information
-#>
 function Get-vtsDisplayDetails {
+  <#
+  .Description
+  Displays monitor connection type (HDMI, DisplayPort, etc.)
+  .EXAMPLE
+  PS> Get-vtsDisplayConnectionType
+  
+  Output:
+  GSM M2362D (DisplayPort (external))
+  GSM M2362D (HDMI)
+  
+  .LINK
+  System Information
+  #>
   $adapterTypes = @{
     '-2'         = 'Unknown'
     '-1'         = 'Unknown'
@@ -428,16 +428,16 @@ function Get-vtsDisplayDetails {
 }
 
 
-<#
-.DESCRIPTION
-Forces the installation of a specified Google Chrome extension.
-.EXAMPLE
-PS> Install-vtsChromeExtension -extensionId "ddloeodolhdfbohkokiflfbacbfpjahp"
-
-.LINK
-Package Management
-#>
 function Install-vtsChromeExtension {
+  <#
+  .DESCRIPTION
+  Forces the installation of a specified Google Chrome extension.
+  .EXAMPLE
+  PS> Install-vtsChromeExtension -extensionId "ddloeodolhdfbohkokiflfbacbfpjahp"
+  
+  .LINK
+  Package Management
+  #>
   param(
     [string]$extensionId,
     [switch]$info
@@ -492,19 +492,19 @@ function Install-vtsChromeExtension {
   $result
 }
 
-<#
-.DESCRIPTION
-Returns temperature of thermal sensor on motherboard. Not accurate for CPU temp.
-.EXAMPLE
-PS> Get-vtsTemperature
-
-Output:
-27.85 C : 82.1300000000001 F : 301K
-
-.LINK
-System Information
-#>
 function Get-vtsTemperature {
+  <#
+  .DESCRIPTION
+  Returns temperature of thermal sensor on motherboard. Not accurate for CPU temp.
+  .EXAMPLE
+  PS> Get-vtsTemperature
+  
+  Output:
+  27.85 C : 82.1300000000001 F : 301K
+  
+  .LINK
+  System Information
+  #>
   $t = Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi"
   $returntemp = @()
 
@@ -521,35 +521,35 @@ function Get-vtsTemperature {
   return $returntemp
 }
 
-<#
-.DESCRIPTION
-Returns USB devices and their current status.
-.EXAMPLE
-PS> Get-vtsUSB
-
-Output:
-FriendlyName                                          Present Status
-------------                                          ------- ------
-Microsoft LifeCam VX-3000                                True OK
-EPSON Utility                                            True OK
-American Power Conversion USB UPS                        True OK
-Microsoft LifeCam VX-3000.                               True OK
-FULL HD 1080P Webcam                                     True OK
-SmartSource Pro/Value                                    True OK
-EPSON ES-400                                             True OK
-.EXAMPLE
-PS> Get-vtsUSB epson
-
-Output:
-FriendlyName                                          Present Status
-------------                                          ------- ------
-EPSON Utility                                            True OK
-EPSON ES-400                                             True OK
-
-.LINK
-Device Management
-#>
 function Get-vtsUSB {
+  <#
+  .DESCRIPTION
+  Returns USB devices and their current status.
+  .EXAMPLE
+  PS> Get-vtsUSB
+  
+  Output:
+  FriendlyName                                          Present Status
+  ------------                                          ------- ------
+  Microsoft LifeCam VX-3000                                True OK
+  EPSON Utility                                            True OK
+  American Power Conversion USB UPS                        True OK
+  Microsoft LifeCam VX-3000.                               True OK
+  FULL HD 1080P Webcam                                     True OK
+  SmartSource Pro/Value                                    True OK
+  EPSON ES-400                                             True OK
+  .EXAMPLE
+  PS> Get-vtsUSB epson
+  
+  Output:
+  FriendlyName                                          Present Status
+  ------------                                          ------- ------
+  EPSON Utility                                            True OK
+  EPSON ES-400                                             True OK
+  
+  .LINK
+  Device Management
+  #>
   param (
     $searchTerm
   )
@@ -560,68 +560,68 @@ function Get-vtsUSB {
   Sort-Object Present -Descending
 }
 
-<#
-.DESCRIPTION
-Returns physical disk stats. Defaults to C drive if no driver letter is specified.
-.EXAMPLE
-PS> Get-vtsDiskStat
-
-Output:
-Drive Property                                   Value
------ --------                                   -----
-C     avg. disk bytes/read                       65536
-C     disk write bytes/sec            44645.6174840863
-C     avg. disk bytes/write           4681.14285714286
-C     % idle time                     96.9313065314281
-C     split io/sec                    6.88540550759652
-C     disk transfers/sec              0.99463553271784
-C     % disk write time              0.716335878527066
-C     avg. disk read queue length  0.00802039105365663
-C     avg. disk write queue length 0.00792347156238492
-C     avg. disk sec/write          0.00246081666666667
-C     avg. disk sec/transfer                         0
-C     avg. disk sec/read                             0
-C     disk reads/sec                                 0
-C     disk writes/sec                                0
-C     disk bytes/sec                                 0
-C     disk read bytes/sec                            0
-C     % disk read time                               0
-C     avg. disk bytes/transfer                       0
-C     avg. disk queue length                         0
-C     % disk time                                    0
-C     current disk queue length                      0
-.EXAMPLE
-PS> Get-vtsDiskStat -DriveLetter D
-
-Output:
-Drive Property                                   Value
------ --------                                   -----
-D     avg. disk bytes/read                       65536
-D     disk write bytes/sec            44645.6174840863
-D     avg. disk bytes/write           4681.14285714286
-D     % idle time                     96.9313065314281
-D     split io/sec                    6.88540550759652
-D     disk transfers/sec              0.99463553271784
-D     % disk write time              0.716335878527066
-D     avg. disk read queue length  0.00802039105365663
-D     avg. disk write queue length 0.00792347156238492
-D     avg. disk sec/write          0.00246081666666667
-D     avg. disk sec/transfer                         0
-D     avg. disk sec/read                             0
-D     disk reads/sec                                 0
-D     disk writes/sec                                0
-D     disk bytes/sec                                 0
-D     disk read bytes/sec                            0
-D     % disk read time                               0
-D     avg. disk bytes/transfer                       0
-D     avg. disk queue length                         0
-D     % disk time                                    0
-D     current disk queue length                      0
-
-.LINK
-System Information
-#>
 function Get-vtsDiskStat {
+  <#
+  .DESCRIPTION
+  Returns physical disk stats. Defaults to C drive if no driver letter is specified.
+  .EXAMPLE
+  PS> Get-vtsDiskStat
+  
+  Output:
+  Drive Property                                   Value
+  ----- --------                                   -----
+  C     avg. disk bytes/read                       65536
+  C     disk write bytes/sec            44645.6174840863
+  C     avg. disk bytes/write           4681.14285714286
+  C     % idle time                     96.9313065314281
+  C     split io/sec                    6.88540550759652
+  C     disk transfers/sec              0.99463553271784
+  C     % disk write time              0.716335878527066
+  C     avg. disk read queue length  0.00802039105365663
+  C     avg. disk write queue length 0.00792347156238492
+  C     avg. disk sec/write          0.00246081666666667
+  C     avg. disk sec/transfer                         0
+  C     avg. disk sec/read                             0
+  C     disk reads/sec                                 0
+  C     disk writes/sec                                0
+  C     disk bytes/sec                                 0
+  C     disk read bytes/sec                            0
+  C     % disk read time                               0
+  C     avg. disk bytes/transfer                       0
+  C     avg. disk queue length                         0
+  C     % disk time                                    0
+  C     current disk queue length                      0
+  .EXAMPLE
+  PS> Get-vtsDiskStat -DriveLetter D
+  
+  Output:
+  Drive Property                                   Value
+  ----- --------                                   -----
+  D     avg. disk bytes/read                       65536
+  D     disk write bytes/sec            44645.6174840863
+  D     avg. disk bytes/write           4681.14285714286
+  D     % idle time                     96.9313065314281
+  D     split io/sec                    6.88540550759652
+  D     disk transfers/sec              0.99463553271784
+  D     % disk write time              0.716335878527066
+  D     avg. disk read queue length  0.00802039105365663
+  D     avg. disk write queue length 0.00792347156238492
+  D     avg. disk sec/write          0.00246081666666667
+  D     avg. disk sec/transfer                         0
+  D     avg. disk sec/read                             0
+  D     disk reads/sec                                 0
+  D     disk writes/sec                                0
+  D     disk bytes/sec                                 0
+  D     disk read bytes/sec                            0
+  D     % disk read time                               0
+  D     avg. disk bytes/transfer                       0
+  D     avg. disk queue length                         0
+  D     % disk time                                    0
+  D     current disk queue length                      0
+  
+  .LINK
+  System Information
+  #>
   param (
     $DriveLetter = "C"
   )
@@ -649,79 +649,79 @@ function Get-vtsDiskStat {
   $stats | Sort-Object Value -Descending
 }
 
-<#
-.DESCRIPTION
-Installs Chocolatey.
-.EXAMPLE
-PS> Install-vtsChoco
-
-Output:
-Forcing web requests to allow TLS v1.2 (Required for requests to Chocolatey.org)
-Getting latest version of the Chocolatey package for download.
-Not using proxy.
-Getting Chocolatey from https://community.chocolatey.org/api/v2/package/chocolatey/1.2.0.
-Downloading https://community.chocolatey.org/api/v2/package/chocolatey/1.2.0 to C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall\chocolatey.zip
-Not using proxy.
-Extracting C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall\chocolatey.zip to C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall
-Installing Chocolatey on the local machine
-Creating ChocolateyInstall as an environment variable (targeting 'Machine')
-  Setting ChocolateyInstall to 'C:\ProgramData\chocolatey'
-WARNING: It's very likely you will need to close and reopen your shell
-  before you can use choco.
-Restricting write permissions to Administrators
-We are setting up the Chocolatey package repository.
-The packages themselves go to 'C:\ProgramData\chocolatey\lib'
-  (i.e. C:\ProgramData\chocolatey\lib\yourPackageName).
-A shim file for the command line goes to 'C:\ProgramData\chocolatey\bin'
-  and points to an executable in 'C:\ProgramData\chocolatey\lib\yourPackageName'.
-
-Creating Chocolatey folders if they do not already exist.
-
-WARNING: You can safely ignore errors related to missing log files when
-  upgrading from a version of Chocolatey less than 0.9.9.
-  'Batch file could not be found' is also safe to ignore.
-  'The system cannot find the file specified' - also safe.
-chocolatey.nupkg file not installed in lib.
- Attempting to locate it from bootstrapper.
-PATH environment variable does not have C:\ProgramData\chocolatey\bin in it. Adding...
-Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.
-WARNING: Chocolatey profile installed. Reload your profile - type . $profile
-Chocolatey (choco.exe) is now ready.
-You can call choco from anywhere, command line or powershell by typing choco.
-Run choco /? for a list of functions.
-You may need to shut down and restart powershell and/or consoles
- first prior to using choco.
-Ensuring Chocolatey commands are on the path
-Ensuring chocolatey.nupkg is in the lib folder
-
-.LINK
-Package Management
-#>
 function Install-vtsChoco {
+  <#
+  .DESCRIPTION
+  Installs Chocolatey.
+  .EXAMPLE
+  PS> Install-vtsChoco
+  
+  Output:
+  Forcing web requests to allow TLS v1.2 (Required for requests to Chocolatey.org)
+  Getting latest version of the Chocolatey package for download.
+  Not using proxy.
+  Getting Chocolatey from https://community.chocolatey.org/api/v2/package/chocolatey/1.2.0.
+  Downloading https://community.chocolatey.org/api/v2/package/chocolatey/1.2.0 to C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall\chocolatey.zip
+  Not using proxy.
+  Extracting C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall\chocolatey.zip to C:\Users\rober\AppData\Local\Temp\chocolatey\chocoInstall
+  Installing Chocolatey on the local machine
+  Creating ChocolateyInstall as an environment variable (targeting 'Machine')
+    Setting ChocolateyInstall to 'C:\ProgramData\chocolatey'
+  WARNING: It's very likely you will need to close and reopen your shell
+    before you can use choco.
+  Restricting write permissions to Administrators
+  We are setting up the Chocolatey package repository.
+  The packages themselves go to 'C:\ProgramData\chocolatey\lib'
+    (i.e. C:\ProgramData\chocolatey\lib\yourPackageName).
+  A shim file for the command line goes to 'C:\ProgramData\chocolatey\bin'
+    and points to an executable in 'C:\ProgramData\chocolatey\lib\yourPackageName'.
+  
+  Creating Chocolatey folders if they do not already exist.
+  
+  WARNING: You can safely ignore errors related to missing log files when
+    upgrading from a version of Chocolatey less than 0.9.9.
+    'Batch file could not be found' is also safe to ignore.
+    'The system cannot find the file specified' - also safe.
+  chocolatey.nupkg file not installed in lib.
+   Attempting to locate it from bootstrapper.
+  PATH environment variable does not have C:\ProgramData\chocolatey\bin in it. Adding...
+  Adding Chocolatey to the profile. This will provide tab completion, refreshenv, etc.
+  WARNING: Chocolatey profile installed. Reload your profile - type . $profile
+  Chocolatey (choco.exe) is now ready.
+  You can call choco from anywhere, command line or powershell by typing choco.
+  Run choco /? for a list of functions.
+  You may need to shut down and restart powershell and/or consoles
+   first prior to using choco.
+  Ensuring Chocolatey commands are on the path
+  Ensuring chocolatey.nupkg is in the lib folder
+  
+  .LINK
+  Package Management
+  #>
   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 }
 
-<#
-.DESCRIPTION
-Runs speedtest by Ookla. Installs via chocolatey.
-.EXAMPLE
-PS> Start-vtsSpeedTest
-
-Output:
-   Speedtest by Ookla
-
-     Server: Sparklight - Anniston, AL (id = 8829)
-        ISP: Spectrum Business
-    Latency:    25.11 ms   (0.18 ms jitter)
-   Download:   236.80 Mbps (data used: 369.4 MB )
-     Upload:   309.15 Mbps (data used: 526.0 MB )
-Packet Loss:     0.0%
- Result URL: https://www.speedtest.net/result/c/23d057dd-8de5-4d62-aef9-72beb122d7a4
-
- .LINK
-Network
- #>
 function Start-vtsSpeedTest {
+  <#
+  .DESCRIPTION
+  Runs speedtest by Ookla. Installs via chocolatey.
+  .EXAMPLE
+  PS> Start-vtsSpeedTest
+  
+  Output:
+     Speedtest by Ookla
+  
+       Server: Sparklight - Anniston, AL (id = 8829)
+          ISP: Spectrum Business
+      Latency:    25.11 ms   (0.18 ms jitter)
+     Download:   236.80 Mbps (data used: 369.4 MB )
+       Upload:   309.15 Mbps (data used: 526.0 MB )
+  Packet Loss:     0.0%
+   Result URL: https://www.speedtest.net/result/c/23d057dd-8de5-4d62-aef9-72beb122d7a4
+  
+   .LINK
+  Network
+   #>
   if (Test-Path "C:\ProgramData\chocolatey\bin\speedtest.exe") {
     C:\ProgramData\chocolatey\bin\speedtest.exe
   }
@@ -739,24 +739,24 @@ function Start-vtsSpeedTest {
   }
 }
  
-<#
-.DESCRIPTION
-Installs all pending Windows Updates.
-.EXAMPLE
-PS> Install-vtsWindowsUpdate
-
-Output:
-X ComputerName Result     KB          Size Title
-- ------------ ------     --          ---- -----
-1 CH-BIMA-W... Accepted   KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
-2 CH-BIMA-W... Downloaded KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
-3 CH-BIMA-W... Installed  KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
-Reboot is required. Do it now? [Y / N] (default is 'N')
-
-.LINK
-Package Management
-#>
 function Install-vtsWindowsUpdate {
+  <#
+  .DESCRIPTION
+  Installs all pending Windows Updates.
+  .EXAMPLE
+  PS> Install-vtsWindowsUpdate
+  
+  Output:
+  X ComputerName Result     KB          Size Title
+  - ------------ ------     --          ---- -----
+  1 CH-BIMA-W... Accepted   KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
+  2 CH-BIMA-W... Downloaded KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
+  3 CH-BIMA-W... Installed  KB5018202   68MB 2022-10 Cumulative Update Preview for .NET Framework 3.5, 4.8 and 4.8...
+  Reboot is required. Do it now? [Y / N] (default is 'N')
+  
+  .LINK
+  Package Management
+  #>
   $NuGet = Get-PackageProvider -Name NuGet
   if ($null -eq $NuGet) {
     Install-PackageProvider -Name NuGet -Force
@@ -772,53 +772,53 @@ function Install-vtsWindowsUpdate {
   Install-WindowsUpdate -AcceptAll
 }
 
-<#
-.DESCRIPTION
-Searches the Remote Desktop Gateway connection log.
-.EXAMPLE
-PS> Search-vtsRDPGatewayLog
-
-Output:
-TimeCreated : 11/17/2022 9:38:46 AM
-Message     : The user "domain\user1", on client computer "100.121.185.200", connected to resource
-              "PC-21.domain.local". Connection protocol used: "HTTP".
-Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
-
-TimeCreated : 11/17/2022 9:45:40 AM
-Message     : The user "domain\user2", on client computer "172.56.65.179", disconnected from the following
-              network resource: "PC-p2.domain.local". Before the user disconnected, the client transferred 1762936
-              bytes and received 6198054 bytes. The client session duration was 4947 seconds. Connection protocol
-              used: "HTTP".
-Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
-
-TimeCreated : 11/17/2022 9:46:01 AM
-Message     : The user "domain\user1", on client computer "100.121.185.200", disconnected from the following network
-              resource: "PC-21.domain.local". Before the user disconnected, the client transferred 1348808 bytes
-              and received 4463546 bytes. The client session duration was 435 seconds. Connection protocol used:
-              "HTTP".
-Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
-.EXAMPLE
-PS> Search-vtsRDPGatewayLog robert
-
-Output:
-TimeCreated : 11/17/2022 9:45:40 AM
-Message     : The user "domain\robert.ryan", on client computer "172.56.65.179", disconnected from the following
-              network resource: "PC-p2.domain.local". Before the user disconnected, the client transferred 1762936
-              bytes and received 6198054 bytes. The client session duration was 4947 seconds. Connection protocol
-              used: "HTTP".
-Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
-
-TimeCreated : 11/17/2022 9:46:01 AM
-Message     : The user "domain\robert.ryan, on client computer "100.121.185.200", disconnected from the following network
-              resource: "PC-21.domain.local". Before the user disconnected, the client transferred 1348808 bytes
-              and received 4463546 bytes. The client session duration was 435 seconds. Connection protocol used:
-              "HTTP".
-Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
-
-.LINK
-Log Management
-#>
 function Search-vtsRDPGatewayLog {
+  <#
+  .DESCRIPTION
+  Searches the Remote Desktop Gateway connection log.
+  .EXAMPLE
+  PS> Search-vtsRDPGatewayLog
+  
+  Output:
+  TimeCreated : 11/17/2022 9:38:46 AM
+  Message     : The user "domain\user1", on client computer "100.121.185.200", connected to resource
+                "PC-21.domain.local". Connection protocol used: "HTTP".
+  Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+  
+  TimeCreated : 11/17/2022 9:45:40 AM
+  Message     : The user "domain\user2", on client computer "172.56.65.179", disconnected from the following
+                network resource: "PC-p2.domain.local". Before the user disconnected, the client transferred 1762936
+                bytes and received 6198054 bytes. The client session duration was 4947 seconds. Connection protocol
+                used: "HTTP".
+  Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+  
+  TimeCreated : 11/17/2022 9:46:01 AM
+  Message     : The user "domain\user1", on client computer "100.121.185.200", disconnected from the following network
+                resource: "PC-21.domain.local". Before the user disconnected, the client transferred 1348808 bytes
+                and received 4463546 bytes. The client session duration was 435 seconds. Connection protocol used:
+                "HTTP".
+  Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+  .EXAMPLE
+  PS> Search-vtsRDPGatewayLog robert
+  
+  Output:
+  TimeCreated : 11/17/2022 9:45:40 AM
+  Message     : The user "domain\robert.ryan", on client computer "172.56.65.179", disconnected from the following
+                network resource: "PC-p2.domain.local". Before the user disconnected, the client transferred 1762936
+                bytes and received 6198054 bytes. The client session duration was 4947 seconds. Connection protocol
+                used: "HTTP".
+  Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+  
+  TimeCreated : 11/17/2022 9:46:01 AM
+  Message     : The user "domain\robert.ryan, on client computer "100.121.185.200", disconnected from the following network
+                resource: "PC-21.domain.local". Before the user disconnected, the client transferred 1348808 bytes
+                and received 4463546 bytes. The client session duration was 435 seconds. Connection protocol used:
+                "HTTP".
+  Log         : Microsoft-Windows-TerminalServices-Gateway/Operational
+  
+  .LINK
+  Log Management
+  #>
   [CmdletBinding()]
   Param(
     [string]$SearchTerm
@@ -851,16 +851,16 @@ function Search-vtsRDPGatewayLog {
   $result | Sort-Object TimeCreated | Format-List
 }
 
-<#
-.DESCRIPTION
-Uninstall ninja and remove keys, files and services.
-.EXAMPLE
-PS> Uninstall-vtsNinja
-
-.LINK
-Package Management
-#>
 function Uninstall-vtsNinja {
+  <#
+  .DESCRIPTION
+  Uninstall ninja and remove keys, files and services.
+  .EXAMPLE
+  PS> Uninstall-vtsNinja
+  
+  .LINK
+  Package Management
+  #>
   param (
     [Parameter(Mandatory = $false)]
     [switch]$DelTeamViewer = $false,
@@ -1033,20 +1033,20 @@ function Uninstall-vtsNinja {
   }    
 }
 
-<#
-.Description
-Sets the default printer.
-
-.EXAMPLE
-PS> Set-vtsDefaultPrinter -Name <"Printer">
-
-.EXAMPLE
-PS> Set-vtsDefaultPrinter -Name "HP Laserjet"
-
-.LINK
-Print Management
-#>
 function Set-vtsDefaultPrinter {
+  <#
+  .Description
+  Sets the default printer.
+  
+  .EXAMPLE
+  PS> Set-vtsDefaultPrinter -Name <"Printer">
+  
+  .EXAMPLE
+  PS> Set-vtsDefaultPrinter -Name "HP Laserjet"
+  
+  .LINK
+  Print Management
+  #>
   Param(
     [Parameter(
       Mandatory = $true)]
@@ -1069,20 +1069,20 @@ function Set-vtsDefaultPrinter {
   }
 }
 
-<#
-.DESCRIPTION
-Returns users toast notifications. Duplicates notifications are removed for brevity.
-.EXAMPLE
-Show notifications for all users
-PS> Show-vtsToastNotification
-.EXAMPLE
-Show notifications for a selected user
-PS> Show-vtsToastNotification -user john.doe
-
-.LINK
-Device Management
-#>
 function Show-vtsToastNotification {
+  <#
+  .DESCRIPTION
+  Returns users toast notifications. Duplicates notifications are removed for brevity.
+  .EXAMPLE
+  Show notifications for all users
+  PS> Show-vtsToastNotification
+  .EXAMPLE
+  Show notifications for a selected user
+  PS> Show-vtsToastNotification -user john.doe
+  
+  .LINK
+  Device Management
+  #>
   param(
     $user = (Get-ChildItem C:\Users\ | Select-Object -ExpandProperty Name)
   )
@@ -1108,18 +1108,18 @@ function Show-vtsToastNotification {
   $notification | Select-Object -Unique
 }
 
-<#
-.DESCRIPTION
-Maps a remote drive.
-.EXAMPLE
-PS> New-vtsMappedDrive -Letter A -Path \\192.168.0.4\sharedfolder
-.EXAMPLE
-PS> New-vtsMappedDrive -Letter A -Path "\\192.168.0.4\folder with spaces"
-
-.LINK
-Drive Management
-#>
 function New-vtsMappedDrive {
+  <#
+  .DESCRIPTION
+  Maps a remote drive.
+  .EXAMPLE
+  PS> New-vtsMappedDrive -Letter A -Path \\192.168.0.4\sharedfolder
+  .EXAMPLE
+  PS> New-vtsMappedDrive -Letter A -Path "\\192.168.0.4\folder with spaces"
+  
+  .LINK
+  Drive Management
+  #>
   param(
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -1131,16 +1131,16 @@ function New-vtsMappedDrive {
   New-PSDrive -Name "$Letter" -PSProvider FileSystem -Root "$Path" -Persist -Scope Global
 }
 
-<#
-.DESCRIPTION
-Install PowerShell 7
-.EXAMPLE
-PS> Install-vtsPwsh
-
-.LINK
-Package Management
-#>
 function Install-vtsPwsh {
+  <#
+  .DESCRIPTION
+  Install PowerShell 7
+  .EXAMPLE
+  PS> Install-vtsPwsh
+  
+  .LINK
+  Package Management
+  #>
   param (
     [switch]$InstallLatestVersionWithGUI
   )
@@ -1155,26 +1155,26 @@ function Install-vtsPwsh {
   }
 }
 
-<#
-.DESCRIPTION
-    Get the default application associated with a specific file extension. If no extension is provided, it returns a list of all file extensions and their associated default applications.
-
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-
-.EXAMPLE
-    Get-FTA .pdf
-    Show Default Application Program Id for an Extension
-
-.LINK
-File Association Management
-    #>
 function Get-FTA {
+  <#
+  .DESCRIPTION
+      Get the default application associated with a specific file extension. If no extension is provided, it returns a list of all file extensions and their associated default applications.
+  
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+  
+  .EXAMPLE
+      Get-FTA .pdf
+      Show Default Application Program Id for an Extension
+  
+  .LINK
+  File Association Management
+      #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $false)]
@@ -1204,25 +1204,25 @@ function Get-FTA {
   
 }
 
-<#
-.DESCRIPTION
-    Get the default application associated with a specific protocol. If no protocol is provided, it returns a list of all protocols and their associated default applications.
-
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-
-.EXAMPLE
-    Get-PTA
-
-.LINK
-File Association Management
-    #>
 function Get-PTA {
+  <#
+  .DESCRIPTION
+      Get the default application associated with a specific protocol. If no protocol is provided, it returns a list of all protocols and their associated default applications.
+  
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+  
+  .EXAMPLE
+      Get-PTA
+  
+  .LINK
+  File Association Management
+      #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $false)]
@@ -1250,26 +1250,26 @@ function Get-PTA {
   }
 }
 
-<#
-.DESCRIPTION
-    Register an application and set it as the default for a specified file extension or protocol.
-
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-
-.EXAMPLE
-    Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
-    This example registers SumatraPDF as the default PDF reader.
-
-.LINK
-File Association Management
-    #>
 function Register-FTA {
+  <#
+  .DESCRIPTION
+      Register an application and set it as the default for a specified file extension or protocol.
+  
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+  
+  .EXAMPLE
+      Register-FTA "C:\SumatraPDF.exe" .pdf -Icon "shell32.dll,100"
+      This example registers SumatraPDF as the default PDF reader.
+  
+  .LINK
+  File Association Management
+      #>
   [CmdletBinding()]
   param (
     [Parameter( Position = 0, Mandatory = $true)]
@@ -1322,22 +1322,22 @@ function Register-FTA {
   Set-FTA -ProgId $ProgId -Extension $Extension -Icon $Icon
 }
 
-<#
-.DESCRIPTION
-    Remove the file type association for a given application.
-
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-
-.LINK
-File Association Management
-    #>
 function Remove-FTA {
+  <#
+  .DESCRIPTION
+      Remove the file type association for a given application.
+  
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+  
+  .LINK
+  File Association Management
+      #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $true)]
@@ -1445,29 +1445,29 @@ function Remove-FTA {
   Write-Output "Removed: $ProgId" 
 }
 
-<#
-.DESCRIPTION
-    Set the default file type association. It can be used to set the default application for a specific file type or protocol.
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-    
-.EXAMPLE
-    Set-FTA AcroExch.Document.DC .pdf
-    Set Acrobat Reader DC as Default .pdf reader
- 
-.EXAMPLE
-    Set-FTA Applications\SumatraPDF.exe .pdf
-    Set Sumatra PDF as Default .pdf reader
-
-.LINK
-File Association Management
-    #>
 function Set-FTA {
+  <#
+  .DESCRIPTION
+      Set the default file type association. It can be used to set the default application for a specific file type or protocol.
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+      
+  .EXAMPLE
+      Set-FTA AcroExch.Document.DC .pdf
+      Set Acrobat Reader DC as Default .pdf reader
+   
+  .EXAMPLE
+      Set-FTA Applications\SumatraPDF.exe .pdf
+      Set Sumatra PDF as Default .pdf reader
+  
+  .LINK
+  File Association Management
+      #>
 
   [CmdletBinding()]
   param (
@@ -1952,28 +1952,28 @@ function Set-FTA {
 
 }
 
-<#
-.DESCRIPTION
-    Set the default application for a specific protocol. It takes a ProgId, a Protocol, and an optional Icon as parameters. 
-    The ProgId is the identifier of the application to be set as default. The Protocol is the protocol for which the application will be set as default. 
-    The Icon is an optional parameter that sets the icon for the application.
-
-.NOTES
-    Version    : 1.2.0
-    Author(s)  : Danyfirex & Dany3j
-    Credits    : https://bbs.pediy.com/thread-213954.htm
-                 LMongrain - Hash Algorithm PureBasic Version
-    License    : MIT License
-    Copyright  : 2022 Danysys. <danysys.com>
-  
-.EXAMPLE
-    Set-PTA ChromeHTML http
-    Set Google Chrome as Default for http Protocol
-
-.LINK
-File Association Management
-    #>
 function Set-PTA {
+  <#
+  .DESCRIPTION
+      Set the default application for a specific protocol. It takes a ProgId, a Protocol, and an optional Icon as parameters. 
+      The ProgId is the identifier of the application to be set as default. The Protocol is the protocol for which the application will be set as default. 
+      The Icon is an optional parameter that sets the icon for the application.
+  
+  .NOTES
+      Version    : 1.2.0
+      Author(s)  : Danyfirex & Dany3j
+      Credits    : https://bbs.pediy.com/thread-213954.htm
+                   LMongrain - Hash Algorithm PureBasic Version
+      License    : MIT License
+      Copyright  : 2022 Danysys. <danysys.com>
+    
+  .EXAMPLE
+      Set-PTA ChromeHTML http
+      Set Google Chrome as Default for http Protocol
+  
+  .LINK
+  File Association Management
+      #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $true)]
@@ -1991,30 +1991,30 @@ function Set-PTA {
   Set-FTA -ProgId $ProgId -Protocol $Protocol -Icon $Icon
 }
 
-<#
-.SYNOPSIS
-    A function to add a printer from a print server.
-
-.DESCRIPTION
-    This function takes a server name and a printer name as input, searches for the printer on the server, and adds it to the local machine. 
-    It prompts the user for confirmation before adding the printer. The function uses the Get-Printer cmdlet to get the list of printers from the server, 
-    and the Add-Printer cmdlet to add the printer.
-
-.PARAMETER Server
-    The name of the server where the printer is located.
-
-.PARAMETER Name
-    The name of the printer to be added. Wildcards can be used for searching.
-
-.EXAMPLE
-    PS C:\> Add-vtsPrinter -Server "ch-dc" -Name "*P18*"
-
-    This command will search for a printer with a name that includes "P18" on the server "ch-dc", and add it to the local machine after user confirmation.
-
-.LINK
-    Print Management
-    #>
 function Add-vtsPrinter {
+  <#
+  .SYNOPSIS
+      A function to add a printer from a print server.
+  
+  .DESCRIPTION
+      This function takes a server name and a printer name as input, searches for the printer on the server, and adds it to the local machine. 
+      It prompts the user for confirmation before adding the printer. The function uses the Get-Printer cmdlet to get the list of printers from the server, 
+      and the Add-Printer cmdlet to add the printer.
+  
+  .PARAMETER Server
+      The name of the server where the printer is located.
+  
+  .PARAMETER Name
+      The name of the printer to be added. Wildcards can be used for searching.
+  
+  .EXAMPLE
+      PS C:\> Add-vtsPrinter -Server "ch-dc" -Name "*P18*"
+  
+      This command will search for a printer with a name that includes "P18" on the server "ch-dc", and add it to the local machine after user confirmation.
+  
+  .LINK
+      Print Management
+      #>
   param(
     [Parameter(Mandatory = $true)]
     [string]$Server,
@@ -2072,32 +2072,32 @@ function Add-vtsPrinter {
   }
 }
 
-<#
-.SYNOPSIS
-This script downloads, extracts, and installs a printer driver from a given URL.
-
-.DESCRIPTION
-The Add-vtsPrinterDriver function downloads a printer driver from a specified URL, extracts it using 7Zip, and installs it on the local machine. 
-It also handles the creation of necessary directories and the installation of required software (Chocolatey and 7Zip).
-
-.PARAMETER WorkingDir
-The directory where the printer driver will be downloaded and extracted. Default is "C:\temp\PrinterDrivers".
-
-.PARAMETER DriverURL
-The URL of the printer driver to be downloaded. This is a mandatory parameter.
-
-.EXAMPLE
-Add-vtsPrinterDriver -WorkingDir "C:\temp\MyDrivers" -DriverURL "http://example.com/driver.zip"
-
-This example downloads the printer driver from http://example.com/driver.zip, extracts it to C:\temp\MyDrivers, and installs it.
-
-.NOTES
-This script requires administrative privileges to install the printer driver and software dependencies.
-
-.LINK
-Print Management
-#>
 function Add-vtsPrinterDriver {
+  <#
+  .SYNOPSIS
+  This script downloads, extracts, and installs a printer driver from a given URL.
+  
+  .DESCRIPTION
+  The Add-vtsPrinterDriver function downloads a printer driver from a specified URL, extracts it using 7Zip, and installs it on the local machine. 
+  It also handles the creation of necessary directories and the installation of required software (Chocolatey and 7Zip).
+  
+  .PARAMETER WorkingDir
+  The directory where the printer driver will be downloaded and extracted. Default is "C:\temp\PrinterDrivers".
+  
+  .PARAMETER DriverURL
+  The URL of the printer driver to be downloaded. This is a mandatory parameter.
+  
+  .EXAMPLE
+  Add-vtsPrinterDriver -WorkingDir "C:\temp\MyDrivers" -DriverURL "http://example.com/driver.zip"
+  
+  This example downloads the printer driver from http://example.com/driver.zip, extracts it to C:\temp\MyDrivers, and installs it.
+  
+  .NOTES
+  This script requires administrative privileges to install the printer driver and software dependencies.
+  
+  .LINK
+  Print Management
+  #>
   param(
     $WorkingDir = "C:\temp\PrinterDrivers",
     [Parameter(Mandatory = $true)]
@@ -2214,25 +2214,26 @@ function Add-vtsPrinterDriver {
     Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
   }
 }
-<#
-.SYNOPSIS
-This function retrieves the license details for a list of users after validating their existence.
 
-.DESCRIPTION
-The function Get-vts365UserLicense connects to the Graph API, validates if the users exist, and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
-
-.PARAMETER UserList
-A single string or comma separated email addresses for which the license details are to be retrieved.
-
-.EXAMPLE
-Get-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
-
-This example validates and retrieves the license details for user1@domain.com and user2@domain.com.
-
-.LINK
-M365
-#>
 function Get-vts365UserLicense {
+  <#
+  .SYNOPSIS
+  This function retrieves the license details for a list of users after validating their existence.
+  
+  .DESCRIPTION
+  The function Get-vts365UserLicense connects to the Graph API, validates if the users exist, and retrieves the license details for a list of users. The user list is passed as a parameter to the function.
+  
+  .PARAMETER UserList
+  A single string or comma separated email addresses for which the license details are to be retrieved.
+  
+  .EXAMPLE
+  Get-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
+  
+  This example validates and retrieves the license details for user1@domain.com and user2@domain.com.
+  
+  .LINK
+  M365
+  #>
   param (
     [Parameter(Mandatory = $false, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
@@ -2286,30 +2287,30 @@ function Get-vts365UserLicense {
   }
 }
 
-<#
-.SYNOPSIS
-This function formats a MAC address input by the user or from the clipboard if not specified.
-
-.DESCRIPTION
-The function Format-vtsMacAddress takes a MAC address as a parameter, removes any separators, converts it to lowercase, checks if it is 12 characters long, and then formats it by inserting colons after every 2 characters. If the MacAddress parameter is not specified, the function will use the current content of the clipboard. The formatted MAC address is then copied to the clipboard.
-
-.PARAMETER MacAddress
-A string representing the MAC address to be formatted. If not specified, the function will use the current content of the clipboard.
-
-.EXAMPLE
-Format-vtsMacAddress -MacAddress "00:0a:95:9d:68:16"
-
-This example formats the provided MAC address.
-
-.EXAMPLE
-Format-vtsMacAddress
-
-This example formats the MAC address currently in the clipboard.
-
-.LINK
-Utilities
-#>
 function Format-vtsMacAddress {
+  <#
+  .SYNOPSIS
+  This function formats a MAC address input by the user or from the clipboard if not specified.
+  
+  .DESCRIPTION
+  The function Format-vtsMacAddress takes a MAC address as a parameter, removes any separators, converts it to lowercase, checks if it is 12 characters long, and then formats it by inserting colons after every 2 characters. If the MacAddress parameter is not specified, the function will use the current content of the clipboard. The formatted MAC address is then copied to the clipboard.
+  
+  .PARAMETER MacAddress
+  A string representing the MAC address to be formatted. If not specified, the function will use the current content of the clipboard.
+  
+  .EXAMPLE
+  Format-vtsMacAddress -MacAddress "00:0a:95:9d:68:16"
+  
+  This example formats the provided MAC address.
+  
+  .EXAMPLE
+  Format-vtsMacAddress
+  
+  This example formats the MAC address currently in the clipboard.
+  
+  .LINK
+  Utilities
+  #>
   param (
     $MacAddress = (Get-Clipboard)
   )
@@ -2334,21 +2335,21 @@ function Format-vtsMacAddress {
   }
 }
 
-<#
-.SYNOPSIS
-This function copies emails from a specified sender within a date range from all mailboxes to a target mailbox and folder.
-
-.DESCRIPTION
-The Copy-vts365MailToMailbox function connects to Exchange Online PowerShell and creates a new compliance search for emails from a specified sender within a specified date range. It waits for the compliance search to complete, gets the results, parses them, and creates objects from the results. It then gets the mailboxes to search, performs the search, and copies the emails to the target mailbox's specified folder.
-
-.EXAMPLE
-Copy-vts365MailToMailbox -senderAddress "sender@example.com" -targetMailbox "target@example.com" -targetFolder "Folder" -startDate "01/01/2020" -endDate "12/31/2020" -SearchName "Search1"
-This example copies all emails from sender@example.com sent between 01/01/2020 and 12/31/2020 from all mailboxes to the "Folder" in the target@example.com mailbox.
-
-.LINK
-M365
-#>
 function Copy-vts365MailToMailbox {
+  <#
+  .SYNOPSIS
+  This function copies emails from a specified sender within a date range from all mailboxes to a target mailbox and folder.
+  
+  .DESCRIPTION
+  The Copy-vts365MailToMailbox function connects to Exchange Online PowerShell and creates a new compliance search for emails from a specified sender within a specified date range. It waits for the compliance search to complete, gets the results, parses them, and creates objects from the results. It then gets the mailboxes to search, performs the search, and copies the emails to the target mailbox's specified folder.
+  
+  .EXAMPLE
+  Copy-vts365MailToMailbox -senderAddress "sender@example.com" -targetMailbox "target@example.com" -targetFolder "Folder" -startDate "01/01/2020" -endDate "12/31/2020" -SearchName "Search1"
+  This example copies all emails from sender@example.com sent between 01/01/2020 and 12/31/2020 from all mailboxes to the "Folder" in the target@example.com mailbox.
+  
+  .LINK
+  M365
+  #>
   param(
     [Parameter(Mandatory = $true, HelpMessage = "Enter the sender's email address")]
     [string]$senderAddress,
@@ -2453,28 +2454,28 @@ function Copy-vts365MailToMailbox {
   Write-Host "Operation completed."
 }
 
-<#
-.SYNOPSIS
-This function adds licenses to a list of users.
-
-.DESCRIPTION
-The function Add-vts365UserLicense connects to the Graph API and adds licenses to a list of users. If no user list is specified, it connects to Exchange Online and allows the user to select mailboxes dynamically. The function also allows the user to select which licenses to add.
-
-.PARAMETER UserList
-An optional parameter. A single string or comma separated email addresses to which the licenses are to be added. If not specified, the user will be prompted to select from a list of all mailboxes.
-
-.EXAMPLE
-Add-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
-
-.EXAMPLE
-Add-vts365UserLicense
-
-This example prompts the user to select from a list of all mailboxes and then adds licenses to the selected users.
-
-.LINK
-M365
-#>
 function Add-vts365UserLicense {
+  <#
+  .SYNOPSIS
+  This function adds licenses to a list of users.
+  
+  .DESCRIPTION
+  The function Add-vts365UserLicense connects to the Graph API and adds licenses to a list of users. If no user list is specified, it connects to Exchange Online and allows the user to select mailboxes dynamically. The function also allows the user to select which licenses to add.
+  
+  .PARAMETER UserList
+  An optional parameter. A single string or comma separated email addresses to which the licenses are to be added. If not specified, the user will be prompted to select from a list of all mailboxes.
+  
+  .EXAMPLE
+  Add-vts365UserLicense -UserList "user1@domain.com, user2@domain.com"
+  
+  .EXAMPLE
+  Add-vts365UserLicense
+  
+  This example prompts the user to select from a list of all mailboxes and then adds licenses to the selected users.
+  
+  .LINK
+  M365
+  #>
   param (
     [Parameter(HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
@@ -2537,23 +2538,23 @@ function Add-vts365UserLicense {
   Write-Host "Operation completed."
 }
 
-<#
-.SYNOPSIS
-This function removes all licenses from a list of users.
-
-.DESCRIPTION
-The function Remove-vtsALL365UserLicense connects to the Graph API and removes all licenses from a list of users. The user list is passed as a parameter to the function.
-
-.PARAMETER UserList
-A single string or comma separated email addresses from which the licenses are to be removed.
-
-.EXAMPLE
-Remove-vtsALL365UserLicense -UserList "user1@domain.com, user2@domain.com"
-
-.LINK
-M365
-#>
 function Remove-vtsALL365UserLicense {
+  <#
+  .SYNOPSIS
+  This function removes all licenses from a list of users.
+  
+  .DESCRIPTION
+  The function Remove-vtsALL365UserLicense connects to the Graph API and removes all licenses from a list of users. The user list is passed as a parameter to the function.
+  
+  .PARAMETER UserList
+  A single string or comma separated email addresses from which the licenses are to be removed.
+  
+  .EXAMPLE
+  Remove-vtsALL365UserLicense -UserList "user1@domain.com, user2@domain.com"
+  
+  .LINK
+  M365
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
@@ -2573,39 +2574,39 @@ function Remove-vtsALL365UserLicense {
   Write-Host "Operation completed."
 }
 
-<#
-.SYNOPSIS
-Searches Windows Event Logs for a specific term and exports the results to a CSV or HTML report.
-
-.DESCRIPTION
-The Search-vtsAllLogs function searches through Windows Event Logs for a specific term. The function allows the user to specify the logs to search, the term to search for, the type of report to generate (CSV or HTML), and the output directory for the report. If a date is provided, the function will only search logs from that date. If the date is set to 'today', the function will search logs from the current date.
-
-.PARAMETER SearchTerm
-The term to search for in the logs. This parameter is mandatory.
-
-.PARAMETER ReportType
-The type of report to generate. Valid options are 'csv' and 'html'. If not specified, the function will default to 'html' for results with less than or equal to 150 entries, and 'csv' for results with more than 150 entries.
-
-.PARAMETER OutputDirectory
-The directory where the report will be saved. If not specified, the function will default to 'C:\temp'.
-
-.PARAMETER Date
-The date of the logs to search. The date should be entered in the format: month/day/year. For example, 12/14/2023. You can also enter 'today' as a value to search logs from the current date.
-
-.EXAMPLE
-Search-vtsAllLogs -SearchTerm "Error" -ReportType "csv" -OutputDirectory "C:\temp" -Date "12/14/2023"
-
-This example searches all logs from 12/14/2023 for the term "Error" and generates a CSV report in the 'C:\temp' directory.
-
-.EXAMPLE
-Search-vtsAllLogs -SearchTerm "Warning" -Date "today"
-
-This example searches all logs from the current date for the term "Warning" and generates a report based on the number of results found.
-
-.LINK
-Log Management
-#>
 function Search-vtsAllLogs {
+  <#
+  .SYNOPSIS
+  Searches Windows Event Logs for a specific term and exports the results to a CSV or HTML report.
+  
+  .DESCRIPTION
+  The Search-vtsAllLogs function searches through Windows Event Logs for a specific term. The function allows the user to specify the logs to search, the term to search for, the type of report to generate (CSV or HTML), and the output directory for the report. If a date is provided, the function will only search logs from that date. If the date is set to 'today', the function will search logs from the current date.
+  
+  .PARAMETER SearchTerm
+  The term to search for in the logs. This parameter is mandatory.
+  
+  .PARAMETER ReportType
+  The type of report to generate. Valid options are 'csv' and 'html'. If not specified, the function will default to 'html' for results with less than or equal to 150 entries, and 'csv' for results with more than 150 entries.
+  
+  .PARAMETER OutputDirectory
+  The directory where the report will be saved. If not specified, the function will default to 'C:\temp'.
+  
+  .PARAMETER Date
+  The date of the logs to search. The date should be entered in the format: month/day/year. For example, 12/14/2023. You can also enter 'today' as a value to search logs from the current date.
+  
+  .EXAMPLE
+  Search-vtsAllLogs -SearchTerm "Error" -ReportType "csv" -OutputDirectory "C:\temp" -Date "12/14/2023"
+  
+  This example searches all logs from 12/14/2023 for the term "Error" and generates a CSV report in the 'C:\temp' directory.
+  
+  .EXAMPLE
+  Search-vtsAllLogs -SearchTerm "Warning" -Date "today"
+  
+  This example searches all logs from the current date for the term "Warning" and generates a report based on the number of results found.
+  
+  .LINK
+  Log Management
+  #>
   [CmdletBinding()]
   param(
     [Parameter(Mandatory = $true)]
@@ -2719,35 +2720,36 @@ function Search-vtsAllLogs {
   
   Write-Host "Report saved at $ReportPath"
 }
-<#
-.SYNOPSIS
-    Get-vtsNICThroughput is a function that measures the throughput of active network adapters.
 
-.DESCRIPTION
-    This function continuously measures the throughput (in Mbps) of all active network adapters on the system. 
-    It does this by capturing the initial and final statistics of each network adapter over a 2-second interval, 
-    and then calculates the difference in received and sent bytes to determine the throughput.
-
-.PARAMETER adapterName
-    The name of the network adapter. If not specified, the function will measure the throughput for all active network adapters.
-
-.EXAMPLE
-    PS C:\> Get-vtsNICThroughput
-
-    This command will start the continuous measurement of throughput for all active network adapters.
-
-.EXAMPLE
-    PS C:\> Get-vtsNICThroughput -AdapterName "Ethernet"
-
-    This command will start the continuous measurement of throughput for the network adapter named "Ethernet".
-
-.NOTES
-    To stop the continuous measurement, use Ctrl+C.
-
-.LINK
-    Network
-#>
 function Get-vtsNICThroughput {
+  <#
+  .SYNOPSIS
+      Get-vtsNICThroughput is a function that measures the throughput of active network adapters.
+  
+  .DESCRIPTION
+      This function continuously measures the throughput (in Mbps) of all active network adapters on the system. 
+      It does this by capturing the initial and final statistics of each network adapter over a 2-second interval, 
+      and then calculates the difference in received and sent bytes to determine the throughput.
+  
+  .PARAMETER adapterName
+      The name of the network adapter. If not specified, the function will measure the throughput for all active network adapters.
+  
+  .EXAMPLE
+      PS C:\> Get-vtsNICThroughput
+  
+      This command will start the continuous measurement of throughput for all active network adapters.
+  
+  .EXAMPLE
+      PS C:\> Get-vtsNICThroughput -AdapterName "Ethernet"
+  
+      This command will start the continuous measurement of throughput for the network adapter named "Ethernet".
+  
+  .NOTES
+      To stop the continuous measurement, use Ctrl+C.
+  
+  .LINK
+      Network
+  #>
   [CmdletBinding()]
   param (
     $AdapterName = (Get-NetAdapter | Where-Object Status -eq Up | Select-Object -expand Name)
@@ -2793,30 +2795,30 @@ function Get-vtsNICThroughput {
   }
 }
 
-<#
-.SYNOPSIS
-This function retrieves mailbox statistics for a list of email addresses from Exchange Online.
-
-.DESCRIPTION
-The Get-vts365MailboxStatistics function connects to Exchange Online and retrieves mailbox statistics for each email address provided. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
-
-.PARAMETER EmailAddress
-An array of email addresses for which to retrieve mailbox statistics. If not provided, the function retrieves statistics for all mailboxes.
-
-.EXAMPLE
-PS C:\> Get-vts365MailboxStatistics -EmailAddress "user1@example.com", "user2@example.com"
-
-This example retrieves mailbox statistics for user1@example.com and user2@example.com.
-
-.EXAMPLE
-PS C:\> Get-vts365MailboxStatistics
-
-This example retrieves mailbox statistics for all mailboxes.
-
-.LINK
-M365
-#>
 function Get-vts365MailboxStatistics {
+  <#
+  .SYNOPSIS
+  This function retrieves mailbox statistics for a list of email addresses from Exchange Online.
+  
+  .DESCRIPTION
+  The Get-vts365MailboxStatistics function connects to Exchange Online and retrieves mailbox statistics for each email address provided. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
+  
+  .PARAMETER EmailAddress
+  An array of email addresses for which to retrieve mailbox statistics. If not provided, the function retrieves statistics for all mailboxes.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365MailboxStatistics -EmailAddress "user1@example.com", "user2@example.com"
+  
+  This example retrieves mailbox statistics for user1@example.com and user2@example.com.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365MailboxStatistics
+  
+  This example retrieves mailbox statistics for all mailboxes.
+  
+  .LINK
+  M365
+  #>
   param(
     $EmailAddress
   )
@@ -2856,27 +2858,27 @@ function Get-vts365MailboxStatistics {
   }
 }
 
-<#
-.SYNOPSIS
-    The Start-vtsScreenRecording function starts a screen recording of the current desktop session.
-
-.DESCRIPTION
-    The Start-vtsScreenRecording function initiates a screen recording using FFmpeg. It creates a new scheduled task that runs a PowerShell script to start the recording. The recording captures the screen at a rate of 5 frames per second and scales the output to a resolution of 1280x720. The output is saved as an MKV file in the "C:\Windows\Temp\VTS\rc" directory. The filename is formatted as "T[timestamp]-[computername]-[username].mkv".
-
-.PARAMETER No Parameters
-
-.EXAMPLE
-    PS C:\> Start-vtsScreenRecording
-
-    This command starts a screen recording of the current desktop session.
-
-.NOTES
-    This function requires FFmpeg to be installed and accessible in the system path. If FFmpeg is not found, it will attempt to download and install it using Chocolatey and aria2.
-
-.LINK
-    Utilities
-#>
 function Start-vtsScreenRecording {
+  <#
+  .SYNOPSIS
+      The Start-vtsScreenRecording function starts a screen recording of the current desktop session.
+  
+  .DESCRIPTION
+      The Start-vtsScreenRecording function initiates a screen recording using FFmpeg. It creates a new scheduled task that runs a PowerShell script to start the recording. The recording captures the screen at a rate of 5 frames per second and scales the output to a resolution of 1280x720. The output is saved as an MKV file in the "C:\Windows\Temp\VTS\rc" directory. The filename is formatted as "T[timestamp]-[computername]-[username].mkv".
+  
+  .PARAMETER No Parameters
+  
+  .EXAMPLE
+      PS C:\> Start-vtsScreenRecording
+  
+      This command starts a screen recording of the current desktop session.
+  
+  .NOTES
+      This function requires FFmpeg to be installed and accessible in the system path. If FFmpeg is not found, it will attempt to download and install it using Chocolatey and aria2.
+  
+  .LINK
+      Utilities
+  #>
   Set-ExecutionPolicy Unrestricted
   if ((Test-Path "C:\Windows\Temp\VTS\rc\start.ps1")) {
     Remove-item "C:\Windows\Temp\VTS\rc\start.ps1" -Force -Confirm:$false
@@ -3597,49 +3599,49 @@ SeDelegateSessionUserImpersonatePrivilege token."
   Start-ScheduledTask -TaskName "RecordSession"
 }
 
-<#
-.SYNOPSIS
-    The Stop-vtsScreenRecording function stops the ongoing screen recording.
-
-.DESCRIPTION
-    The Stop-vtsScreenRecording function stops the screen recording initiated by the Start-vtsScreenRecording function. It disables the scheduled task that was created to start the recording and stops the FFmpeg and PowerShell processes that were running the recording.
-
-.PARAMETER No Parameters
-
-.EXAMPLE
-    PS C:\> Stop-vtsScreenRecording
-
-    This command stops the ongoing screen recording.
-
-.NOTES
-    This function should be used to stop a screen recording that was started with the Start-vtsScreenRecording function.
-
-.LINK
-    Utilities
-#>
 function Stop-vtsScreenRecording {
+  <#
+  .SYNOPSIS
+      The Stop-vtsScreenRecording function stops the ongoing screen recording.
+  
+  .DESCRIPTION
+      The Stop-vtsScreenRecording function stops the screen recording initiated by the Start-vtsScreenRecording function. It disables the scheduled task that was created to start the recording and stops the FFmpeg and PowerShell processes that were running the recording.
+  
+  .PARAMETER No Parameters
+  
+  .EXAMPLE
+      PS C:\> Stop-vtsScreenRecording
+  
+      This command stops the ongoing screen recording.
+  
+  .NOTES
+      This function should be used to stop a screen recording that was started with the Start-vtsScreenRecording function.
+  
+  .LINK
+      Utilities
+  #>
   Disable-ScheduledTask -TaskName "RecordSession"
   Get-Process ffmpeg, powershell | Stop-Process -Force -Confirm:$false
 }
 
-<#
-.SYNOPSIS
-This function calculates the size of a directory in MB or GB.
-
-.DESCRIPTION
-The Get-vtsDirectorySize function calculates the size of a directory and returns the size in MB or GB. If the size is greater than 1024 MB, it will be converted to GB.
-
-.PARAMETER Path
-The path of the directory you want to calculate the size of. If no path is provided, the function will calculate the size of the current directory.
-
-.EXAMPLE
-Get-vtsDirectorySize -Path "C:\Windows"
-This command will calculate the size of the Windows directory.
-
-.LINK
-File Management
-#>
 function Get-vtsDirectorySize {
+  <#
+  .SYNOPSIS
+  This function calculates the size of a directory in MB or GB.
+  
+  .DESCRIPTION
+  The Get-vtsDirectorySize function calculates the size of a directory and returns the size in MB or GB. If the size is greater than 1024 MB, it will be converted to GB.
+  
+  .PARAMETER Path
+  The path of the directory you want to calculate the size of. If no path is provided, the function will calculate the size of the current directory.
+  
+  .EXAMPLE
+  Get-vtsDirectorySize -Path "C:\Windows"
+  This command will calculate the size of the Windows directory.
+  
+  .LINK
+  File Management
+  #>
   [CmdletBinding()]
   param(
     [Parameter(Mandatory = $false)]
@@ -3665,31 +3667,31 @@ function Get-vtsDirectorySize {
   }
 }
 
-<#
-.SYNOPSIS
-    This function adds a specified user as an admin to all SharePoint sites.
-
-.DESCRIPTION
-    The Add-vtsSharePointAdminToAllSites function connects to SharePoint Online using the provided admin site URL, retrieves all site collections, and adds the specified user as an admin to each site.
-
-.PARAMETER adminSiteUrl
-    The URL of the SharePoint admin site. This parameter is mandatory.
-
-.PARAMETER userToMakeOwner
-    The username of the user to be made an admin. This parameter is mandatory.
-
-.EXAMPLE
-    Add-vtsSharePointAdminToAllSites -adminSiteUrl "https://contoso-admin.sharepoint.com" -userToMakeOwner "user@contoso.com"
-    This example adds the user "user@contoso.com" as an admin to all SharePoint sites in the "contoso" tenant.
-
-.NOTES
-    This function requires the Microsoft.Online.SharePoint.PowerShell module. If the module is not installed, the function will install it.
-    Requres PowerShell 5. PowerShell 7 doesn't work.
-
-.LINK
-    M365
-#>
 function Add-vtsSharePointAdminToAllSites {
+  <#
+  .SYNOPSIS
+      This function adds a specified user as an admin to all SharePoint sites.
+  
+  .DESCRIPTION
+      The Add-vtsSharePointAdminToAllSites function connects to SharePoint Online using the provided admin site URL, retrieves all site collections, and adds the specified user as an admin to each site.
+  
+  .PARAMETER adminSiteUrl
+      The URL of the SharePoint admin site. This parameter is mandatory.
+  
+  .PARAMETER userToMakeOwner
+      The username of the user to be made an admin. This parameter is mandatory.
+  
+  .EXAMPLE
+      Add-vtsSharePointAdminToAllSites -adminSiteUrl "https://contoso-admin.sharepoint.com" -userToMakeOwner "user@contoso.com"
+      This example adds the user "user@contoso.com" as an admin to all SharePoint sites in the "contoso" tenant.
+  
+  .NOTES
+      This function requires the Microsoft.Online.SharePoint.PowerShell module. If the module is not installed, the function will install it.
+      Requres PowerShell 5. PowerShell 7 doesn't work.
+  
+  .LINK
+      M365
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter the SharePoint admin site URL in the format 'https://yourdomain-admin.sharepoint.com'")]
     [string]$adminSiteUrl,
@@ -3717,31 +3719,31 @@ function Add-vtsSharePointAdminToAllSites {
   }
 }
 
-<#
-.SYNOPSIS
-This function retrieves the disconnect time of a session.
-
-.DESCRIPTION
-The Get-vtsSessionDisconnectTime function uses the Get-WinEvent cmdlet to retrieve the event logs for a specific EventID from the Microsoft-Windows-TerminalServices-LocalSessionManager/Operational log. It then parses the XML of each event to get the username and the disconnect time. It returns an array of custom objects, each containing a username and a disconnect time.
-
-.PARAMETER EventID
-The ID of the event to filter the event logs. The default value is 24.
-
-.PARAMETER LogName
-The name of the log to get the event logs from. The default value is "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational".
-
-.EXAMPLE
-PS C:\> Get-vtsSessionDisconnectTime
-
-This command retrieves the disconnect time of all VTS sessions.
-
-.NOTES
-Additional information about the function.
-
-.LINK
-Log Management
-#>
 function Get-vtsSessionDisconnectTime {
+  <#
+  .SYNOPSIS
+  This function retrieves the disconnect time of a session.
+  
+  .DESCRIPTION
+  The Get-vtsSessionDisconnectTime function uses the Get-WinEvent cmdlet to retrieve the event logs for a specific EventID from the Microsoft-Windows-TerminalServices-LocalSessionManager/Operational log. It then parses the XML of each event to get the username and the disconnect time. It returns an array of custom objects, each containing a username and a disconnect time.
+  
+  .PARAMETER EventID
+  The ID of the event to filter the event logs. The default value is 24.
+  
+  .PARAMETER LogName
+  The name of the log to get the event logs from. The default value is "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational".
+  
+  .EXAMPLE
+  PS C:\> Get-vtsSessionDisconnectTime
+  
+  This command retrieves the disconnect time of all VTS sessions.
+  
+  .NOTES
+  Additional information about the function.
+  
+  .LINK
+  Log Management
+  #>
   param(
     [int]$EventID = 24,
     [string]$LogName = "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
@@ -3763,27 +3765,27 @@ function Get-vtsSessionDisconnectTime {
   return $output
 }
 
-<#
-.SYNOPSIS
-This function continuously monitors for changes in the connected devices.
-
-.DESCRIPTION
-The Get-vtsDeviceChange function uses the Get-PnpDevice cmdlet to continuously scan for devices that are currently connected to the system. It compares the results of two consecutive scans to detect any changes in the connected devices. If a device is connected or removed between the two scans, it will output a message indicating the change.
-
-.PARAMETER None
-This function does not take any parameters.
-
-.EXAMPLE
-PS C:\> Get-vtsDeviceChange
-This command will start the function and continuously monitor for any changes in the connected devices. If a device is connected or removed, it will output a message indicating the change.
-
-.NOTES
-To stop the function, use the keyboard shortcut for stopping a running command in your shell (usually Ctrl+C).
-
-.LINK
-Device Management
-#>
 function Get-vtsDeviceChange {
+  <#
+  .SYNOPSIS
+  This function continuously monitors for changes in the connected devices.
+  
+  .DESCRIPTION
+  The Get-vtsDeviceChange function uses the Get-PnpDevice cmdlet to continuously scan for devices that are currently connected to the system. It compares the results of two consecutive scans to detect any changes in the connected devices. If a device is connected or removed between the two scans, it will output a message indicating the change.
+  
+  .PARAMETER None
+  This function does not take any parameters.
+  
+  .EXAMPLE
+  PS C:\> Get-vtsDeviceChange
+  This command will start the function and continuously monitor for any changes in the connected devices. If a device is connected or removed, it will output a message indicating the change.
+  
+  .NOTES
+  To stop the function, use the keyboard shortcut for stopping a running command in your shell (usually Ctrl+C).
+  
+  .LINK
+  Device Management
+  #>
   while ($true) {
     $FirstScan = Get-PnpDevice | Where-Object Present -eq True | Select-Object -expand FriendlyName
 
@@ -3806,29 +3808,27 @@ function Get-vtsDeviceChange {
   }
 }
 
-
-
-<#
-.SYNOPSIS
-Starts a packet capture using Wireshark's tshark.
-
-.DESCRIPTION
-The Start-vtsPacketCapture function starts a packet capture on the specified network interface. If Wireshark is not installed, it will install it along with Chocolatey and Npcap.
-
-.PARAMETER interface
-The network interface to capture packets from. Defaults to the first Ethernet interface that is up.
-
-.PARAMETER output
-The path to the output file. Defaults to a .pcap file in C:\temp with the computer name and current date and time.
-
-.EXAMPLE
-Start-vtsPacketCapture -interface "Ethernet" -output "C:\temp\capture.pcap"
-Starts a packet capture on the Ethernet interface, with the output saved to C:\temp\capture.pcap.
-
-.LINK
-Network
-#>
 function Start-vtsPacketCapture {
+  <#
+  .SYNOPSIS
+  Starts a packet capture using Wireshark's tshark.
+  
+  .DESCRIPTION
+  The Start-vtsPacketCapture function starts a packet capture on the specified network interface. If Wireshark is not installed, it will install it along with Chocolatey and Npcap.
+  
+  .PARAMETER interface
+  The network interface to capture packets from. Defaults to the first Ethernet interface that is up.
+  
+  .PARAMETER output
+  The path to the output file. Defaults to a .pcap file in C:\temp with the computer name and current date and time.
+  
+  .EXAMPLE
+  Start-vtsPacketCapture -interface "Ethernet" -output "C:\temp\capture.pcap"
+  Starts a packet capture on the Ethernet interface, with the output saved to C:\temp\capture.pcap.
+  
+  .LINK
+  Network
+  #>
   param (
     [string]$interface = (get-netadapter | Where-Object Name -like "*ethernet*" | Where-Object Status -eq Up | Select-Object -expand name),
     [string]$output = "C:\temp\$($env:COMPUTERNAME)-$(Get-Date -f hhmm-MM-dd-yyyy)-capture.pcap"
@@ -3876,45 +3876,45 @@ function Start-vtsPacketCapture {
   Start-Process -FilePath $tsharkPath -ArgumentList "-i $interface -w $output" -WindowStyle Hidden
 }
 
-<#
-.SYNOPSIS
-Stops the currently running packet capture.
-
-.DESCRIPTION
-The Stop-vtsPacketCapture function stops the currently running packet capture started by Start-vtsPacketCapture.
-
-.EXAMPLE
-Stop-vtsPacketCapture
-Stops the currently running packet capture.
-
-.LINK
-Network
-#>
 function Stop-vtsPacketCapture {
+  <#
+  .SYNOPSIS
+  Stops the currently running packet capture.
+  
+  .DESCRIPTION
+  The Stop-vtsPacketCapture function stops the currently running packet capture started by Start-vtsPacketCapture.
+  
+  .EXAMPLE
+  Stop-vtsPacketCapture
+  Stops the currently running packet capture.
+  
+  .LINK
+  Network
+  #>
   Write-Host "Stopping packet capture..."
   Get-Process tshark | Stop-Process -Confirm:$false
   Write-Host "Packet capture stopped."
 }
 
-<#
-.SYNOPSIS
-This function sets up mailbox archiving for a specified user in Office 365.
-
-.DESCRIPTION
-The Set-vts365MailboxArchive function connects to Exchange Online and performs several operations related to mailbox archiving. It allows you to view user retention policies, view user archive details, enable archive, and setup auto-archiving.
-
-.PARAMETER UserEmail
-The email address of the user for whom the mailbox archiving will be set up. The email address should be in 'user@domain.com' format.
-
-.EXAMPLE
-Set-vts365MailboxArchive -UserEmail "user@domain.com"
-
-This example sets up mailbox archiving for the user with the email address "user@domain.com".
-
-.LINK
-M365
-#>
 function Set-vts365MailboxArchive {
+  <#
+  .SYNOPSIS
+  This function sets up mailbox archiving for a specified user in Office 365.
+  
+  .DESCRIPTION
+  The Set-vts365MailboxArchive function connects to Exchange Online and performs several operations related to mailbox archiving. It allows you to view user retention policies, view user archive details, enable archive, and setup auto-archiving.
+  
+  .PARAMETER UserEmail
+  The email address of the user for whom the mailbox archiving will be set up. The email address should be in 'user@domain.com' format.
+  
+  .EXAMPLE
+  Set-vts365MailboxArchive -UserEmail "user@domain.com"
+  
+  This example sets up mailbox archiving for the user with the email address "user@domain.com".
+  
+  .LINK
+  M365
+  #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Please enter the user in 'user@domain.com' format")]
@@ -4048,33 +4048,33 @@ function Set-vts365MailboxArchive {
   ViewUserArchiveDetails
 }
 
-<#
-.SYNOPSIS
-This function retrieves and returns the source of a user's lockout event from the Security log. If no lockout events are detected, it offers to enable logging for account lockouts.
-
-.DESCRIPTION
-The Get-vtsLockoutSource function employs the Get-WinEvent cmdlet to search for a lockout event for a specified user in the Security log. 
-If a lockout event is identified, the function generates a custom object that includes the time of the lockout event, the locked user's username, and the source of the lockout. 
-In the absence of a lockout event, the function prompts the user to enable logging for account lockouts. If the user agrees, the function enables logging for account lockouts and informs the user to wait for another account lockout to retry.
-
-.PARAMETER user
-This optional parameter specifies the username for which the lockout source is to be retrieved. If not provided, the function will return all lockout events.
-
-.EXAMPLE
-PS C:\> Get-vtsLockoutSource -user "jdoe"
-
-This command initiates the retrieval of the source of the lockout event for the user "jdoe". If no lockout events are detected for "jdoe", it will offer to enable logging for account lockouts.
-
-.INPUTS
-System.String
-
-.OUTPUTS
-PSCustomObject
-
-.LINK
-Log Management
-#>
 function Get-vtsLockoutSource {
+  <#
+  .SYNOPSIS
+  This function retrieves and returns the source of a user's lockout event from the Security log. If no lockout events are detected, it offers to enable logging for account lockouts.
+  
+  .DESCRIPTION
+  The Get-vtsLockoutSource function employs the Get-WinEvent cmdlet to search for a lockout event for a specified user in the Security log. 
+  If a lockout event is identified, the function generates a custom object that includes the time of the lockout event, the locked user's username, and the source of the lockout. 
+  In the absence of a lockout event, the function prompts the user to enable logging for account lockouts. If the user agrees, the function enables logging for account lockouts and informs the user to wait for another account lockout to retry.
+  
+  .PARAMETER user
+  This optional parameter specifies the username for which the lockout source is to be retrieved. If not provided, the function will return all lockout events.
+  
+  .EXAMPLE
+  PS C:\> Get-vtsLockoutSource -user "jdoe"
+  
+  This command initiates the retrieval of the source of the lockout event for the user "jdoe". If no lockout events are detected for "jdoe", it will offer to enable logging for account lockouts.
+  
+  .INPUTS
+  System.String
+  
+  .OUTPUTS
+  PSCustomObject
+  
+  .LINK
+  Log Management
+  #>
   param(
     [Parameter(Mandatory = $false)]
     [string]$user
@@ -4099,34 +4099,34 @@ function Get-vtsLockoutSource {
   $logs | Where-Object Message -like "*$user*" | Select-Object TimeCreated, @{n = 'LockedUser'; e = { $_.Properties[0].Value } }, @{n = 'LockoutSource'; e = { $_.Properties[1].Value } }, @{n = 'LogSource'; e = { $_.Properties[4].Value } } | Format-Table -AutoSize
 }
 
-<#
-.SYNOPSIS
-This function sets the calendar permissions for a specified user in Office 365.
-
-.DESCRIPTION
-The Set-vts365CalendarPermissions function connects to Exchange Online and modifies the calendar permissions for a specified user. It first identifies the calendar path and backs up the existing permissions. Then, it adds or modifies the permissions for the specified access user. Finally, it verifies the updated permissions.
-
-.PARAMETER user
-The email address of the user whose calendar permissions you want to modify. The format should be 'user@domain.com'.
-
-.PARAMETER accessUser
-The email address of the user to whom you want to grant or modify access to the calendar. The format should be 'user@domain.com'.
-
-.PARAMETER accessRights
-The level of access rights you want to grant to the access user. Acceptable values are 'Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor'.
-
-.EXAMPLE
-Set-vts365CalendarPermissions -user 'user1@domain.com' -accessUser 'user2@domain.com' -accessRights 'Editor'
-
-This example modifies the calendar permissions for user1@domain.com, granting 'Editor' access to user2@domain.com.
-
-.NOTES
-The function will backup the existing permissions to C:\temp\CalendarPermissionsBackup.txt before making any changes.
-
-.LINK
-M365
-#>
 function Set-vts365CalendarPermissions {
+  <#
+  .SYNOPSIS
+  This function sets the calendar permissions for a specified user in Office 365.
+  
+  .DESCRIPTION
+  The Set-vts365CalendarPermissions function connects to Exchange Online and modifies the calendar permissions for a specified user. It first identifies the calendar path and backs up the existing permissions. Then, it adds or modifies the permissions for the specified access user. Finally, it verifies the updated permissions.
+  
+  .PARAMETER user
+  The email address of the user whose calendar permissions you want to modify. The format should be 'user@domain.com'.
+  
+  .PARAMETER accessUser
+  The email address of the user to whom you want to grant or modify access to the calendar. The format should be 'user@domain.com'.
+  
+  .PARAMETER accessRights
+  The level of access rights you want to grant to the access user. Acceptable values are 'Owner', 'PublishingEditor', 'Editor', 'PublishingAuthor', 'Author', 'NonEditingAuthor', 'Reviewer', 'Contributor'.
+  
+  .EXAMPLE
+  Set-vts365CalendarPermissions -user 'user1@domain.com' -accessUser 'user2@domain.com' -accessRights 'Editor'
+  
+  This example modifies the calendar permissions for user1@domain.com, granting 'Editor' access to user2@domain.com.
+  
+  .NOTES
+  The function will backup the existing permissions to C:\temp\CalendarPermissionsBackup.txt before making any changes.
+  
+  .LINK
+  M365
+  #>
   param(
     [Parameter(Mandatory = $true, HelpMessage = "Enter the email address of the user whose calendar permissions you want to modify. The format should be 'user@domain.com'")]
     $user,
@@ -4193,32 +4193,32 @@ function Set-vts365CalendarPermissions {
   $Permissions
 }
 
-<#
-.SYNOPSIS
-This function retrieves the details of a specific Autotask ticket.
-
-.DESCRIPTION
-The Get-vtsAutotaskTicketDetails function makes a REST API call to Autotask's REST API to retrieve the details of a specific ticket. The function requires the ticket number, API integration code, username, and secret as parameters.
-
-.PARAMETER TicketNumber
-The number of the ticket for which details are to be retrieved.
-
-.PARAMETER ApiIntegrationCode
-The API integration code required for the API call.
-
-.PARAMETER UserName
-The username required for the API call.
-
-.PARAMETER Secret
-The secret required for the API call.
-
-.EXAMPLE
-Get-vtsAutotaskTicketDetails -TicketNumber "T20240214.0040" -ApiIntegrationCode '3SzZgr4XTFKavqT59YscgQA7!gr4XTFKI5*' -UserName 'avqT59YscgQA7!@EXAMPLE.COM' -Secret 'ZWqtUYKzPoJv0!'
-
-.LINK
-AutoTask API
-#>
 function Get-vtsAutotaskTicketDetails {
+  <#
+  .SYNOPSIS
+  This function retrieves the details of a specific Autotask ticket.
+  
+  .DESCRIPTION
+  The Get-vtsAutotaskTicketDetails function makes a REST API call to Autotask's REST API to retrieve the details of a specific ticket. The function requires the ticket number, API integration code, username, and secret as parameters.
+  
+  .PARAMETER TicketNumber
+  The number of the ticket for which details are to be retrieved.
+  
+  .PARAMETER ApiIntegrationCode
+  The API integration code required for the API call.
+  
+  .PARAMETER UserName
+  The username required for the API call.
+  
+  .PARAMETER Secret
+  The secret required for the API call.
+  
+  .EXAMPLE
+  Get-vtsAutotaskTicketDetails -TicketNumber "T20240214.0040" -ApiIntegrationCode '3SzZgr4XTFKavqT59YscgQA7!gr4XTFKI5*' -UserName 'avqT59YscgQA7!@EXAMPLE.COM' -Secret 'ZWqtUYKzPoJv0!'
+  
+  .LINK
+  AutoTask API
+  #>
   param (
     [Parameter(Mandatory = $true)]
     [string]$TicketNumber,
@@ -4261,32 +4261,32 @@ function Get-vtsAutotaskTicketDetails {
   $response | Select-Object -expand items
 }
 
-<#
-.SYNOPSIS
-This function retrieves all notes of a specific Autotask ticket using the ticket number.
-
-.DESCRIPTION
-The Get-vtsAutotaskTicketNotes function makes a REST API call to Autotask's REST API to retrieve the ticket ID of a specific ticket using the ticket number, and then retrieves all notes of that ticket. The function requires the ticket number, API integration code, username, and secret as parameters.
-
-.PARAMETER TicketNumber
-The number of the ticket for which notes are to be retrieved.
-
-.PARAMETER ApiIntegrationCode
-The API integration code required for the API call.
-
-.PARAMETER UserName
-The username required for the API call.
-
-.PARAMETER Secret
-The secret required for the API call.
-
-.EXAMPLE
-Get-vtsAutotaskTicketNotes -TicketNumber "T20240214.0040" -ApiIntegrationCode 'tOi5y2bp7j8U7=T59YscgQA7!gr4XTFKI5*' -UserName 'avqTtOi5y2bp7j8U7=gQA7!@EXAMPLE.COM' -Secret 'ZWqtUYKztOi5y2bp7j8U7=oJv0!'
-
-.LINK
-AutoTask API
-#>
 function Get-vtsAutotaskTicketNotes {
+  <#
+  .SYNOPSIS
+  This function retrieves all notes of a specific Autotask ticket using the ticket number.
+  
+  .DESCRIPTION
+  The Get-vtsAutotaskTicketNotes function makes a REST API call to Autotask's REST API to retrieve the ticket ID of a specific ticket using the ticket number, and then retrieves all notes of that ticket. The function requires the ticket number, API integration code, username, and secret as parameters.
+  
+  .PARAMETER TicketNumber
+  The number of the ticket for which notes are to be retrieved.
+  
+  .PARAMETER ApiIntegrationCode
+  The API integration code required for the API call.
+  
+  .PARAMETER UserName
+  The username required for the API call.
+  
+  .PARAMETER Secret
+  The secret required for the API call.
+  
+  .EXAMPLE
+  Get-vtsAutotaskTicketNotes -TicketNumber "T20240214.0040" -ApiIntegrationCode 'tOi5y2bp7j8U7=T59YscgQA7!gr4XTFKI5*' -UserName 'avqTtOi5y2bp7j8U7=gQA7!@EXAMPLE.COM' -Secret 'ZWqtUYKztOi5y2bp7j8U7=oJv0!'
+  
+  .LINK
+  AutoTask API
+  #>
   param (
     [Parameter(Mandatory = $true)]
     [string]$TicketNumber,
@@ -4338,33 +4338,33 @@ function Get-vtsAutotaskTicketNotes {
   $response | Select-Object -expand items
 }
 
-<#
-.SYNOPSIS
-This function retrieves the first and last name of a contact from Autotask's REST API using the contact's ID.
-
-.DESCRIPTION
-The Get-vtsAutoTaskContactNamebyID function makes a GET request to Autotask's REST API to retrieve the details of a contact. It requires the contact's ID, API integration code, username, and secret as parameters. The function returns the first and last name of the contact.
-
-.PARAMETER ContactID
-The ID of the contact whose details are to be retrieved.
-
-.PARAMETER ApiIntegrationCode
-The API integration code required for the API call.
-
-.PARAMETER UserName
-The username required for the API call.
-
-.PARAMETER Secret
-The secret required for the API call.
-
-.EXAMPLE
-Get-vtsAutoTaskContactNamebyID -ContactID "30683060" -ApiIntegrationCode "YourApiIntegrationCode" -UserName "YourUserName" -Secret "YourSecret"
-This example shows how to call the function with all required parameters.
-
-.LINK
-AutoTask API
-#>
 function Get-vtsAutoTaskContactNamebyID {
+  <#
+  .SYNOPSIS
+  This function retrieves the first and last name of a contact from Autotask's REST API using the contact's ID.
+  
+  .DESCRIPTION
+  The Get-vtsAutoTaskContactNamebyID function makes a GET request to Autotask's REST API to retrieve the details of a contact. It requires the contact's ID, API integration code, username, and secret as parameters. The function returns the first and last name of the contact.
+  
+  .PARAMETER ContactID
+  The ID of the contact whose details are to be retrieved.
+  
+  .PARAMETER ApiIntegrationCode
+  The API integration code required for the API call.
+  
+  .PARAMETER UserName
+  The username required for the API call.
+  
+  .PARAMETER Secret
+  The secret required for the API call.
+  
+  .EXAMPLE
+  Get-vtsAutoTaskContactNamebyID -ContactID "30683060" -ApiIntegrationCode "YourApiIntegrationCode" -UserName "YourUserName" -Secret "YourSecret"
+  This example shows how to call the function with all required parameters.
+  
+  .LINK
+  AutoTask API
+  #>
   param(
     [Parameter(Mandatory = $true)]
     [string]$ContactID,
@@ -4396,33 +4396,33 @@ function Get-vtsAutoTaskContactNamebyID {
   "$($response.item.firstName) $($response.item.lastName)"
 }
 
-<#
-.SYNOPSIS
-This function retrieves the first and last name of a resource from Autotask's REST API using the resource's ID.
-
-.DESCRIPTION
-The Get-vtsAutoTaskResourceNamebyID function makes a GET request to Autotask's REST API to retrieve the details of a resource. It requires the resource's ID, API integration code, username, and secret as parameters. The function returns the first and last name of the resource.
-
-.PARAMETER ResourceID
-The ID of the resource whose details are to be retrieved.
-
-.PARAMETER ApiIntegrationCode
-The API integration code required for the API call.
-
-.PARAMETER UserName
-The username required for the API call.
-
-.PARAMETER Secret
-The secret required for the API call.
-
-.EXAMPLE
-Get-vtsAutoTaskResourceNamebyID -ResourceID "30683060" -ApiIntegrationCode "YourApiIntegrationCode" -UserName "YourUserName" -Secret "YourSecret"
-This example shows how to call the function with all required parameters.
-
-.LINK
-AutoTask API
-#>
 function Get-vtsAutoTaskResourceNamebyID {
+  <#
+  .SYNOPSIS
+  This function retrieves the first and last name of a resource from Autotask's REST API using the resource's ID.
+  
+  .DESCRIPTION
+  The Get-vtsAutoTaskResourceNamebyID function makes a GET request to Autotask's REST API to retrieve the details of a resource. It requires the resource's ID, API integration code, username, and secret as parameters. The function returns the first and last name of the resource.
+  
+  .PARAMETER ResourceID
+  The ID of the resource whose details are to be retrieved.
+  
+  .PARAMETER ApiIntegrationCode
+  The API integration code required for the API call.
+  
+  .PARAMETER UserName
+  The username required for the API call.
+  
+  .PARAMETER Secret
+  The secret required for the API call.
+  
+  .EXAMPLE
+  Get-vtsAutoTaskResourceNamebyID -ResourceID "30683060" -ApiIntegrationCode "YourApiIntegrationCode" -UserName "YourUserName" -Secret "YourSecret"
+  This example shows how to call the function with all required parameters.
+  
+  .LINK
+  AutoTask API
+  #>
   param(
     [Parameter(Mandatory = $true)]
     [string]$ResourceID,
@@ -4454,37 +4454,37 @@ function Get-vtsAutoTaskResourceNamebyID {
   "$($response.item.firstName) $($response.item.lastName)"
 }
 
-<#
-.SYNOPSIS
-This function searches for a specific pattern in the content of files in a given directory and optionally exports the results to a CSV file.
-
-.DESCRIPTION
-The Get-vtsFileContentMatch function takes a directory path, a pattern to match, and an optional array of file types to exclude. It recursively searches through all files in the specified directory (excluding the specified file types), and returns a custom object for each line in each file that matches the specified pattern. The custom object contains the full path of the file and the line that matched the pattern. The function can also export the results to a CSV file if the path to the CSV file is provided.
-
-.PARAMETER Path
-The path to the directory to search. This parameter is mandatory.
-
-.PARAMETER Pattern
-The pattern or word to match in the file content. This parameter is mandatory.
-
-.PARAMETER Exclude
-An array of file types to exclude from the search. The default value is '*.exe', '*.dll'. This parameter is optional.
-
-.PARAMETER ExportToCsv
-A boolean value indicating whether to export the results to a CSV file. This parameter is optional.
-
-.PARAMETER CsvPath
-The path to the CSV file to export the results to. This parameter is optional.
-
-.EXAMPLE
-Get-vtsFileContentMatch -Path "C:\Users\Username\Documents" -Pattern "error" -ExportToCsv $true -CsvPath "C:\Users\Username\Documents\results.csv"
-
-This example searches for the word "error" in all files in the "C:\Users\Username\Documents" directory, excluding .exe and .dll files, and exports the results to a CSV file.
-
-.LINK
-Utilities
-#>
 function Get-vtsFileContentMatch {
+  <#
+  .SYNOPSIS
+  This function searches for a specific pattern in the content of files in a given directory and optionally exports the results to a CSV file.
+  
+  .DESCRIPTION
+  The Get-vtsFileContentMatch function takes a directory path, a pattern to match, and an optional array of file types to exclude. It recursively searches through all files in the specified directory (excluding the specified file types), and returns a custom object for each line in each file that matches the specified pattern. The custom object contains the full path of the file and the line that matched the pattern. The function can also export the results to a CSV file if the path to the CSV file is provided.
+  
+  .PARAMETER Path
+  The path to the directory to search. This parameter is mandatory.
+  
+  .PARAMETER Pattern
+  The pattern or word to match in the file content. This parameter is mandatory.
+  
+  .PARAMETER Exclude
+  An array of file types to exclude from the search. The default value is '*.exe', '*.dll'. This parameter is optional.
+  
+  .PARAMETER ExportToCsv
+  A boolean value indicating whether to export the results to a CSV file. This parameter is optional.
+  
+  .PARAMETER CsvPath
+  The path to the CSV file to export the results to. This parameter is optional.
+  
+  .EXAMPLE
+  Get-vtsFileContentMatch -Path "C:\Users\Username\Documents" -Pattern "error" -ExportToCsv $true -CsvPath "C:\Users\Username\Documents\results.csv"
+  
+  This example searches for the word "error" in all files in the "C:\Users\Username\Documents" directory, excluding .exe and .dll files, and exports the results to a CSV file.
+  
+  .LINK
+  Utilities
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Please provide the path to the directory.")]
     [string]$Path,
@@ -4519,32 +4519,32 @@ function Get-vtsFileContentMatch {
   }
 }
 
-<#
-.SYNOPSIS
-This function revokes a specific email message in Office 365.
-
-.DESCRIPTION
-The Revoke-vts365EmailMessage function connects to Exchange Online and IPPS Session, gets the message trace, starts a compliance search, waits for the search to complete, purges and deletes the email instances, and checks the status of the search action.
-
-.PARAMETER TicketNumber
-This is a mandatory parameter. It is the unique identifier for the compliance search.
-
-.PARAMETER From
-This is an optional parameter. It is the sender's email address.
-
-.PARAMETER To
-This is an optional parameter. It is the recipient's email address.
-
-.EXAMPLE
-Revoke-vts365EmailMessage -TicketNumber "12345" -From "sender@example.com" -To "recipient@example.com"
-
-This example shows how to revoke an email message sent from "sender@example.com" to "recipient@example.com" with the ticket number "12345".
-
-.LINK
-Still in Development
-
-#>
 function Revoke-vts365EmailMessage {
+  <#
+  .SYNOPSIS
+  This function revokes a specific email message in Office 365.
+  
+  .DESCRIPTION
+  The Revoke-vts365EmailMessage function connects to Exchange Online and IPPS Session, gets the message trace, starts a compliance search, waits for the search to complete, purges and deletes the email instances, and checks the status of the search action.
+  
+  .PARAMETER TicketNumber
+  This is a mandatory parameter. It is the unique identifier for the compliance search.
+  
+  .PARAMETER From
+  This is an optional parameter. It is the sender's email address.
+  
+  .PARAMETER To
+  This is an optional parameter. It is the recipient's email address.
+  
+  .EXAMPLE
+  Revoke-vts365EmailMessage -TicketNumber "12345" -From "sender@example.com" -To "recipient@example.com"
+  
+  This example shows how to revoke an email message sent from "sender@example.com" to "recipient@example.com" with the ticket number "12345".
+  
+  .LINK
+  Still in Development
+  
+  #>
   param(
     # [Parameter(Mandatory = $true)]
     [string]$TicketNumber = "TEST4",
@@ -4592,24 +4592,24 @@ function Revoke-vts365EmailMessage {
   Write-Host "Operation completed."
 }
 
-<#
-.SYNOPSIS
-This function invokes a system check using DISM and System File Checker.
-
-.DESCRIPTION
-The Start-vtsRepair function initiates a system check by first running the DISM restore health process, followed by a System File Checker scan. It provides status updates at each stage of the process.
-
-.EXAMPLE
-Start-vtsRepair
-This command will initiate the system check process.
-
-.NOTES
-The DISM restore health process can help fix Windows corruption errors. The System File Checker scan will scan all protected system files, and replace corrupted files with a cached copy.
-
-.LINK
-Utilities
-#>
 function Start-vtsRepair {
+  <#
+  .SYNOPSIS
+  This function invokes a system check using DISM and System File Checker.
+  
+  .DESCRIPTION
+  The Start-vtsRepair function initiates a system check by first running the DISM restore health process, followed by a System File Checker scan. It provides status updates at each stage of the process.
+  
+  .EXAMPLE
+  Start-vtsRepair
+  This command will initiate the system check process.
+  
+  .NOTES
+  The DISM restore health process can help fix Windows corruption errors. The System File Checker scan will scan all protected system files, and replace corrupted files with a cached copy.
+  
+  .LINK
+  Utilities
+  #>
   Write-Host "Starting DISM restore health process..."
   dism /online /cleanup-image /restorehealth
   Write-Host "DISM restore health process completed."
@@ -4619,32 +4619,32 @@ function Start-vtsRepair {
   Write-Host "System File Checker scan completed."
 }
 
-<#
-.SYNOPSIS
-This function creates a new SharePoint Online document library.
-
-.DESCRIPTION
-The New-vtsSPOnlineDocumentLibrary function creates a new document library in a specified SharePoint Online site. 
-It requires the organization name, site URL, and the name of the new document library as parameters. 
-If the PnP.PowerShell module is not installed, the function will install it for the current user.
-
-.PARAMETER orgName
-The name of the organization. This parameter is mandatory. Example: contoso
-
-.PARAMETER siteUrl
-The URL of the SharePoint Online site where the new document library will be created. This parameter is mandatory. Example: https://contoso.sharepoint.com/sites/test
-
-.PARAMETER libraryName
-The name of the new document library to be created. This parameter is mandatory.
-
-.EXAMPLE
-New-vtsSPOnlineDocumentLibrary -orgName "contoso" -siteUrl "https://contoso.sharepoint.com/sites/test" -libraryName "NewLibrary"
-This example creates a new document library named "NewLibrary" in the "test" site of the "contoso" organization.
-
-.LINK
-SharePoint Online
-#>
 function New-vtsSPOnlineDocumentLibrary {
+  <#
+  .SYNOPSIS
+  This function creates a new SharePoint Online document library.
+  
+  .DESCRIPTION
+  The New-vtsSPOnlineDocumentLibrary function creates a new document library in a specified SharePoint Online site. 
+  It requires the organization name, site URL, and the name of the new document library as parameters. 
+  If the PnP.PowerShell module is not installed, the function will install it for the current user.
+  
+  .PARAMETER orgName
+  The name of the organization. This parameter is mandatory. Example: contoso
+  
+  .PARAMETER siteUrl
+  The URL of the SharePoint Online site where the new document library will be created. This parameter is mandatory. Example: https://contoso.sharepoint.com/sites/test
+  
+  .PARAMETER libraryName
+  The name of the new document library to be created. This parameter is mandatory.
+  
+  .EXAMPLE
+  New-vtsSPOnlineDocumentLibrary -orgName "contoso" -siteUrl "https://contoso.sharepoint.com/sites/test" -libraryName "NewLibrary"
+  This example creates a new document library named "NewLibrary" in the "test" site of the "contoso" organization.
+  
+  .LINK
+  SharePoint Online
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter the organization name. Example: contoso")]
     [string]$orgName,
@@ -4672,29 +4672,29 @@ function New-vtsSPOnlineDocumentLibrary {
   New-PnPList -Title $libraryName -Template DocumentLibrary -Url $libraryName
 }
 
-<#
-.SYNOPSIS
-This function retrieves all folders in a specified SharePoint Online document library.
-
-.DESCRIPTION
-The Get-vtsSPOnlineDocumentLibraryFolders function retrieves all folders in a specified SharePoint Online document library. 
-It requires the site URL and the name of the document library as parameters. 
-If the PnP.PowerShell module is not installed, the function will install it for the current user.
-
-.PARAMETER siteUrl
-The URL of the SharePoint Online site where the document library is located. This parameter is mandatory. Example: https://contoso.sharepoint.com/sites/test
-
-.PARAMETER libraryName
-The name of the document library from which to retrieve folders. This parameter is mandatory.
-
-.EXAMPLE
-Get-vtsSPOnlineDocumentLibraryFolders -siteUrl "https://contoso.sharepoint.com/sites/test" -libraryName "LibraryName"
-This example retrieves all folders in the "LibraryName" document library on the "test" site.
-
-.LINK
-SharePoint Online
-#>
 function Get-vtsSPOnlineDocumentLibraryFolders {
+  <#
+  .SYNOPSIS
+  This function retrieves all folders in a specified SharePoint Online document library.
+  
+  .DESCRIPTION
+  The Get-vtsSPOnlineDocumentLibraryFolders function retrieves all folders in a specified SharePoint Online document library. 
+  It requires the site URL and the name of the document library as parameters. 
+  If the PnP.PowerShell module is not installed, the function will install it for the current user.
+  
+  .PARAMETER siteUrl
+  The URL of the SharePoint Online site where the document library is located. This parameter is mandatory. Example: https://contoso.sharepoint.com/sites/test
+  
+  .PARAMETER libraryName
+  The name of the document library from which to retrieve folders. This parameter is mandatory.
+  
+  .EXAMPLE
+  Get-vtsSPOnlineDocumentLibraryFolders -siteUrl "https://contoso.sharepoint.com/sites/test" -libraryName "LibraryName"
+  This example retrieves all folders in the "LibraryName" document library on the "test" site.
+  
+  .LINK
+  SharePoint Online
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter the site URL. Example: https://contoso.sharepoint.com/sites/test")]
     [string]$siteUrl,
@@ -4727,31 +4727,31 @@ function Get-vtsSPOnlineDocumentLibraryFolders {
   return $folders.Name
 }
 
-<#
-.SYNOPSIS
-This function retrieves all domain controllers and invokes the Get-vtsLockoutSource function on each of them.
-
-.DESCRIPTION
-The Get-vtsDomainLockouts function retrieves a list of all domain controllers in the current Active Directory domain. It then invokes the Get-vtsLockoutSource function on each domain controller to retrieve the source of account lockout events.
-
-.PARAMETER None
-This function does not accept any parameters.
-
-.EXAMPLE
-PS C:\> Get-vtsDomainLockouts
-
-This command retrieves all domain controllers and invokes the Get-vtsLockoutSource function on each of them.
-
-.INPUTS
-None
-
-.OUTPUTS
-None
-
-.LINK
-Log Management
-#>
 function Get-vtsDomainLockouts {
+  <#
+  .SYNOPSIS
+  This function retrieves all domain controllers and invokes the Get-vtsLockoutSource function on each of them.
+  
+  .DESCRIPTION
+  The Get-vtsDomainLockouts function retrieves a list of all domain controllers in the current Active Directory domain. It then invokes the Get-vtsLockoutSource function on each domain controller to retrieve the source of account lockout events.
+  
+  .PARAMETER None
+  This function does not accept any parameters.
+  
+  .EXAMPLE
+  PS C:\> Get-vtsDomainLockouts
+  
+  This command retrieves all domain controllers and invokes the Get-vtsLockoutSource function on each of them.
+  
+  .INPUTS
+  None
+  
+  .OUTPUTS
+  None
+  
+  .LINK
+  Log Management
+  #>
   Write-Host "Retrieving domain controllers...`n"
   $DCs = Get-ADDomainController -Filter * | Select-Object -ExpandProperty Hostname
   Write-Host "Domain Controllers:`n $($DCs -join ""`n "")`n"
@@ -4760,28 +4760,28 @@ function Get-vtsDomainLockouts {
 }
 
 
-<#
-.SYNOPSIS
-This function suspends an Active Directory user and optionally schedules a task to reactivate the user after a specified number of days.
-
-.DESCRIPTION
-The Suspend-vtsADUser function fetches all Active Directory users and displays them in an Out-GridView for selection. After a user is selected, the function prompts for the number of days after which to reactivate the user. If no input is entered, the user is disabled. If a number of days is entered, the function disables the user and schedules a task to re-enable the user after the specified number of days.
-
-.PARAMETER None
-This function does not take any parameters.
-
-.EXAMPLE
-Suspend-vtsADUser
-
-This example shows how to run the function without any parameters. It will fetch all Active Directory users, allow you to select a user, and then prompt for the number of days after which to reactivate the user.
-
-.NOTES
-This function requires the Active Directory module for Windows PowerShell and the Task Scheduler cmdlets.
-
-.LINK
-Active Directory
-#>
 function Suspend-vtsADUser {
+  <#
+  .SYNOPSIS
+  This function suspends an Active Directory user and optionally schedules a task to reactivate the user after a specified number of days.
+  
+  .DESCRIPTION
+  The Suspend-vtsADUser function fetches all Active Directory users and displays them in an Out-GridView for selection. After a user is selected, the function prompts for the number of days after which to reactivate the user. If no input is entered, the user is disabled. If a number of days is entered, the function disables the user and schedules a task to re-enable the user after the specified number of days.
+  
+  .PARAMETER None
+  This function does not take any parameters.
+  
+  .EXAMPLE
+  Suspend-vtsADUser
+  
+  This example shows how to run the function without any parameters. It will fetch all Active Directory users, allow you to select a user, and then prompt for the number of days after which to reactivate the user.
+  
+  .NOTES
+  This function requires the Active Directory module for Windows PowerShell and the Task Scheduler cmdlets.
+  
+  .LINK
+  Active Directory
+  #>
 
   $users = Get-ADUser -Filter * -Property DisplayName, PhysicalDeliveryOfficeName, Manager | Select-Object DisplayName, PhysicalDeliveryOfficeName, @{Name = 'Manager'; Expression = { (Get-ADUser $_.Manager).Name } }, SamAccountName | Sort-Object DisplayName
     
@@ -4831,31 +4831,31 @@ function Suspend-vtsADUser {
 
 }
 
-<#
-.SYNOPSIS
-    A function to get printer(s) by port address.
-
-.DESCRIPTION
-    This function retrieves printer(s) associated with a given port address. If no port address is provided, it retrieves all printers.
-
-.PARAMETER PrinterHostAddress
-    The port address of the printer. This parameter is optional. If not provided, the function retrieves all printers.
-
-.EXAMPLE
-    PS C:\> Get-vtsPrinterByPortAddress -PrinterHostAddress "192.168.1.10"
-    This command retrieves the printer(s) associated with the port address "192.168.1.10".
-
-.EXAMPLE
-    PS C:\> Get-vtsPrinterByPortAddress
-    This command retrieves all printers as no port address is provided.
-
-.NOTES
-    The function returns a custom object that includes the printer host address and the associated printers.
-
-.LINK
-    Print Management
-#>
 function Get-vtsPrinterByPortAddress {
+  <#
+  .SYNOPSIS
+      A function to get printer(s) by port address.
+  
+  .DESCRIPTION
+      This function retrieves printer(s) associated with a given port address. If no port address is provided, it retrieves all printers.
+  
+  .PARAMETER PrinterHostAddress
+      The port address of the printer. This parameter is optional. If not provided, the function retrieves all printers.
+  
+  .EXAMPLE
+      PS C:\> Get-vtsPrinterByPortAddress -PrinterHostAddress "192.168.1.10"
+      This command retrieves the printer(s) associated with the port address "192.168.1.10".
+  
+  .EXAMPLE
+      PS C:\> Get-vtsPrinterByPortAddress
+      This command retrieves all printers as no port address is provided.
+  
+  .NOTES
+      The function returns a custom object that includes the printer host address and the associated printers.
+  
+  .LINK
+      Print Management
+  #>
   # Define parameters
   param (
     # PrinterHostAddress is not mandatory
@@ -4907,36 +4907,36 @@ function Get-vtsPrinterByPortAddress {
   }
 }
 
-<#
-.SYNOPSIS
-This script compares the files in two directories and generates a report of their SHA1 hashes.
-
-.DESCRIPTION
-The Compare-vtsFiles function takes in two parameters, the source folder and the destination folder. It calculates the SHA1 hash of each file in both folders and compares them. If the hashes match, it means the files are identical. If they don't, the files are different. The function generates a report of the comparison results, including the file paths and their hashes. The report is saved in a CSV file in the TEMP directory.
-
-.PARAMETER SourceFolder
-The path of the source folder.
-
-.PARAMETER DestinationFolder
-The path of the destination folder.
-
-.PARAMETER ReportPath
-The path where the report will be saved. By default, it is saved in the TEMP directory.
-
-.EXAMPLE
-Compare-vtsFiles -SourceFolder "C:\Source" -DestinationFolder "C:\Destination"
-
-This will compare the files in the Source and Destination folders and generate a report in the TEMP directory.
-
-.EXAMPLE
-Compare-vtsFiles -SourceFolder "C:\Source" -DestinationFolder "C:\Destination" -ReportPath "C:\Reports\Hashes.csv"
-
-This will compare the files in the Source and Destination folders and generate a report in the specified path.
-
-.LINK
-File Management
-#>
 function Compare-vtsFiles {
+  <#
+  .SYNOPSIS
+  This script compares the files in two directories and generates a report of their SHA1 hashes.
+  
+  .DESCRIPTION
+  The Compare-vtsFiles function takes in two parameters, the source folder and the destination folder. It calculates the SHA1 hash of each file in both folders and compares them. If the hashes match, it means the files are identical. If they don't, the files are different. The function generates a report of the comparison results, including the file paths and their hashes. The report is saved in a CSV file in the TEMP directory.
+  
+  .PARAMETER SourceFolder
+  The path of the source folder.
+  
+  .PARAMETER DestinationFolder
+  The path of the destination folder.
+  
+  .PARAMETER ReportPath
+  The path where the report will be saved. By default, it is saved in the TEMP directory.
+  
+  .EXAMPLE
+  Compare-vtsFiles -SourceFolder "C:\Source" -DestinationFolder "C:\Destination"
+  
+  This will compare the files in the Source and Destination folders and generate a report in the TEMP directory.
+  
+  .EXAMPLE
+  Compare-vtsFiles -SourceFolder "C:\Source" -DestinationFolder "C:\Destination" -ReportPath "C:\Reports\Hashes.csv"
+  
+  This will compare the files in the Source and Destination folders and generate a report in the specified path.
+  
+  .LINK
+  File Management
+  #>
   param (
     [string]$SourceFolder,
     [string]$DestinationFolder,
@@ -5004,28 +5004,28 @@ function Compare-vtsFiles {
   Write-Host "Report exported to $ReportPath"
 }
 
-<#
-.SYNOPSIS
-This script connects to a WiFi network using the provided SSID and password.
-
-.DESCRIPTION
-The Connect-vtsWiFi function connects to a WiFi network using the provided SSID and password. If no SSID is provided, the function will list all available networks and prompt the user to select one. If no password is provided, the function will prompt the user to enter one. If a WiFi profile for the selected SSID already exists, the function will ask the user if they want to remove the old profile and replace it.
-
-.PARAMETER SSID
-The SSID of the WiFi network to connect to. If not provided, the function will list all available networks and prompt the user to select one.
-
-.PARAMETER Password
-The password for the WiFi network to connect to. If not provided, the function will prompt the user to enter one.
-
-.EXAMPLE
-Connect-vtsWiFi -SSID "MyWiFiNetwork" -Password "MyPassword"
-
-This example connects to the WiFi network "MyWiFiNetwork" using the password "MyPassword".
-
-.LINK
-Network
-#>
 function Connect-vtsWiFi {
+  <#
+  .SYNOPSIS
+  This script connects to a WiFi network using the provided SSID and password.
+  
+  .DESCRIPTION
+  The Connect-vtsWiFi function connects to a WiFi network using the provided SSID and password. If no SSID is provided, the function will list all available networks and prompt the user to select one. If no password is provided, the function will prompt the user to enter one. If a WiFi profile for the selected SSID already exists, the function will ask the user if they want to remove the old profile and replace it.
+  
+  .PARAMETER SSID
+  The SSID of the WiFi network to connect to. If not provided, the function will list all available networks and prompt the user to select one.
+  
+  .PARAMETER Password
+  The password for the WiFi network to connect to. If not provided, the function will prompt the user to enter one.
+  
+  .EXAMPLE
+  Connect-vtsWiFi -SSID "MyWiFiNetwork" -Password "MyPassword"
+  
+  This example connects to the WiFi network "MyWiFiNetwork" using the password "MyPassword".
+  
+  .LINK
+  Network
+  #>
   param (
     [Parameter(Mandatory = $false)]
     [string]$SSID,
@@ -5079,43 +5079,43 @@ function Connect-vtsWiFi {
 
 }
 
-<#
-.SYNOPSIS
-This script uses OpenAI's GPT-4 model to generate IT support ticket notes and follow-up questions.
-
-.DESCRIPTION
-The script consists of three main functions: LineAcrossScreen, Invoke-OpenAIAPI, and Generate-Questions. 
-
-LineAcrossScreen creates a line across the console screen with a specified color. 
-
-Invoke-OpenAIAPI sends a request to OpenAI's API with a given prompt and API key, and optionally a previous response for context. It returns the AI's response.
-
-Generate-Questions uses the OpenAI API to generate a set of follow-up questions based on the provided ticket notes.
-
-The main loop of the script prompts the user to enter an issue description and ticket notes, generates follow-up questions, and finally generates the ticket notes.
-
-.PARAMETER Prompt
-The prompt to be sent to the OpenAI API.
-
-.PARAMETER OpenAIAPIKey
-The API key for OpenAI.
-
-.PARAMETER PreviousResponse
-The previous response from the AI, used for context in the next API call.
-
-.PARAMETER TicketNotes
-The ticket notes to be used as context for generating follow-up questions.
-
-.PARAMETER Color
-The color of the line to be drawn across the console screen.
-
-.EXAMPLE
-PS> ai3
-
-.LINK
-AI
-#>
 function ai3 {
+  <#
+  .SYNOPSIS
+  This script uses OpenAI's GPT-4 model to generate IT support ticket notes and follow-up questions.
+  
+  .DESCRIPTION
+  The script consists of three main functions: LineAcrossScreen, Invoke-OpenAIAPI, and Generate-Questions. 
+  
+  LineAcrossScreen creates a line across the console screen with a specified color. 
+  
+  Invoke-OpenAIAPI sends a request to OpenAI's API with a given prompt and API key, and optionally a previous response for context. It returns the AI's response.
+  
+  Generate-Questions uses the OpenAI API to generate a set of follow-up questions based on the provided ticket notes.
+  
+  The main loop of the script prompts the user to enter an issue description and ticket notes, generates follow-up questions, and finally generates the ticket notes.
+  
+  .PARAMETER Prompt
+  The prompt to be sent to the OpenAI API.
+  
+  .PARAMETER OpenAIAPIKey
+  The API key for OpenAI.
+  
+  .PARAMETER PreviousResponse
+  The previous response from the AI, used for context in the next API call.
+  
+  .PARAMETER TicketNotes
+  The ticket notes to be used as context for generating follow-up questions.
+  
+  .PARAMETER Color
+  The color of the line to be drawn across the console screen.
+  
+  .EXAMPLE
+  PS> ai3
+  
+  .LINK
+  AI
+  #>
 
   Start-Transcript | Out-Null
 
@@ -5359,38 +5359,38 @@ function ai3 {
   Stop-Transcript
 }
 
-<#
-.SYNOPSIS
-This function downloads a file from a given URL using the fast download utility aria2.
-
-.DESCRIPTION
-Invoke-vtsFastDownload is a function that downloads a file from a specified URL to a specified path on the local system. 
-It first checks if the download path exists, if not, it creates it. 
-Then it sets the current location to the download path and sets the execution policy and security protocol. 
-It installs Chocolatey if not already installed and then installs aria2 using Chocolatey. 
-Finally, it downloads the file using aria2 and saves it at the specified location.
-
-.PARAMETER DownloadPath
-The path where the downloaded file will be saved. Default is "C:\temp".
-
-.PARAMETER URL
-The URL of the file to be downloaded. This is a mandatory parameter.
-
-.PARAMETER FileName
-The name of the file to be saved on the local system. This is a mandatory parameter.
-
-.EXAMPLE
-Invoke-vtsFastDownload -URL "http://example.com/file.zip" -FileName "file.zip"
-This will download the file from the specified URL and save it as "file.zip" in the default download path "C:\temp".
-
-.EXAMPLE
-Invoke-vtsFastDownload -DownloadPath "D:\downloads" -URL "http://example.com/file.zip" -FileName "file.zip"
-This will download the file from the specified URL and save it as "file.zip" in the specified download path "D:\downloads".
-
-.LINK
-Utilities
-#>
 function Invoke-vtsFastDownload {
+  <#
+  .SYNOPSIS
+  This function downloads a file from a given URL using the fast download utility aria2.
+  
+  .DESCRIPTION
+  Invoke-vtsFastDownload is a function that downloads a file from a specified URL to a specified path on the local system. 
+  It first checks if the download path exists, if not, it creates it. 
+  Then it sets the current location to the download path and sets the execution policy and security protocol. 
+  It installs Chocolatey if not already installed and then installs aria2 using Chocolatey. 
+  Finally, it downloads the file using aria2 and saves it at the specified location.
+  
+  .PARAMETER DownloadPath
+  The path where the downloaded file will be saved. Default is "C:\temp".
+  
+  .PARAMETER URL
+  The URL of the file to be downloaded. This is a mandatory parameter.
+  
+  .PARAMETER FileName
+  The name of the file to be saved on the local system. This is a mandatory parameter.
+  
+  .EXAMPLE
+  Invoke-vtsFastDownload -URL "http://example.com/file.zip" -FileName "file.zip"
+  This will download the file from the specified URL and save it as "file.zip" in the default download path "C:\temp".
+  
+  .EXAMPLE
+  Invoke-vtsFastDownload -DownloadPath "D:\downloads" -URL "http://example.com/file.zip" -FileName "file.zip"
+  This will download the file from the specified URL and save it as "file.zip" in the specified download path "D:\downloads".
+  
+  .LINK
+  Utilities
+  #>
   param (
     [string]$DownloadPath = "C:\temp",
     [Parameter(Mandatory = $true)]
@@ -5427,27 +5427,27 @@ function Invoke-vtsFastDownload {
   Write-Host "`nDownload complete. File saved at $(Join-Path $DownloadPath $FileName)" -ForegroundColor Green
 }
 
-<#
-.SYNOPSIS
-    This script gets the character count of file names in a directory and exports the data to a CSV file.
-
-.DESCRIPTION
-    The Get-vtsFilePathCharacterCount function takes a directory path and an output file path as parameters. It then retrieves all the items in the directory, counts the number of characters in each item's full name, and stores this information in an array. The array is then exported to a CSV file at the specified output file path.
-
-.PARAMETER directoryPath
-    The path of the directory to get the file character count from. This parameter is mandatory.
-
-.PARAMETER outputFilePath
-    The path of the CSV file to output the results to. This parameter is mandatory.
-
-.EXAMPLE
-    Get-vtsFilePathCharacterCount -directoryPath "C:\path\to\directory" -outputFilePath "C:\path\to\outputfile.csv"
-    This command gets the character count of all file names in the directory "C:\path\to\directory" and exports the data to the CSV file at "C:\path\to\outputfile.csv".
-
-.LINK
-    File Management
-#>
 function Get-vtsFilePathCharacterCount {
+  <#
+  .SYNOPSIS
+      This script gets the character count of file names in a directory and exports the data to a CSV file.
+  
+  .DESCRIPTION
+      The Get-vtsFilePathCharacterCount function takes a directory path and an output file path as parameters. It then retrieves all the items in the directory, counts the number of characters in each item's full name, and stores this information in an array. The array is then exported to a CSV file at the specified output file path.
+  
+  .PARAMETER directoryPath
+      The path of the directory to get the file character count from. This parameter is mandatory.
+  
+  .PARAMETER outputFilePath
+      The path of the CSV file to output the results to. This parameter is mandatory.
+  
+  .EXAMPLE
+      Get-vtsFilePathCharacterCount -directoryPath "C:\path\to\directory" -outputFilePath "C:\path\to\outputfile.csv"
+      This command gets the character count of all file names in the directory "C:\path\to\directory" and exports the data to the CSV file at "C:\path\to\outputfile.csv".
+  
+  .LINK
+      File Management
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Please enter the directory path in the format 'C:\path\to\directory'")]
     [string]$directoryPath,
@@ -5477,40 +5477,40 @@ function Get-vtsFilePathCharacterCount {
   Write-Host "Export completed successfully"
 }
 
-<#
-.SYNOPSIS
-    This function resets the printer drivers and settings on a Windows machine.
-
-.DESCRIPTION
-    The Reset-vtsPrintersandDrivers function is a destructive process that resets the printer drivers and settings on a Windows machine. It should be used as a last resort. The function first prompts the user for confirmation before proceeding. It then checks for the RunAsUser module and installs it if not present. The function then gets the network printers and saves them to a temporary directory. It attempts to remove the driver and registry paths with the spooler service running, then stops the spooler service and tries again. Finally, it starts the spooler service and removes the printer drivers.
-
-.PARAMETER driverPath
-    The path to the printer drivers. Default is "C:\Windows\System32\spool\drivers".
-
-.PARAMETER printProcessorRegPath
-    The registry path to the print processors. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors".
-
-.PARAMETER driverRegPath
-    The registry path to the drivers. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers".
-
-.PARAMETER printProcessorName
-    The name of the print processor. Default is "winprint".
-
-.PARAMETER printProcessorDll
-    The DLL of the print processor. Default is "winprint.dll".
-
-.EXAMPLE
-    Reset-vtsPrintersandDrivers
-    This command will reset the printer drivers and settings on the machine with the default parameters.
-
-.EXAMPLE
-    Reset-vtsPrintersandDrivers -driverPath "C:\CustomPath\drivers"
-    This command will reset the printer drivers and settings on the machine with a custom driver path.
-
-.LINK
-    Print Management
-#>
 function Reset-vtsPrintersandDrivers {
+  <#
+  .SYNOPSIS
+      This function resets the printer drivers and settings on a Windows machine.
+  
+  .DESCRIPTION
+      The Reset-vtsPrintersandDrivers function is a destructive process that resets the printer drivers and settings on a Windows machine. It should be used as a last resort. The function first prompts the user for confirmation before proceeding. It then checks for the RunAsUser module and installs it if not present. The function then gets the network printers and saves them to a temporary directory. It attempts to remove the driver and registry paths with the spooler service running, then stops the spooler service and tries again. Finally, it starts the spooler service and removes the printer drivers.
+  
+  .PARAMETER driverPath
+      The path to the printer drivers. Default is "C:\Windows\System32\spool\drivers".
+  
+  .PARAMETER printProcessorRegPath
+      The registry path to the print processors. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors".
+  
+  .PARAMETER driverRegPath
+      The registry path to the drivers. Default is "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Drivers".
+  
+  .PARAMETER printProcessorName
+      The name of the print processor. Default is "winprint".
+  
+  .PARAMETER printProcessorDll
+      The DLL of the print processor. Default is "winprint.dll".
+  
+  .EXAMPLE
+      Reset-vtsPrintersandDrivers
+      This command will reset the printer drivers and settings on the machine with the default parameters.
+  
+  .EXAMPLE
+      Reset-vtsPrintersandDrivers -driverPath "C:\CustomPath\drivers"
+      This command will reset the printer drivers and settings on the machine with a custom driver path.
+  
+  .LINK
+      Print Management
+  #>
   param (
     [string]$driverPath = "C:\Windows\System32\spool\drivers",
     [string]$printProcessorRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Environments\Windows x64\Print Processors",
@@ -5655,26 +5655,26 @@ function Reset-vtsPrintersandDrivers {
   Write-Host "Reset-vtsPrintersandDrivers function completed."
 }
 
-<#
-.SYNOPSIS
-   A script to take a screenshot of the current screen and save it to a specified path.
-
-.DESCRIPTION
-   This script uses the System.Windows.Forms and System.Drawing assemblies to capture a screenshot of the current screen. 
-   The screenshot is saved as a .png file at the path specified by the $Path parameter. 
-   If no path is specified, the screenshot will be saved in the temp folder with a timestamp in the filename.
-
-.PARAMETER Path
-   The path where the screenshot will be saved. If not specified, the screenshot will be saved in the temp folder with a timestamp in the filename.
-
-.EXAMPLE
-   Get-vtsScreenshot -Path "C:\Users\Username\Pictures\Screenshot.png"
-   This command will take a screenshot and save it as Screenshot.png in the Pictures folder of the user Username.
-
-.LINK
-    Utilities
-#>
 function Get-vtsScreenshot {
+  <#
+  .SYNOPSIS
+     A script to take a screenshot of the current screen and save it to a specified path.
+  
+  .DESCRIPTION
+     This script uses the System.Windows.Forms and System.Drawing assemblies to capture a screenshot of the current screen. 
+     The screenshot is saved as a .png file at the path specified by the $Path parameter. 
+     If no path is specified, the screenshot will be saved in the temp folder with a timestamp in the filename.
+  
+  .PARAMETER Path
+     The path where the screenshot will be saved. If not specified, the screenshot will be saved in the temp folder with a timestamp in the filename.
+  
+  .EXAMPLE
+     Get-vtsScreenshot -Path "C:\Users\Username\Pictures\Screenshot.png"
+     This command will take a screenshot and save it as Screenshot.png in the Pictures folder of the user Username.
+  
+  .LINK
+      Utilities
+  #>
   param (
     [string]$Path = "$env:temp\$(Get-Date -f yyyy-MM-dd-HH-mm)-Screenshot.png"
   )
@@ -5697,34 +5697,34 @@ function Get-vtsScreenshot {
   Write-Host "Screenshot saved at $Path"
 }
 
-<#
-.SYNOPSIS
-This script takes a screenshot of the current display and converts it to ASCII art to be displayed directly in the console.
-
-.DESCRIPTION
-The script uses the Get-vtsScreenshot function to capture a screenshot and save it to a specified directory. It then uses the ImageToAscii class to convert the screenshot into ASCII art. The ASCII art is then printed to the console.
-
-.PARAMETER ImageDirectory
-The directory where the screenshot will be saved. Default is "C:\temp\".
-
-.PARAMETER NumOfImages
-The number of screenshots to take and convert to ASCII art. Default is 3.
-
-.PARAMETER SleepInterval
-The interval in seconds between each screenshot. Default is 1.
-
-.EXAMPLE
-PS C:\> .\screen-to-ascii.ps1 -ImageDirectory "C:\screenshots\" -NumOfImages 5 -SleepInterval 2
-This example will take 5 screenshots at an interval of 2 seconds each, save them to the "C:\screenshots\" directory, and convert each one to ASCII art.
-
-.NOTES
-The ASCII art is generated with a fixed width of 100 characters. This is to maintain the aspect ratio of the ASCII characters.
-
-.LINK
-Utilities
-
-#>
 function Convert-vtsScreenToAscii {
+  <#
+  .SYNOPSIS
+  This script takes a screenshot of the current display and converts it to ASCII art to be displayed directly in the console.
+  
+  .DESCRIPTION
+  The script uses the Get-vtsScreenshot function to capture a screenshot and save it to a specified directory. It then uses the ImageToAscii class to convert the screenshot into ASCII art. The ASCII art is then printed to the console.
+  
+  .PARAMETER ImageDirectory
+  The directory where the screenshot will be saved. Default is "C:\temp\".
+  
+  .PARAMETER NumOfImages
+  The number of screenshots to take and convert to ASCII art. Default is 3.
+  
+  .PARAMETER SleepInterval
+  The interval in seconds between each screenshot. Default is 1.
+  
+  .EXAMPLE
+  PS C:\> .\screen-to-ascii.ps1 -ImageDirectory "C:\screenshots\" -NumOfImages 5 -SleepInterval 2
+  This example will take 5 screenshots at an interval of 2 seconds each, save them to the "C:\screenshots\" directory, and convert each one to ASCII art.
+  
+  .NOTES
+  The ASCII art is generated with a fixed width of 100 characters. This is to maintain the aspect ratio of the ASCII characters.
+  
+  .LINK
+  Utilities
+  
+  #>
   param (
     [string]$ImageDirectory = "$env:temp\",
     [int]$NumOfImages = 100,
@@ -5816,30 +5816,30 @@ public class ImageToAscii {
 
 }
 
-<#
-.SYNOPSIS
-    This script generates a report of Microsoft Teams' memberships.
-
-.DESCRIPTION
-    The Get-vts365TeamsMembershipReport function generates a report of all Microsoft Teams' memberships. 
-    It lists all the teams along with their owners, members, and guests. 
-    If a team does not have any members or guests, it will be noted in the report. 
-    The report is then copied to the clipboard.
-
-.PARAMETER None
-    This function does not take any parameters.
-
-.EXAMPLE
-    PS C:\> .\Get-vts365TeamsMembershipReport.ps1
-    This command runs the script and generates the report.
-
-.NOTES
-    You need to have the MicrosoftTeams module installed and be connected to Microsoft Teams for this script to work.
-
-.LINK
-    M365
-#>
 function Get-vts365TeamsMembershipReport {
+  <#
+  .SYNOPSIS
+      This script generates a report of Microsoft Teams' memberships.
+  
+  .DESCRIPTION
+      The Get-vts365TeamsMembershipReport function generates a report of all Microsoft Teams' memberships. 
+      It lists all the teams along with their owners, members, and guests. 
+      If a team does not have any members or guests, it will be noted in the report. 
+      The report is then copied to the clipboard.
+  
+  .PARAMETER None
+      This function does not take any parameters.
+  
+  .EXAMPLE
+      PS C:\> .\Get-vts365TeamsMembershipReport.ps1
+      This command runs the script and generates the report.
+  
+  .NOTES
+      You need to have the MicrosoftTeams module installed and be connected to Microsoft Teams for this script to work.
+  
+  .LINK
+      M365
+  #>
   if (-not (Get-Module -ListAvailable -Name MicrosoftTeams)) {
     Install-Module -Name MicrosoftTeams
   }
@@ -5885,30 +5885,30 @@ function Get-vts365TeamsMembershipReport {
   Write-Host "Results copied to clipboard." -f Yellow
 }
 
-<#
-.SYNOPSIS
-    This function performs a ping operation on a list of IP addresses or hostnames and compiles a report.
-
-.DESCRIPTION
-    The Ping-vtsList function conducts a ping test on a list of IP addresses or hostnames that are provided in a file. 
-    It then compiles a comprehensive report detailing the status and response time for each target. 
-    Additionally, the function provides an option to export this report to an HTML file for easy viewing and sharing.
-
-.PARAMETER TargetIPAddressFile
-    This parameter requires the full path to the file that contains the target IP addresses or hostnames.
-
-.PARAMETER ReportTitle
-    This parameter allows you to set the title of the report. If not specified, the default title is "Ping Report".
-
-.EXAMPLE
-    Ping-vtsList -TargetIPAddressFile "C:\temp\IPList.txt" -ReportTitle "Server Ping Report"
-
-    In this example, the function pings the IP addresses or hostnames listed in the file "C:\temp\IPList.txt" and generates a report with the title "Server Ping Report".
-
-.LINK
-    Network
-#>
 function Ping-vtsList {
+  <#
+  .SYNOPSIS
+      This function performs a ping operation on a list of IP addresses or hostnames and compiles a report.
+  
+  .DESCRIPTION
+      The Ping-vtsList function conducts a ping test on a list of IP addresses or hostnames that are provided in a file. 
+      It then compiles a comprehensive report detailing the status and response time for each target. 
+      Additionally, the function provides an option to export this report to an HTML file for easy viewing and sharing.
+  
+  .PARAMETER TargetIPAddressFile
+      This parameter requires the full path to the file that contains the target IP addresses or hostnames.
+  
+  .PARAMETER ReportTitle
+      This parameter allows you to set the title of the report. If not specified, the default title is "Ping Report".
+  
+  .EXAMPLE
+      Ping-vtsList -TargetIPAddressFile "C:\temp\IPList.txt" -ReportTitle "Server Ping Report"
+  
+      In this example, the function pings the IP addresses or hostnames listed in the file "C:\temp\IPList.txt" and generates a report with the title "Server Ping Report".
+  
+  .LINK
+      Network
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter the full path to the file containing the target IP addresses / hostnames.")]
     $TargetIPAddressFile,
@@ -5997,28 +5997,28 @@ function Ping-vtsList {
   }
 }
 
-<#
-.SYNOPSIS
-This script performs a pathping test on a list of servers and logs the results.
-
-.DESCRIPTION
-The Start-vtsPathPing function in this script performs a pathping test on a list of servers. The results of the test are logged in a text file in a specified directory. If the directory does not exist, it is created. The progress of the test is displayed in the console.
-
-.PARAMETER Servers
-An array of server names or IP addresses to test. The default values are "uvwss.ubervoip.net" and "ubervoice.ubervoip.net".
-
-.PARAMETER LogDir
-The directory where the log file will be saved. The default value is "$env:temp\Network Testing\".
-
-.EXAMPLE
-Start-vtsPathPing -Servers "192.168.1.1", "192.168.1.2" -LogDir "C:\Logs\"
-
-This example performs a pathping test on the servers "192.168.1.1" and "192.168.1.2". The results are saved in the "C:\Logs\" directory.
-
-.LINK
-Network
-#>
 function Start-vtsPathPing {
+  <#
+  .SYNOPSIS
+  This script performs a pathping test on a list of servers and logs the results.
+  
+  .DESCRIPTION
+  The Start-vtsPathPing function in this script performs a pathping test on a list of servers. The results of the test are logged in a text file in a specified directory. If the directory does not exist, it is created. The progress of the test is displayed in the console.
+  
+  .PARAMETER Servers
+  An array of server names or IP addresses to test. The default values are "uvwss.ubervoip.net" and "ubervoice.ubervoip.net".
+  
+  .PARAMETER LogDir
+  The directory where the log file will be saved. The default value is "$env:temp\Network Testing\".
+  
+  .EXAMPLE
+  Start-vtsPathPing -Servers "192.168.1.1", "192.168.1.2" -LogDir "C:\Logs\"
+  
+  This example performs a pathping test on the servers "192.168.1.1" and "192.168.1.2". The results are saved in the "C:\Logs\" directory.
+  
+  .LINK
+  Network
+  #>
   param(
       [Parameter(Mandatory=$false)]
       $Servers = @(
@@ -6054,39 +6054,39 @@ function Start-vtsPathPing {
   & notepad.exe "$($Logdir)\$($Timestamp)-pathping.txt"
 }
 
-<#
-.SYNOPSIS
-Starts a console session for serial communication using PuTTY's plink.exe.
-
-.DESCRIPTION
-The Start-vtsConsole function checks for the presence of plink.exe and Chocolatey, installs them if necessary, retrieves the COM port name of devices with class 'Ports' and status 'OK', and starts a console session using plink.exe for serial communication.
-
-.PARAMETER PlinkPath
-The path to the plink.exe executable. Default is "C:\Program Files\PuTTY\plink.exe".
-
-.PARAMETER ChocolateyBinPath
-The path to the Chocolatey bin directory. Default is "C:\ProgramData\chocolatey\bin\choco.exe".
-
-.EXAMPLE
-PS C:\> Start-vtsConsole
-
-This command starts a console session using the default paths for plink.exe and Chocolatey.
-
-.EXAMPLE
-PS C:\> Start-vtsConsole -PlinkPath "D:\Tools\PuTTY\plink.exe" -ChocolateyBinPath "D:\choco\bin\choco.exe"
-
-This command starts a console session using the specified paths for plink.exe and Chocolatey.
-
-.INPUTS
-None
-
-.OUTPUTS
-None
-
-.LINK
-Network
-#>
 function Start-vtsConsole {
+  <#
+  .SYNOPSIS
+  Starts a console session for serial communication using PuTTY's plink.exe.
+  
+  .DESCRIPTION
+  The Start-vtsConsole function checks for the presence of plink.exe and Chocolatey, installs them if necessary, retrieves the COM port name of devices with class 'Ports' and status 'OK', and starts a console session using plink.exe for serial communication.
+  
+  .PARAMETER PlinkPath
+  The path to the plink.exe executable. Default is "C:\Program Files\PuTTY\plink.exe".
+  
+  .PARAMETER ChocolateyBinPath
+  The path to the Chocolatey bin directory. Default is "C:\ProgramData\chocolatey\bin\choco.exe".
+  
+  .EXAMPLE
+  PS C:\> Start-vtsConsole
+  
+  This command starts a console session using the default paths for plink.exe and Chocolatey.
+  
+  .EXAMPLE
+  PS C:\> Start-vtsConsole -PlinkPath "D:\Tools\PuTTY\plink.exe" -ChocolateyBinPath "D:\choco\bin\choco.exe"
+  
+  This command starts a console session using the specified paths for plink.exe and Chocolatey.
+  
+  .INPUTS
+  None
+  
+  .OUTPUTS
+  None
+  
+  .LINK
+  Network
+  #>
   param (
       [string]$PlinkPath = "C:\Program Files\PuTTY\plink.exe",
       [string]$ChocolateyBinPath = "C:\ProgramData\chocolatey\bin\choco.exe"
@@ -6125,54 +6125,54 @@ function Start-vtsConsole {
   & $PlinkPath -serial $COMPORT
 }
 
-<#
-.SYNOPSIS
-Creates new Microsoft 365 users from a CSV file.
-
-.DESCRIPTION
-The New-vts365User function creates new Microsoft 365 users with the specified domain and usage location. It requires a CSV file path as input, which should contain the user details. The function also allows setting a password length.
-
-The CSV file must contain the following columns:
-"FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
-
-Example CSV content:
-"FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
-"John","Doe","john.doe@contoso.com","+1 234567890","john.recovery@email.com"
-"Jane","Smith","jane.smith@contoso.com","+1 987654321","jane.recovery@email.com"
-
-.PARAMETER CsvPath
-The path to the CSV file containing user information to be imported.
-
-.PARAMETER UsageLocation
-The usage location for the new user. Default is 'US'.
-
-.PARAMETER PasswordLength
-The length of the password to be generated for the new user. Default is 16 characters.
-
-.PARAMETER CustomPassword
-Specifies a custom password for the new user. If not provided, a random password will be generated.
-
-.PARAMETER CreateTemplate
-Switch to create a CSV template for user input.
-
-.EXAMPLE
-New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com"
-
-This command creates new users from the specified CSV file with the domain 'contoso.com' and the default usage location and password length.
-
-.EXAMPLE
-New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com" -UsageLocation "GB" -PasswordLength 20
-
-This command creates new users with the domain 'contoso.com', sets the usage location to 'GB', and generates passwords with a length of 20 characters.
-
-.NOTES
-Requires the MSOnline and AzureAD modules.
-
-.LINK
-M365
-
-#>
 function New-vts365User {
+  <#
+  .SYNOPSIS
+  Creates new Microsoft 365 users from a CSV file.
+  
+  .DESCRIPTION
+  The New-vts365User function creates new Microsoft 365 users with the specified domain and usage location. It requires a CSV file path as input, which should contain the user details. The function also allows setting a password length.
+  
+  The CSV file must contain the following columns:
+  "FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
+  
+  Example CSV content:
+  "FirstName","LastName","PrimaryEmail","RecoveryPhone","RecoveryEmail"
+  "John","Doe","john.doe@contoso.com","+1 234567890","john.recovery@email.com"
+  "Jane","Smith","jane.smith@contoso.com","+1 987654321","jane.recovery@email.com"
+  
+  .PARAMETER CsvPath
+  The path to the CSV file containing user information to be imported.
+  
+  .PARAMETER UsageLocation
+  The usage location for the new user. Default is 'US'.
+  
+  .PARAMETER PasswordLength
+  The length of the password to be generated for the new user. Default is 16 characters.
+  
+  .PARAMETER CustomPassword
+  Specifies a custom password for the new user. If not provided, a random password will be generated.
+  
+  .PARAMETER CreateTemplate
+  Switch to create a CSV template for user input.
+  
+  .EXAMPLE
+  New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com"
+  
+  This command creates new users from the specified CSV file with the domain 'contoso.com' and the default usage location and password length.
+  
+  .EXAMPLE
+  New-vts365User -CsvPath "C:\Users\example\userlist.csv" -Domain "contoso.com" -UsageLocation "GB" -PasswordLength 20
+  
+  This command creates new users with the domain 'contoso.com', sets the usage location to 'GB', and generates passwords with a length of 20 characters.
+  
+  .NOTES
+  Requires the MSOnline and AzureAD modules.
+  
+  .LINK
+  M365
+  
+  #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory = $false)]
@@ -6493,25 +6493,25 @@ function New-vts365User {
   ii $keyPath
 }
 
-<#
-.SYNOPSIS
-Retrieves the network profiles and their associated keys on the local machine.
-
-.DESCRIPTION
-This function lists all wireless network profiles stored on the local machine along with their clear text keys (passwords). It uses the 'netsh' command-line utility to query the profiles and extract the information.
-
-.EXAMPLE
-PS C:\> Get-vtsWlanProfilesAndKeys
-
-This command will display a list of all wireless network profiles and their associated keys.
-
-.NOTES
-This function requires administrative privileges to reveal the keys for the network profiles.
-
-.LINK
-Network
-#>
 function Get-vtsWlanProfilesAndKeys {
+  <#
+  .SYNOPSIS
+  Retrieves the network profiles and their associated keys on the local machine.
+  
+  .DESCRIPTION
+  This function lists all wireless network profiles stored on the local machine along with their clear text keys (passwords). It uses the 'netsh' command-line utility to query the profiles and extract the information.
+  
+  .EXAMPLE
+  PS C:\> Get-vtsWlanProfilesAndKeys
+  
+  This command will display a list of all wireless network profiles and their associated keys.
+  
+  .NOTES
+  This function requires administrative privileges to reveal the keys for the network profiles.
+  
+  .LINK
+  Network
+  #>
     netsh wlan show profiles | 
     Where-Object {$_ -match ' : '} | 
     ForEach-Object {$_.split(':')[1].trim()} | 
@@ -6523,31 +6523,31 @@ function Get-vtsWlanProfilesAndKeys {
     Select-Object @{Name='Network'; Expression={$networkName}}, @{Name='Key'; Expression={$_.split(':')[1].trim()}}
 }
 
-<#
-.SYNOPSIS
-Retrieves the last sign-in information for all Microsoft 365 users.
-
-.DESCRIPTION
-The Get-vts365LastSignIn function connects to Microsoft Graph, retrieves all users, and gathers the most recent sign-in log for each user. It outputs the user's display name, user principal name, last sign-in time, application used, and the client application used for the last sign-in.
-
-.EXAMPLE
-PS C:\> Get-vts365LastSignIn
-
-This command retrieves the last sign-in information for all Microsoft 365 users and displays it in the console.
-
-.EXAMPLE
-PS C:\> Get-vts365LastSignIn
-Do you want to export a report? (Y/N): Y
-
-This command retrieves the last sign-in information for all Microsoft 365 users, displays it in the console, and prompts the user to export the information to a CSV file.
-
-.NOTES
-Requires the Microsoft.Graph module.
-
-.LINK
-M365
-#>
 function Get-vts365LastSignIn {
+  <#
+  .SYNOPSIS
+  Retrieves the last sign-in information for all Microsoft 365 users.
+  
+  .DESCRIPTION
+  The Get-vts365LastSignIn function connects to Microsoft Graph, retrieves all users, and gathers the most recent sign-in log for each user. It outputs the user's display name, user principal name, last sign-in time, application used, and the client application used for the last sign-in.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365LastSignIn
+  
+  This command retrieves the last sign-in information for all Microsoft 365 users and displays it in the console.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365LastSignIn
+  Do you want to export a report? (Y/N): Y
+  
+  This command retrieves the last sign-in information for all Microsoft 365 users, displays it in the console, and prompts the user to export the information to a CSV file.
+  
+  .NOTES
+  Requires the Microsoft.Graph module.
+  
+  .LINK
+  M365
+  #>
   # Connect to Microsoft Graph
   Connect-MgGraph -Scopes "User.Read.All", "AuditLog.Read.All"
 
@@ -6610,24 +6610,24 @@ function Get-vts365LastSignIn {
   Disconnect-MgGraph
 }
 
-<#
-.SYNOPSIS
-    Retrieves readable permissions for a given directory path.
-
-.DESCRIPTION
-    The Get-vtsReadablePermissions function takes a file system path as input and returns a custom object array with the permissions of each subfolder. It includes details such as the user or group with access, the type of access, and the inheritance and propagation of the permissions.
-
-.EXAMPLE
-    PS C:\> Get-vtsReadablePermissions -Path "C:\MyFolder"
-    This example retrieves the permissions for all the immediate child folders of "C:\MyFolder".
-
-.NOTES
-    This function requires at least PowerShell version 3.0 to run properly due to the usage of the Get-ChildItem -Directory parameter.
-
-.LINK
-    File Management
-#>
 function Get-vtsReadablePermissions {
+  <#
+  .SYNOPSIS
+      Retrieves readable permissions for a given directory path.
+  
+  .DESCRIPTION
+      The Get-vtsReadablePermissions function takes a file system path as input and returns a custom object array with the permissions of each subfolder. It includes details such as the user or group with access, the type of access, and the inheritance and propagation of the permissions.
+  
+  .EXAMPLE
+      PS C:\> Get-vtsReadablePermissions -Path "C:\MyFolder"
+      This example retrieves the permissions for all the immediate child folders of "C:\MyFolder".
+  
+  .NOTES
+      This function requires at least PowerShell version 3.0 to run properly due to the usage of the Get-ChildItem -Directory parameter.
+  
+  .LINK
+      File Management
+  #>
     param (
         [Parameter(Mandatory = $true)]
         [string]$Path
@@ -6725,25 +6725,26 @@ function Get-vtsReadablePermissions {
         $FilteredPermissions | Out-HtmlView -Title "Permission Report - $(Get-Date -f "dddd MM-dd-yyyy HHmm")" -Filepath "$Filepath\Permission Report - $(Get-Date -f MM_dd_yyyy).html"
     }
 }
-<#
-.SYNOPSIS
-This function takes ownership and grants full control permissions to a specified directory and its contents.
 
-.DESCRIPTION
-The Set-vtsDirectoryOwnership function takes ownership of a specified directory and grants full control permissions to the current user. It uses the takeown and icacls commands to achieve this. The function can be used to take ownership and set permissions on any directory.
-
-.PARAMETER DirectoryPath
-The path of the directory to take ownership of and grant permissions to. This parameter is mandatory.
-
-.EXAMPLE
-Set-vtsDirectoryOwnership -DirectoryPath "E:\Users\tmays"
-
-This example takes ownership of the "E:\Users\tmays" directory and grants full control permissions to the current user.
-
-.LINK
-File Management
-#>
 function Set-vtsDirectoryOwnership {
+  <#
+  .SYNOPSIS
+  This function takes ownership and grants full control permissions to a specified directory and its contents.
+  
+  .DESCRIPTION
+  The Set-vtsDirectoryOwnership function takes ownership of a specified directory and grants full control permissions to the current user. It uses the takeown and icacls commands to achieve this. The function can be used to take ownership and set permissions on any directory.
+  
+  .PARAMETER DirectoryPath
+  The path of the directory to take ownership of and grant permissions to. This parameter is mandatory.
+  
+  .EXAMPLE
+  Set-vtsDirectoryOwnership -DirectoryPath "E:\Users\tmays"
+  
+  This example takes ownership of the "E:\Users\tmays" directory and grants full control permissions to the current user.
+  
+  .LINK
+  File Management
+  #>
   param (
     [Parameter(Mandatory = $true, HelpMessage = "Enter the path of the directory to take ownership of and grant permissions to.")]
     [string]$DirectoryPath
@@ -6768,28 +6769,28 @@ function Set-vtsDirectoryOwnership {
   }
 }
 
-<#
-.SYNOPSIS
-Retrieves shortcut (.lnk) file information from specified paths.
-
-.DESCRIPTION
-The Get-vtsShortcut function retrieves detailed information about Windows shortcut files (.lnk), including their target paths, hotkeys, arguments, and icon locations. If no path is specified, it searches both the current user's and all users' Start Menu folders.
-
-.PARAMETER path
-Optional. The path to search for shortcut files. If not specified, searches Start Menu folders.
-
-.EXAMPLE
-PS> Get-vtsShortcut
-Returns all shortcuts from user and system Start Menu folders.
-
-.EXAMPLE
-PS> Get-vtsShortcut -path "C:\Users\Username\Desktop"
-Returns all shortcuts from the specified desktop folder.
-
-.LINK
-File Management
-#>
 function Get-vtsShortcut {
+  <#
+  .SYNOPSIS
+  Retrieves shortcut (.lnk) file information from specified paths.
+  
+  .DESCRIPTION
+  The Get-vtsShortcut function retrieves detailed information about Windows shortcut files (.lnk), including their target paths, hotkeys, arguments, and icon locations. If no path is specified, it searches both the current user's and all users' Start Menu folders.
+  
+  .PARAMETER path
+  Optional. The path to search for shortcut files. If not specified, searches Start Menu folders.
+  
+  .EXAMPLE
+  PS> Get-vtsShortcut
+  Returns all shortcuts from user and system Start Menu folders.
+  
+  .EXAMPLE
+  PS> Get-vtsShortcut -path "C:\Users\Username\Desktop"
+  Returns all shortcuts from the specified desktop folder.
+  
+  .LINK
+  File Management
+  #>
   param(
     $path = $null
   )
@@ -6826,52 +6827,52 @@ function Get-vtsShortcut {
   }
 }
 
-<#
-.SYNOPSIS
-Modifies properties of an existing Windows shortcut file.
-
-.DESCRIPTION
-The Set-vtsShortcut function allows modification of Windows shortcut (.lnk) file properties including the target path, hotkey, arguments, and icon location. It accepts input from the pipeline or direct parameters.
-
-.PARAMETER LinkPath
-The full path to the shortcut file to modify.
-
-.PARAMETER Hotkey
-The keyboard shortcut to assign to the shortcut file.
-
-.PARAMETER IconLocation 
-The path to the icon file and icon index to use.
-
-.PARAMETER Arguments
-The command-line arguments to pass to the target application.
-
-.PARAMETER TargetPath
-The path to the target file that the shortcut will launch.
-
-.EXAMPLE
-PS> Get-vtsShortcut "C:\shortcut.lnk" | Set-vtsShortcut -TargetPath "C:\NewTarget.exe"
-Modifies the target path of an existing shortcut.
-
-.EXAMPLE
-PS> Set-vtsShortcut -LinkPath "C:\shortcut.lnk" -Hotkey "CTRL+ALT+F"
-Sets a keyboard shortcut for an existing shortcut file.
-
-.EXAMPLE
-Get-ChildItem -Path "C:\Path\To\Your\Directory" -Include *.lnk -Recurse -file | 
-Select-Object -expand fullname |
-ForEach-Object { 
-  Get-vtsShortcut $_ | 
-  Where-Object TargetPath -like "*192.168.1.220*" | 
-  ForEach-Object {
-    Set-vtsShortcut -LinkPath "$($_.LinkPath)" -IconLocation "$($_.IconLocation)" -TargetPath "$(($_.TargetPath) -replace '192.168.1.220','192.168.5.220')"
-  }
-}
-Recursively searches for all `.lnk` (shortcut) files in a specified directory. It then filters these shortcuts to find those whose target path contains the IP address `192.168.1.220`. For each matching shortcut, it updates the target path to replace `192.168.1.220` with `192.168.5.220`, while preserving the original link path and icon location.
-
-.LINK
-File Management
-#>
 function Set-vtsShortcut {
+  <#
+  .SYNOPSIS
+  Modifies properties of an existing Windows shortcut file.
+  
+  .DESCRIPTION
+  The Set-vtsShortcut function allows modification of Windows shortcut (.lnk) file properties including the target path, hotkey, arguments, and icon location. It accepts input from the pipeline or direct parameters.
+  
+  .PARAMETER LinkPath
+  The full path to the shortcut file to modify.
+  
+  .PARAMETER Hotkey
+  The keyboard shortcut to assign to the shortcut file.
+  
+  .PARAMETER IconLocation 
+  The path to the icon file and icon index to use.
+  
+  .PARAMETER Arguments
+  The command-line arguments to pass to the target application.
+  
+  .PARAMETER TargetPath
+  The path to the target file that the shortcut will launch.
+  
+  .EXAMPLE
+  PS> Get-vtsShortcut "C:\shortcut.lnk" | Set-vtsShortcut -TargetPath "C:\NewTarget.exe"
+  Modifies the target path of an existing shortcut.
+  
+  .EXAMPLE
+  PS> Set-vtsShortcut -LinkPath "C:\shortcut.lnk" -Hotkey "CTRL+ALT+F"
+  Sets a keyboard shortcut for an existing shortcut file.
+  
+  .EXAMPLE
+  Get-ChildItem -Path "C:\Path\To\Your\Directory" -Include *.lnk -Recurse -file | 
+  Select-Object -expand fullname |
+  ForEach-Object { 
+    Get-vtsShortcut $_ | 
+    Where-Object TargetPath -like "*192.168.1.220*" | 
+    ForEach-Object {
+      Set-vtsShortcut -LinkPath "$($_.LinkPath)" -IconLocation "$($_.IconLocation)" -TargetPath "$(($_.TargetPath) -replace '192.168.1.220','192.168.5.220')"
+    }
+  }
+  Recursively searches for all `.lnk` (shortcut) files in a specified directory. It then filters these shortcuts to find those whose target path contains the IP address `192.168.1.220`. For each matching shortcut, it updates the target path to replace `192.168.1.220` with `192.168.5.220`, while preserving the original link path and icon location.
+  
+  .LINK
+  File Management
+  #>
   param(
     [Parameter(ValueFromPipelineByPropertyName = $true)]
     $LinkPath,
@@ -6894,21 +6895,21 @@ function Set-vtsShortcut {
   }
 }
 
-<#
-.SYNOPSIS
-This function manages licenses for a list of users by adding and removing licenses in a single operation.
-
-.DESCRIPTION
-The function Set-vts365UserLicense connects to the Graph API and manages licenses for selected users. 
-It allows selecting users from Exchange Online and choosing which licenses to add and remove.
-
-.EXAMPLE
-Set-vts365UserLicense
-
-.LINK
-M365
-#>
 function Set-vts365UserLicense {
+  <#
+  .SYNOPSIS
+  This function manages licenses for a list of users by adding and removing licenses in a single operation.
+  
+  .DESCRIPTION
+  The function Set-vts365UserLicense connects to the Graph API and manages licenses for selected users. 
+  It allows selecting users from Exchange Online and choosing which licenses to add and remove.
+  
+  .EXAMPLE
+  Set-vts365UserLicense
+  
+  .LINK
+  M365
+  #>
   param (
     [Parameter(Mandatory = $false, HelpMessage = "Enter a single email or a comma separated list of emails.")]
     $UserList
@@ -6970,29 +6971,29 @@ function Set-vts365UserLicense {
   Write-Host "Operation completed."
 }
 
-<#
-.SYNOPSIS
-Retrieves a mapping of printer names to their corresponding port names and host addresses.
-
-.DESCRIPTION
-The Get-vtsPrinterAddressMapping function retrieves all printer ports with their host addresses and maps them to the printers using those ports. It returns a list of custom objects containing the printer name, port name, and printer host address.
-
-.EXAMPLE
-PS C:\> Get-vtsPrinterAddressMapping
-
-This command retrieves and displays a list of printers along with their port names and host addresses.
-
-.OUTPUTS
-System.Object
-A custom object with the following properties:
-- PrinterName: The name of the printer.
-- PortName: The name of the port.
-- PrinterHostAddress: The host address of the printer port.
-
-.LINK
-Print Management
-#>
 function Get-vtsPrinterAddressMapping {
+  <#
+  .SYNOPSIS
+  Retrieves a mapping of printer names to their corresponding port names and host addresses.
+  
+  .DESCRIPTION
+  The Get-vtsPrinterAddressMapping function retrieves all printer ports with their host addresses and maps them to the printers using those ports. It returns a list of custom objects containing the printer name, port name, and printer host address.
+  
+  .EXAMPLE
+  PS C:\> Get-vtsPrinterAddressMapping
+  
+  This command retrieves and displays a list of printers along with their port names and host addresses.
+  
+  .OUTPUTS
+  System.Object
+  A custom object with the following properties:
+  - PrinterName: The name of the printer.
+  - PortName: The name of the port.
+  - PrinterHostAddress: The host address of the printer port.
+  
+  .LINK
+  Print Management
+  #>
   # Get all printer ports with their host addresses
   $PortNames = Get-PrinterPort | Where-Object { $_.PrinterHostAddress } | Select-Object Name, PrinterHostAddress
   # Initialize an array to store results
@@ -7020,63 +7021,63 @@ function Get-vtsPrinterAddressMapping {
   $Results
 }
 
-<#
-.SYNOPSIS
-    Creates multiple Active Directory users from a CSV file.
-
-.DESCRIPTION
-    The New-vtsBulkADUsers function automates the creation of multiple Active Directory users
-    using data from a CSV file. It supports creating users in either a new or existing OU,
-    sets up email properties, and triggers an AD sync after completion.
-
-.PARAMETER CsvPath
-    Path to the CSV file containing user information. Required columns:
-    - FirstName
-    - LastName
-    - PrimaryEmail
-
-.PARAMETER OUOption
-    Specifies whether to create a new OU ('CreateNew') or select an existing one ('Select').
-
-.PARAMETER NewOUName
-    Name of the new OU to create. Required when OUOption is 'CreateNew'.
-
-.PARAMETER NewOUPath
-    Distinguished path where the new OU will be created. Required when OUOption is 'CreateNew'.
-
-.PARAMETER Password
-    SecureString containing the default password for new users.
-    Defaults to "WelcomeRocky123!".
-
-.PARAMETER LogPath
-    Path where the operation log will be saved.
-    Defaults to "C:\temp\User_Creation-<current-date>.csv".
-
-.EXAMPLE
-    PS> New-vtsBulkADUsers -CsvPath "C:\Users.csv" -OUOption Select
-    Creates users from Users.csv in an existing OU selected via GUI.
-
-.EXAMPLE
-    PS> $params = @{
-        CsvPath = "C:\Users.csv"
-        OUOption = "CreateNew"
-        NewOUName = "NewEmployees"
-        NewOUPath = "DC=contoso,DC=com"
-    }
-    PS> New-vtsBulkADUsers @params
-    Creates users from Users.csv in a new OU named "NewEmployees".
-
-.NOTES
-    Author: VTS Systems
-    Required Modules: ActiveDirectory
-    CSV Format Example:
-    FirstName,LastName,PrimaryEmail
-    John,Doe,john.doe@contoso.com
-
-.LINK
-    M365
-#>
 function New-vtsBulkADUsers {
+  <#
+  .SYNOPSIS
+      Creates multiple Active Directory users from a CSV file.
+  
+  .DESCRIPTION
+      The New-vtsBulkADUsers function automates the creation of multiple Active Directory users
+      using data from a CSV file. It supports creating users in either a new or existing OU,
+      sets up email properties, and triggers an AD sync after completion.
+  
+  .PARAMETER CsvPath
+      Path to the CSV file containing user information. Required columns:
+      - FirstName
+      - LastName
+      - PrimaryEmail
+  
+  .PARAMETER OUOption
+      Specifies whether to create a new OU ('CreateNew') or select an existing one ('Select').
+  
+  .PARAMETER NewOUName
+      Name of the new OU to create. Required when OUOption is 'CreateNew'.
+  
+  .PARAMETER NewOUPath
+      Distinguished path where the new OU will be created. Required when OUOption is 'CreateNew'.
+  
+  .PARAMETER Password
+      SecureString containing the default password for new users.
+      Defaults to "WelcomeRocky123!".
+  
+  .PARAMETER LogPath
+      Path where the operation log will be saved.
+      Defaults to "C:\temp\User_Creation-<current-date>.csv".
+  
+  .EXAMPLE
+      PS> New-vtsBulkADUsers -CsvPath "C:\Users.csv" -OUOption Select
+      Creates users from Users.csv in an existing OU selected via GUI.
+  
+  .EXAMPLE
+      PS> $params = @{
+          CsvPath = "C:\Users.csv"
+          OUOption = "CreateNew"
+          NewOUName = "NewEmployees"
+          NewOUPath = "DC=contoso,DC=com"
+      }
+      PS> New-vtsBulkADUsers @params
+      Creates users from Users.csv in a new OU named "NewEmployees".
+  
+  .NOTES
+      Author: VTS Systems
+      Required Modules: ActiveDirectory
+      CSV Format Example:
+      FirstName,LastName,PrimaryEmail
+      John,Doe,john.doe@contoso.com
+  
+  .LINK
+      M365
+  #>
   [CmdletBinding()]
 param(
   [Parameter(Mandatory)]
@@ -7189,41 +7190,41 @@ param(
   
 }
 
-<#
-.SYNOPSIS
-    Manages file retention by resetting, marking, moving, and deleting files based on access times.
-
-.DESCRIPTION
-    This script manages file retention in a specified directory. It performs the following actions:
-    - Resets the LastWriteTime for recently accessed files.
-    - Marks old files by setting an artificial LastWriteTime.
-    - Moves old files to a "ToBeDeleted" directory.
-    - Deletes files from the "ToBeDeleted" directory after a specified grace period.
-
-.PARAMETER BasePath
-    The base path where the files are located. Default is "C:\qdstm*\out".
-
-.PARAMETER DaysBeforeSoftDelete
-    The number of days before a file is considered old and marked for deletion. Default is 30 days.
-
-.PARAMETER DaysBeforeHardDelete
-    The number of days before a file is permanently deleted from the "ToBeDeleted" directory. Default is 45 days.
-
-.PARAMETER ArtificialLastWriteTimeYears
-    The number of years to subtract from the LastWriteTime to mark a file as old. Default is 100 years.
-
-.PARAMETER Extension
-    The file extension to filter files. Default is "*.pdf".
-
-.EXAMPLE
-    PS> .\Manage-vtsFileRetention.ps1 -BasePath "C:\example\path" -DaysBeforeSoftDelete 60 -DaysBeforeHardDelete 90 -Extension "*.txt"
-    This example manages file retention for .txt files in the specified path, marking files as old after 60 days and deleting them after 90 days.
-
-.LINK
-    File Management
-
-#>
 function Manage-vtsFileRetention {
+  <#
+  .SYNOPSIS
+      Manages file retention by resetting, marking, moving, and deleting files based on access times.
+  
+  .DESCRIPTION
+      This script manages file retention in a specified directory. It performs the following actions:
+      - Resets the LastWriteTime for recently accessed files.
+      - Marks old files by setting an artificial LastWriteTime.
+      - Moves old files to a "ToBeDeleted" directory.
+      - Deletes files from the "ToBeDeleted" directory after a specified grace period.
+  
+  .PARAMETER BasePath
+      The base path where the files are located. Default is "C:\qdstm*\out".
+  
+  .PARAMETER DaysBeforeSoftDelete
+      The number of days before a file is considered old and marked for deletion. Default is 30 days.
+  
+  .PARAMETER DaysBeforeHardDelete
+      The number of days before a file is permanently deleted from the "ToBeDeleted" directory. Default is 45 days.
+  
+  .PARAMETER ArtificialLastWriteTimeYears
+      The number of years to subtract from the LastWriteTime to mark a file as old. Default is 100 years.
+  
+  .PARAMETER Extension
+      The file extension to filter files. Default is "*.pdf".
+  
+  .EXAMPLE
+      PS> .\Manage-vtsFileRetention.ps1 -BasePath "C:\example\path" -DaysBeforeSoftDelete 60 -DaysBeforeHardDelete 90 -Extension "*.txt"
+      This example manages file retention for .txt files in the specified path, marking files as old after 60 days and deleting them after 90 days.
+  
+  .LINK
+      File Management
+  
+  #>
   param (
       [string]$BasePath = "C:\qdstm*\out",
       [int]$DaysBeforeSoftDelete = 30,
@@ -7341,21 +7342,21 @@ function Manage-vtsFileRetention {
   }
 }
 
-<#
-.SYNOPSIS
-Enables TLS 1.2 for server and client, sets default secure protocols for WinHTTP, and enables strong cryptography for .NET Framework.
-
-.DESCRIPTION
-This function configures the necessary registry settings to enable TLS 1.2 for both server and client, sets the default secure protocols for WinHTTP, and enables strong cryptography for the .NET Framework.
-
-.EXAMPLE
-Enable-vtsTLS12AndStrongCrypto
-
-.LINK
-Network
-
-#>
 function Enable-vtsTLS12AndStrongCrypto {
+  <#
+  .SYNOPSIS
+  Enables TLS 1.2 for server and client, sets default secure protocols for WinHTTP, and enables strong cryptography for .NET Framework.
+  
+  .DESCRIPTION
+  This function configures the necessary registry settings to enable TLS 1.2 for both server and client, sets the default secure protocols for WinHTTP, and enables strong cryptography for the .NET Framework.
+  
+  .EXAMPLE
+  Enable-vtsTLS12AndStrongCrypto
+  
+  .LINK
+  Network
+  
+  #>
 
   # Enable TLS 1.2 for Server and Client
   $TLSPaths = @(
@@ -7388,23 +7389,23 @@ function Enable-vtsTLS12AndStrongCrypto {
   Write-Output "TLS 1.2 and .NET Strong Cryptography settings have been configured. Please restart the server for the changes to take effect."
 }
 
-<#
-.SYNOPSIS
-This function retrieves the recipients of a given set of distribution lists from Exchange Online.
-
-.DESCRIPTION
-The Get-vts365DynamicDistributionListRecipients function connects to Exchange Online and retrieves the recipients of the specified dynamic distribution lists. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
-
-.PARAMETER DistributionList
-An array of distribution list names for which to retrieve recipients.
-
-.EXAMPLE
-PS C:\> Get-vts365DynamicDistributionListRecipients -DistributionList "Group1", "Group2"
-
-.LINK
-M365
-#>
 function Get-vts365DynamicDistributionListRecipients {
+  <#
+  .SYNOPSIS
+  This function retrieves the recipients of a given set of distribution lists from Exchange Online.
+  
+  .DESCRIPTION
+  The Get-vts365DynamicDistributionListRecipients function connects to Exchange Online and retrieves the recipients of the specified dynamic distribution lists. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
+  
+  .PARAMETER DistributionList
+  An array of distribution list names for which to retrieve recipients.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365DynamicDistributionListRecipients -DistributionList "Group1", "Group2"
+  
+  .LINK
+  M365
+  #>
 
   if (-not(Get-ConnectionInformation)) {
     Connect-ExchangeOnline -ShowBanner:$false
@@ -7490,17 +7491,20 @@ function Get-vts365DynamicDistributionListRecipients {
   }
 }
 
-<#
-.SYNOPSIS
-This function retrieves the recipients of a given set of distribution lists from Exchange Online.
-
-.DESCRIPTION
-The Get-vts365DistributionListRecipients function connects to Exchange Online and retrieves the recipients of the specified distribution lists. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
-
-.EXAMPLE
-PS C:\> Get-vts365DistributionListRecipients
-#>
 function Get-vts365DistributionListRecipients {
+  <#
+  .SYNOPSIS
+  This function retrieves the recipients of a given set of distribution lists from Exchange Online.
+  
+  .DESCRIPTION
+  The Get-vts365DistributionListRecipients function connects to Exchange Online and retrieves the recipients of the specified distribution lists. The results are stored in an array and outputted at the end. It also provides an option to export the results to an HTML report.
+  
+  .EXAMPLE
+  PS C:\> Get-vts365DistributionListRecipients
+  
+  .LINK
+  M365
+  #>
   if (-not(Get-ConnectionInformation)) {
       Connect-ExchangeOnline -ShowBanner:$false
   }
@@ -7617,33 +7621,33 @@ function Get-vts365DistributionListRecipients {
   }
 }
 
-<#
-.SYNOPSIS
-Exports the configuration of selected distribution lists to a CSV file.
-
-.DESCRIPTION
-The Export-vts365DistributionListConfig function connects to Exchange Online and exports detailed configuration information about selected distribution lists to a CSV file. It includes information such as managed by users, members, moderators, and various distribution list settings.
-
-.PARAMETER FilePath
-The path where the CSV file will be saved. If not specified, defaults to the Downloads folder with filename format 'yyyy-MM-dd_HHmm_DistributionListConfig.csv'.
-
-.EXAMPLE
-Export-vts365DistributionListConfig
-
-This example prompts for distribution list selection and exports their configuration to the default location.
-
-.EXAMPLE
-Export-vts365DistributionListConfig -FilePath "C:\Reports\DLConfig.csv"
-
-This example exports the selected distribution lists' configuration to the specified file path.
-
-.NOTES
-Requires connection to Exchange Online PowerShell.
-
-.LINK
-M365 Migration Scripts
-#>
 function Export-vts365DistributionListConfig {
+  <#
+  .SYNOPSIS
+  Exports the configuration of selected distribution lists to a CSV file.
+  
+  .DESCRIPTION
+  The Export-vts365DistributionListConfig function connects to Exchange Online and exports detailed configuration information about selected distribution lists to a CSV file. It includes information such as managed by users, members, moderators, and various distribution list settings.
+  
+  .PARAMETER FilePath
+  The path where the CSV file will be saved. If not specified, defaults to the Downloads folder with filename format 'yyyy-MM-dd_HHmm_DistributionListConfig.csv'.
+  
+  .EXAMPLE
+  Export-vts365DistributionListConfig
+  
+  This example prompts for distribution list selection and exports their configuration to the default location.
+  
+  .EXAMPLE
+  Export-vts365DistributionListConfig -FilePath "C:\Reports\DLConfig.csv"
+  
+  This example exports the selected distribution lists' configuration to the specified file path.
+  
+  .NOTES
+  Requires connection to Exchange Online PowerShell.
+  
+  .LINK
+  M365 Migration Scripts
+  #>
   [CmdletBinding()]
   param (
       [Parameter()]
@@ -7742,34 +7746,34 @@ function Export-vts365DistributionListConfig {
   }
 }
 
-<#
-.SYNOPSIS
-Imports and creates distribution lists from a CSV configuration file.
-
-.DESCRIPTION
-The Import-vts365DistributionListConfig function creates new distribution lists in Exchange Online based on configuration data from a CSV file. It supports creating security groups, distribution groups, and room lists with their respective settings and members.
-
-The function will prefix all new distribution list names with "C-" and will automatically handle different types of groups including:
-- MailUniversalSecurityGroup
-- MailUniversalDistributionGroup
-- RoomList
-
-.PARAMETER FilePath
-The path to the CSV file containing the distribution list configurations to import. The CSV file should include columns for DisplayName, Name, Alias, PrimarySmtpAddress, and other distribution list properties.
-
-.EXAMPLE
-Import-vts365DistributionListConfig -FilePath "C:\DistributionLists.csv"
-
-This example imports distribution list configurations from the specified CSV file and creates the corresponding groups in Exchange Online.
-
-.NOTES
-Requires an active connection to Exchange Online PowerShell.
-Make sure the CSV file contains all required columns and properly formatted data.
-
-.LINK
-M365 Migration Scripts
-#>
 function Import-vts365DistributionListConfig {
+  <#
+  .SYNOPSIS
+  Imports and creates distribution lists from a CSV configuration file.
+  
+  .DESCRIPTION
+  The Import-vts365DistributionListConfig function creates new distribution lists in Exchange Online based on configuration data from a CSV file. It supports creating security groups, distribution groups, and room lists with their respective settings and members.
+  
+  The function will prefix all new distribution list names with "C-" and will automatically handle different types of groups including:
+  - MailUniversalSecurityGroup
+  - MailUniversalDistributionGroup
+  - RoomList
+  
+  .PARAMETER FilePath
+  The path to the CSV file containing the distribution list configurations to import. The CSV file should include columns for DisplayName, Name, Alias, PrimarySmtpAddress, and other distribution list properties.
+  
+  .EXAMPLE
+  Import-vts365DistributionListConfig -FilePath "C:\DistributionLists.csv"
+  
+  This example imports distribution list configurations from the specified CSV file and creates the corresponding groups in Exchange Online.
+  
+  .NOTES
+  Requires an active connection to Exchange Online PowerShell.
+  Make sure the CSV file contains all required columns and properly formatted data.
+  
+  .LINK
+  M365 Migration Scripts
+  #>
   [CmdletBinding()]
   param (
       [Parameter(Mandatory)]
