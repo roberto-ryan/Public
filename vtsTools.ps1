@@ -68,8 +68,6 @@ function Get-vtsMappedDrive {
   .LINK
   Drive Management
   #>
-  # This is required for Verbose to work correctly.
-  # If you don't want the Verbose message, remove "-Verbose" from the Parameters field.
   [CmdletBinding()]
   param ()
 
@@ -4856,7 +4854,6 @@ function Get-vtsPrinterByPortAddress {
   .LINK
       Print Management
   #>
-  # Define parameters
   param (
     # PrinterHostAddress is not mandatory
     [Parameter(Mandatory = $false)]
@@ -6548,7 +6545,7 @@ function Get-vts365LastSignIn {
   .LINK
   M365
   #>
-  # Connect to Microsoft Graph
+
   Connect-MgGraph -Scopes "User.Read.All", "AuditLog.Read.All"
 
   # Get all users
@@ -6994,7 +6991,7 @@ function Get-vtsPrinterAddressMapping {
   .LINK
   Print Management
   #>
-  # Get all printer ports with their host addresses
+
   $PortNames = Get-PrinterPort | Where-Object { $_.PrinterHostAddress } | Select-Object Name, PrinterHostAddress
   # Initialize an array to store results
   $Results = @()
