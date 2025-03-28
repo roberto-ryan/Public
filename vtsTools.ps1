@@ -8348,13 +8348,13 @@ if(!document.getElementById)
 	}
 }
 
-function Get-WindowsISO {
+function Get-WinISO {
   <#
   .SYNOPSIS
   Downloads Microsoft 365 installation files based on specified parameters.
   
   .DESCRIPTION
-  The Get-WindowsISO function retrieves and downloads Microsoft 365 installation files
+  The Get-WinISO function retrieves and downloads Microsoft 365 installation files
   from official sources. It supports various options for Windows versions, release types, editions,
   languages, and architectures.
   
@@ -8374,7 +8374,7 @@ function Get-WindowsISO {
   Specifies the architecture. Valid values are x86, x64, arm64, or All.
   
   .EXAMPLE
-  Get-WindowsISO -Win 11 -Rel Latest -Ed Pro -Lang English -Arch x64
+  Get-WinISO -Win 11 -Rel Latest -Ed Pro -Lang English -Arch x64
   
   Downloads the latest Windows 11 Pro 64-bit installation files in English.
   
