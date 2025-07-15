@@ -197,23 +197,8 @@ function Get-FunctionInfo {
             Type = 'string'
         }
         
-        # Simplified parameter parsing to avoid regex issues
-        try {
-            # Check if parameter is mandatory
-            if ($content -match "\[Parameter.*Mandatory.*\]") {
-                $paramInfo.Mandatory = $true
-            }
-            
-            # Try to get parameter type (simplified)
-            $paramName = [regex]::Escape($paramInfo.Name)
-            if ($content -match "\[(\w+)\]\s*\`$$paramName") {
-                $paramInfo.Type = $matches[1]
-            }
-        }
-        catch {
-            # If regex fails, just use defaults
-            Write-Host "Warning: Could not parse parameter $($paramInfo.Name)" -ForegroundColor Yellow
-        }
+        # Skip complex parameter parsing to avoid regex issues
+        # Just use the defaults: Mandatory = $false, Type = 'string'
         
         $functionInfo.Parameters += $paramInfo
     }
@@ -238,7 +223,7 @@ function Show-MainMenu {
     $categoryList = $Categories + "Exit"
     
     try {
-        $selected = $categoryList | Invoke-Gum -Arguments @("choose", "--header", "Select a category:", "--height", "15", "--cursor.foreground", "212")
+        $selected = $categoryList | Invoke-Gum -Arguments @("choose", "--header", "Select a category:", "--height", "15")
     } catch {
         $selected = Show-MenuFallback -Header "Select a category:" -Options $categoryList
     }
@@ -278,7 +263,7 @@ function Show-CategoryFunctions {
     
     # Use gum to select function or fallback
     try {
-        $selected = $functionList | Invoke-Gum -Arguments @("choose", "--header", "Select a function:", "--height", "20", "--cursor.foreground", "212")
+        $selected = $functionList | Invoke-Gum -Arguments @("choose", "--header", "Select a function:", "--height", "20")
     } catch {
         $selected = Show-MenuFallback -Header "Select a function:" -Options $functionList
     }
@@ -355,7 +340,7 @@ function Show-FunctionDetails {
     $actions = @("Execute Function", "Execute with Parameters", "View Source", "← Back to Functions")
     
     try {
-        $selectedAction = $actions | Invoke-Gum -Arguments @("choose", "--header", "Choose an action:", "--cursor.foreground", "212")
+        $selectedAction = $actions | Invoke-Gum -Arguments @("choose", "--header", "Choose an action:")
     } catch {
         $selectedAction = Show-MenuFallback -Header "Choose an action:" -Options $actions
     }
