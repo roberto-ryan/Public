@@ -74,14 +74,40 @@ function Initialize-GumPath {
     foreach ($path in $gumPaths) {
         if (Test-Path "$path\gum.exe") {
             Write-Host "Found gum.exe at: $path" -ForegroundColor Green
-            # Add to PATH for this session
-            $env:Path += ";$path"
-            Write-Host "Added $path to PATH for this session" -ForegroundColor Green
-            return $true
+            # Add to PATH for this session (ensure no duplicates)
+            if ($env:Path -notlike "*$path*") {
+                $env:Path = "$env:Path;$path"
+                Write-Host "Added $path to PATH for this session" -ForegroundColor Green
+            }
+            # Test if gum is now accessible
+            if (Get-Command gum -ErrorAction SilentlyContinue) {
+                Write-Host "gum is now accessible!" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "gum found but still not accessible, trying direct path..." -ForegroundColor Yellow
+                # Set a global variable for direct path access
+                $global:GumPath = "$path\gum.exe"
+                return $true
+            }
         }
     }
     
     return $false
+}
+
+# Helper function to call gum with fallback to direct path
+function Invoke-Gum {
+    param(
+        [string[]]$Arguments
+    )
+    
+    if (Get-Command gum -ErrorAction SilentlyContinue) {
+        return & gum @Arguments
+    } elseif ($global:GumPath -and (Test-Path $global:GumPath)) {
+        return & $global:GumPath @Arguments
+    } else {
+        throw "gum not available"
+    }
 }
 
 # Fallback functions for when gum is not available
@@ -171,16 +197,22 @@ function Get-FunctionInfo {
             Type = 'string'
         }
         
-        # Check if parameter is mandatory and get type
-        $paramPattern = "\[Parameter\([^)]*Mandatory[^)]*\)\]\s*\r?\n\s*\[([^\]]+)\]\s*\`$$($paramInfo.Name)"
-        if ($content -match $paramPattern) {
-            $paramInfo.Mandatory = $true
-            $paramInfo.Type = $matches[1]
-        } else {
-            $typePattern = "\[([^\]]+)\]\s*\`$$($paramInfo.Name)"
-            if ($content -match $typePattern) {
+        # Simplified parameter parsing to avoid regex issues
+        try {
+            # Check if parameter is mandatory
+            if ($content -match "\[Parameter.*Mandatory.*\]") {
+                $paramInfo.Mandatory = $true
+            }
+            
+            # Try to get parameter type (simplified)
+            $paramName = [regex]::Escape($paramInfo.Name)
+            if ($content -match "\[(\w+)\]\s*\`$$paramName") {
                 $paramInfo.Type = $matches[1]
             }
+        }
+        catch {
+            # If regex fails, just use defaults
+            Write-Host "Warning: Could not parse parameter $($paramInfo.Name)" -ForegroundColor Yellow
         }
         
         $functionInfo.Parameters += $paramInfo
@@ -195,25 +227,19 @@ function Show-MainMenu {
     
     Clear-Host
     
-    # Create the header with psCandy if available
-    if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -Color Cyan
-        Write-Candy "║        VTS Tools Terminal UI           ║" -Color Cyan
-        Write-Candy "╚════════════════════════════════════════╝" -Color Cyan
-    } else {
-        Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Cyan
-        Write-Host "║        VTS Tools Terminal UI           ║" -ForegroundColor Cyan
-        Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Cyan
-    }
+    # Create the header - simplified to avoid encoding issues
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "        VTS Tools Terminal UI          " -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
     
     Write-Host ""
     
     # Use gum to select category or fallback
     $categoryList = $Categories + "Exit"
     
-    if (Get-Command gum -ErrorAction SilentlyContinue) {
-        $selected = $categoryList | & gum choose --header "Select a category:" --height 15 --cursor.foreground="212"
-    } else {
+    try {
+        $selected = $categoryList | Invoke-Gum -Arguments @("choose", "--header", "Select a category:", "--height", "15", "--cursor.foreground", "212")
+    } catch {
         $selected = Show-MenuFallback -Header "Select a category:" -Options $categoryList
     }
     
@@ -229,18 +255,9 @@ function Show-CategoryFunctions {
     
     Clear-Host
     
-    # Header
-    if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -Color Cyan
-        Write-Candy "║        $Category" -Color Cyan -NoNewline
-        $padding = 40 - $Category.Length - 9
-        Write-Candy (" " * $padding) -NoNewline
-        Write-Candy "║" -Color Cyan
-        Write-Candy "╚════════════════════════════════════════╝" -Color Cyan
-    } else {
-        Write-Host "Category: $Category" -ForegroundColor Cyan
-        Write-Host ("=" * 50) -ForegroundColor DarkCyan
-    }
+    # Header - simplified
+    Write-Host "Category: $Category" -ForegroundColor Cyan
+    Write-Host ("=" * 50) -ForegroundColor DarkCyan
     
     Write-Host ""
     
@@ -260,9 +277,9 @@ function Show-CategoryFunctions {
     $functionList += "← Back to Categories"
     
     # Use gum to select function or fallback
-    if (Get-Command gum -ErrorAction SilentlyContinue) {
-        $selected = $functionList | & gum choose --header "Select a function:" --height 20 --cursor.foreground="212"
-    } else {
+    try {
+        $selected = $functionList | Invoke-Gum -Arguments @("choose", "--header", "Select a function:", "--height", "20", "--cursor.foreground", "212")
+    } catch {
         $selected = Show-MenuFallback -Header "Select a function:" -Options $functionList
     }
     
@@ -281,18 +298,9 @@ function Show-FunctionDetails {
     
     Clear-Host
     
-    # Header with function name
-    if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -Color Green
-        Write-Candy "║ Function: $($Function.Name)" -Color Green -NoNewline
-        $padding = 40 - $Function.Name.Length - 11
-        Write-Candy (" " * $padding) -NoNewline
-        Write-Candy "║" -Color Green
-        Write-Candy "╚════════════════════════════════════════╝" -Color Green
-    } else {
-        Write-Host "Function: $($Function.Name)" -ForegroundColor Green
-        Write-Host ("=" * 50) -ForegroundColor DarkGreen
-    }
+    # Header with function name - simplified
+    Write-Host "Function: $($Function.Name)" -ForegroundColor Green
+    Write-Host ("=" * 50) -ForegroundColor DarkGreen
     
     Write-Host ""
     
@@ -346,9 +354,9 @@ function Show-FunctionDetails {
     # Action menu
     $actions = @("Execute Function", "Execute with Parameters", "View Source", "← Back to Functions")
     
-    if (Get-Command gum -ErrorAction SilentlyContinue) {
-        $selectedAction = $actions | & gum choose --header "Choose an action:" --cursor.foreground="212"
-    } else {
+    try {
+        $selectedAction = $actions | Invoke-Gum -Arguments @("choose", "--header", "Choose an action:", "--cursor.foreground", "212")
+    } catch {
         $selectedAction = Show-MenuFallback -Header "Choose an action:" -Options $actions
     }
     
@@ -377,9 +385,9 @@ function Invoke-VTSFunction {
             $prompt += ": "
             
             # Use gum input for parameter collection or fallback
-            if (Get-Command gum -ErrorAction SilentlyContinue) {
-                $value = & gum input --placeholder "Enter value for $($param.Name)" --prompt "$prompt"
-            } else {
+            try {
+                $value = Invoke-Gum -Arguments @("input", "--placeholder", "Enter value for $($param.Name)", "--prompt", "$prompt")
+            } catch {
                 $value = Get-InputFallback -Prompt "$prompt" -Placeholder "Enter value for $($param.Name)"
             }
             
@@ -463,9 +471,9 @@ function Start-VTSToolsTUI {
                         Write-Host "Source: $($selectedFunction.Path)" -ForegroundColor Cyan
                         Write-Host ("=" * 70) -ForegroundColor DarkCyan
                         
-                        if (Get-Command gum -ErrorAction SilentlyContinue) {
-                            Get-Content $selectedFunction.Path | & gum pager
-                        } else {
+                        try {
+                            Get-Content $selectedFunction.Path | Invoke-Gum -Arguments @("pager")
+                        } catch {
                             Get-Content $selectedFunction.Path | Out-Host
                             Write-Host "`nPress any key to continue..." -ForegroundColor DarkGray
                             $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
