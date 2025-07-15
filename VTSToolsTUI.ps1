@@ -10,16 +10,22 @@
 # Check for required modules and tools
 function Test-Requirements {
     $missingRequirements = @()
+    $hasGum = $false
+    $hasPsCandy = $false
     
     # Check for psCandy module
     if (-not (Get-Module -ListAvailable -Name psCandy)) {
-        $missingRequirements += "psCandy PowerShell module"
+        $missingRequirements += "psCandy PowerShell module (optional)"
+    } else {
+        $hasPsCandy = $true
     }
     
     # Check for gum
     $gumPath = Get-Command gum -ErrorAction SilentlyContinue
     if (-not $gumPath) {
         $missingRequirements += "gum CLI tool"
+    } else {
+        $hasGum = $true
     }
     
     if ($missingRequirements.Count -gt 0) {
@@ -27,8 +33,17 @@ function Test-Requirements {
         $missingRequirements | ForEach-Object { Write-Host "  • $_" -ForegroundColor Red }
         Write-Host "`nInstallation Instructions:" -ForegroundColor Cyan
         Write-Host "  • psCandy: Install-Module psCandy -Scope CurrentUser" -ForegroundColor White
-        Write-Host "  • gum: Visit https://github.com/charmbracelet/gum#installation" -ForegroundColor White
+        Write-Host "  • gum: Run .\Install-VTSTUIRequirements.ps1" -ForegroundColor White
         Write-Host ""
+        
+        # If gum is missing, offer to run in fallback mode
+        if (-not $hasGum) {
+            Write-Host "Alternative: Run in fallback mode without gum (basic functionality)" -ForegroundColor Cyan
+            $choice = Read-Host "Continue without gum? (y/n)"
+            if ($choice -eq 'y' -or $choice -eq 'Y') {
+                return $true
+            }
+        }
         return $false
     }
     return $true
@@ -37,6 +52,43 @@ function Test-Requirements {
 # Import psCandy if available
 if (Get-Module -ListAvailable -Name psCandy) {
     Import-Module psCandy -ErrorAction SilentlyContinue
+}
+
+# Fallback functions for when gum is not available
+function Show-MenuFallback {
+    param(
+        [string]$Header,
+        [array]$Options
+    )
+    
+    Write-Host "`n$Header" -ForegroundColor Cyan
+    Write-Host ("=" * $Header.Length) -ForegroundColor DarkCyan
+    
+    for ($i = 0; $i -lt $Options.Count; $i++) {
+        Write-Host "  $($i + 1). $($Options[$i])" -ForegroundColor White
+    }
+    
+    do {
+        $choice = Read-Host "`nEnter your choice (1-$($Options.Count))"
+        $index = $choice -as [int]
+    } while ($index -lt 1 -or $index -gt $Options.Count)
+    
+    return $Options[$index - 1]
+}
+
+function Get-InputFallback {
+    param(
+        [string]$Prompt,
+        [string]$Placeholder = ""
+    )
+    
+    $displayPrompt = $Prompt
+    if ($Placeholder) {
+        $displayPrompt += " [$Placeholder]"
+    }
+    $displayPrompt += ": "
+    
+    return Read-Host $displayPrompt
 }
 
 # Function to parse PowerShell function files
@@ -111,9 +163,9 @@ function Show-MainMenu {
     
     # Create the header with psCandy if available
     if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -ForegroundColor Cyan
-        Write-Candy "║        VTS Tools Terminal UI           ║" -ForegroundColor Cyan
-        Write-Candy "╚════════════════════════════════════════╝" -ForegroundColor Cyan
+        Write-Candy "╔════════════════════════════════════════╗" -Color Cyan
+        Write-Candy "║        VTS Tools Terminal UI           ║" -Color Cyan
+        Write-Candy "╚════════════════════════════════════════╝" -Color Cyan
     } else {
         Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Cyan
         Write-Host "║        VTS Tools Terminal UI           ║" -ForegroundColor Cyan
@@ -122,9 +174,14 @@ function Show-MainMenu {
     
     Write-Host ""
     
-    # Use gum to select category
+    # Use gum to select category or fallback
     $categoryList = $Categories + "Exit"
-    $selected = $categoryList | & gum choose --header "Select a category:" --height 15 --cursor.foreground="212"
+    
+    if (Get-Command gum -ErrorAction SilentlyContinue) {
+        $selected = $categoryList | & gum choose --header "Select a category:" --height 15 --cursor.foreground="212"
+    } else {
+        $selected = Show-MenuFallback -Header "Select a category:" -Options $categoryList
+    }
     
     return $selected
 }
@@ -140,12 +197,12 @@ function Show-CategoryFunctions {
     
     # Header
     if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -ForegroundColor Cyan
-        Write-Candy "║        $Category" -ForegroundColor Cyan -NoNewline
+        Write-Candy "╔════════════════════════════════════════╗" -Color Cyan
+        Write-Candy "║        $Category" -Color Cyan -NoNewline
         $padding = 40 - $Category.Length - 9
         Write-Candy (" " * $padding) -NoNewline
-        Write-Candy "║" -ForegroundColor Cyan
-        Write-Candy "╚════════════════════════════════════════╝" -ForegroundColor Cyan
+        Write-Candy "║" -Color Cyan
+        Write-Candy "╚════════════════════════════════════════╝" -Color Cyan
     } else {
         Write-Host "Category: $Category" -ForegroundColor Cyan
         Write-Host ("=" * 50) -ForegroundColor DarkCyan
@@ -168,8 +225,12 @@ function Show-CategoryFunctions {
     }
     $functionList += "← Back to Categories"
     
-    # Use gum to select function
-    $selected = $functionList | & gum choose --header "Select a function:" --height 20 --cursor.foreground="212"
+    # Use gum to select function or fallback
+    if (Get-Command gum -ErrorAction SilentlyContinue) {
+        $selected = $functionList | & gum choose --header "Select a function:" --height 20 --cursor.foreground="212"
+    } else {
+        $selected = Show-MenuFallback -Header "Select a function:" -Options $functionList
+    }
     
     if ($selected -eq "← Back to Categories") {
         return $null
@@ -188,12 +249,12 @@ function Show-FunctionDetails {
     
     # Header with function name
     if (Get-Command Write-Candy -ErrorAction SilentlyContinue) {
-        Write-Candy "╔════════════════════════════════════════╗" -ForegroundColor Green
-        Write-Candy "║ Function: $($Function.Name)" -ForegroundColor Green -NoNewline
+        Write-Candy "╔════════════════════════════════════════╗" -Color Green
+        Write-Candy "║ Function: $($Function.Name)" -Color Green -NoNewline
         $padding = 40 - $Function.Name.Length - 11
         Write-Candy (" " * $padding) -NoNewline
-        Write-Candy "║" -ForegroundColor Green
-        Write-Candy "╚════════════════════════════════════════╝" -ForegroundColor Green
+        Write-Candy "║" -Color Green
+        Write-Candy "╚════════════════════════════════════════╝" -Color Green
     } else {
         Write-Host "Function: $($Function.Name)" -ForegroundColor Green
         Write-Host ("=" * 50) -ForegroundColor DarkGreen
@@ -250,7 +311,12 @@ function Show-FunctionDetails {
     
     # Action menu
     $actions = @("Execute Function", "Execute with Parameters", "View Source", "← Back to Functions")
-    $selectedAction = $actions | & gum choose --header "Choose an action:" --cursor.foreground="212"
+    
+    if (Get-Command gum -ErrorAction SilentlyContinue) {
+        $selectedAction = $actions | & gum choose --header "Choose an action:" --cursor.foreground="212"
+    } else {
+        $selectedAction = Show-MenuFallback -Header "Choose an action:" -Options $actions
+    }
     
     return $selectedAction
 }
@@ -276,8 +342,12 @@ function Invoke-VTSFunction {
             }
             $prompt += ": "
             
-            # Use gum input for parameter collection
-            $value = & gum input --placeholder "Enter value for $($param.Name)" --prompt "$prompt"
+            # Use gum input for parameter collection or fallback
+            if (Get-Command gum -ErrorAction SilentlyContinue) {
+                $value = & gum input --placeholder "Enter value for $($param.Name)" --prompt "$prompt"
+            } else {
+                $value = Get-InputFallback -Prompt "$prompt" -Placeholder "Enter value for $($param.Name)"
+            }
             
             if ($value -and $value.Trim()) {
                 # Try to convert value to appropriate type
@@ -355,7 +425,14 @@ function Start-VTSToolsTUI {
                         Clear-Host
                         Write-Host "Source: $($selectedFunction.Path)" -ForegroundColor Cyan
                         Write-Host ("=" * 70) -ForegroundColor DarkCyan
-                        Get-Content $selectedFunction.Path | & gum pager
+                        
+                        if (Get-Command gum -ErrorAction SilentlyContinue) {
+                            Get-Content $selectedFunction.Path | & gum pager
+                        } else {
+                            Get-Content $selectedFunction.Path | Out-Host
+                            Write-Host "`nPress any key to continue..." -ForegroundColor DarkGray
+                            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                        }
                     }
                     "← Back to Functions" {
                         break
