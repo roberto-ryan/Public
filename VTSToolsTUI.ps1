@@ -20,7 +20,7 @@ function Test-Requirements {
         $hasPsCandy = $true
     }
     
-    # Check for gum
+    # Check for gum (after trying to initialize it)
     $gumPath = Get-Command gum -ErrorAction SilentlyContinue
     if (-not $gumPath) {
         $missingRequirements += "gum CLI tool"
@@ -52,6 +52,36 @@ function Test-Requirements {
 # Import psCandy if available
 if (Get-Module -ListAvailable -Name psCandy) {
     Import-Module psCandy -ErrorAction SilentlyContinue
+}
+
+# Function to find and add gum to PATH
+function Initialize-GumPath {
+    # Check if gum is already available
+    if (Get-Command gum -ErrorAction SilentlyContinue) {
+        return $true
+    }
+    
+    # Common gum installation paths
+    $gumPaths = @(
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\charmbracelet.gum_Microsoft.Winget.Source_8wekyb3d8bbwe\gum_0.16.2_Windows_x86_64",
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\charmbracelet.gum_Microsoft.Winget.Source_8wekyb3d8bbwe",
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Links",
+        "$env:PROGRAMFILES\gum",
+        "$env:PROGRAMFILES(X86)\gum",
+        "$env:USERPROFILE\.local\bin"
+    )
+    
+    foreach ($path in $gumPaths) {
+        if (Test-Path "$path\gum.exe") {
+            Write-Host "Found gum.exe at: $path" -ForegroundColor Green
+            # Add to PATH for this session
+            $env:Path += ";$path"
+            Write-Host "Added $path to PATH for this session" -ForegroundColor Green
+            return $true
+        }
+    }
+    
+    return $false
 }
 
 # Fallback functions for when gum is not available
@@ -142,11 +172,15 @@ function Get-FunctionInfo {
         }
         
         # Check if parameter is mandatory and get type
-        if ($content -match "\[Parameter\([^)]*Mandatory[^)]*\)\]\s*\r?\n\s*\[([^\]]+)\]\s*\$$($paramInfo.Name)") {
+        $paramPattern = "\[Parameter\([^)]*Mandatory[^)]*\)\]\s*\r?\n\s*\[([^\]]+)\]\s*\`$$($paramInfo.Name)"
+        if ($content -match $paramPattern) {
             $paramInfo.Mandatory = $true
             $paramInfo.Type = $matches[1]
-        } elseif ($content -match "\[([^\]]+)\]\s*\$$($paramInfo.Name)") {
-            $paramInfo.Type = $matches[1]
+        } else {
+            $typePattern = "\[([^\]]+)\]\s*\`$$($paramInfo.Name)"
+            if ($content -match $typePattern) {
+                $paramInfo.Type = $matches[1]
+            }
         }
         
         $functionInfo.Parameters += $paramInfo
@@ -373,6 +407,9 @@ function Invoke-VTSFunction {
 
 # Main execution
 function Start-VTSToolsTUI {
+    # Try to initialize gum path first
+    Initialize-GumPath | Out-Null
+    
     if (-not (Test-Requirements)) {
         return
     }
