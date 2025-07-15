@@ -30,9 +30,6 @@ if (-not (Get-Module -ListAvailable -Name psCandy)) {
 # Import psCandy module
 Import-Module psCandy -Force
 
-# Import the module classes after loading
-using module psCandy
-
 # Define VTS Theme
 $VTSTheme = @{
     "list" = @{
