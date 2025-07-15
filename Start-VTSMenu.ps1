@@ -11,7 +11,7 @@
     Menu
 #>
 
-# Set UTF-8 encoding for proper emoji display
+# Set UTF-8 encoding for proper display
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Check if psCandy module is installed
@@ -103,15 +103,15 @@ function Get-CategoryIcon {
     param([string]$Category)
     
     switch ($Category.ToLower()) {
-        "m365" { return "🌐" }
-        "network" { return "🔗" }
-        "system information" { return "💻" }
-        "device management" { return "🔧" }
-        "utilities" { return "⚙️" }
-        "active directory" { return "👥" }
-        "security" { return "🔒" }
-        "menu" { return "📋" }
-        default { return "📄" }
+        "m365" { return "[M365]" }
+        "network" { return "[NET]" }
+        "system information" { return "[SYS]" }
+        "device management" { return "[DEV]" }
+        "utilities" { return "[UTIL]" }
+        "active directory" { return "[AD]" }
+        "security" { return "[SEC]" }
+        "menu" { return "[MENU]" }
+        default { return "[SCRIPT]" }
     }
 }
 
@@ -120,14 +120,14 @@ function Get-ScriptIcon {
     param([string]$ScriptName, [string]$Category)
     
     switch ($Category.ToLower()) {
-        "m365" { return "☁️" }
-        "network" { return "🌐" }
-        "system information" { return "📊" }
-        "device management" { return "🔌" }
-        "utilities" { return "🛠️" }
-        "active directory" { return "👤" }
-        "security" { return "🛡️" }
-        default { return "⚡" }
+        "m365" { return "[M365]" }
+        "network" { return "[NET]" }
+        "system information" { return "[SYS]" }
+        "device management" { return "[DEV]" }
+        "utilities" { return "[UTIL]" }
+        "active directory" { return "[AD]" }
+        "security" { return "[SEC]" }
+        default { return "[PS]" }
     }
 }
 
@@ -137,19 +137,19 @@ function Invoke-SelectedScript {
     
     try {
         Clear-Host
-        Write-Host "🚀 Executing: $([System.IO.Path]::GetFileName($ScriptPath))" -ForegroundColor Green
+        Write-Host "=> Executing: $([System.IO.Path]::GetFileName($ScriptPath))" -ForegroundColor Green
         Write-Host "=" * 60 -ForegroundColor Cyan
         
         # Execute the script
         & $ScriptPath
         
         Write-Host "`n" + "=" * 60 -ForegroundColor Cyan
-        Write-Host "✅ Script execution completed." -ForegroundColor Green
+        Write-Host "=> Script execution completed." -ForegroundColor Green
         Write-Host "Press any key to return to menu..." -ForegroundColor Yellow
         $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     }
     catch {
-        Write-Error "❌ Failed to execute script: $_"
+        Write-Error "=> Failed to execute script: $_"
         Write-Host "Press any key to return to menu..." -ForegroundColor Yellow
         $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     }
@@ -170,12 +170,12 @@ function Show-CategoryMenu {
     }
     
     # Add exit option
-    $categoryItems.Add([ListItem]::new("Exit", "EXIT", "❌", [System.Drawing.Color]::Red))
+    $categoryItems.Add([ListItem]::new("Exit", "EXIT", "[EXIT]", [System.Drawing.Color]::Red))
     
     $categoryList = [List]::new($categoryItems)
     $categoryList.LoadTheme($VTSTheme)
     $categoryList.SetHeight(15)
-    $categoryList.SetTitle("🎯 VTS Tools - Select Category")
+    $categoryList.SetTitle(">> VTS Tools - Select Category")
     $categoryList.SetLimit($true)
     
     return $categoryList.Display()
@@ -188,7 +188,7 @@ function Show-ScriptsMenu {
     $scriptItems = [System.Collections.Generic.List[ListItem]]::new()
     
     # Add back option
-    $scriptItems.Add([ListItem]::new("← Back to Categories", "BACK", "🔙", [System.Drawing.Color]::Orange))
+    $scriptItems.Add([ListItem]::new("<- Back to Categories", "BACK", "[BACK]", [System.Drawing.Color]::Orange))
     
     # Add scripts
     foreach ($script in ($Scripts | Sort-Object Name)) {
@@ -200,7 +200,7 @@ function Show-ScriptsMenu {
     $scriptList = [List]::new($scriptItems)
     $scriptList.LoadTheme($VTSTheme)
     $scriptList.SetHeight(20)
-    $scriptList.SetTitle("📜 $Category Scripts")
+    $scriptList.SetTitle(">> $Category Scripts")
     $scriptList.SetLimit($true)
     
     return $scriptList.Display()
@@ -255,7 +255,7 @@ function Start-VTSMenu {
         
         if (-not $categoryChoice -or $categoryChoice.Value -eq "EXIT") {
             Clear-Host
-            Write-Host "👋 Thank you for using VTS Tools!" -ForegroundColor Cyan
+            Write-Host "Thank you for using VTS Tools!" -ForegroundColor Cyan
             break
         }
         
