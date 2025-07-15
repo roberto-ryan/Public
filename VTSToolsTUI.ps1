@@ -1,339 +1,243 @@
 #Requires -Version 5.1
-<#
-.SYNOPSIS
-    Simple Terminal User Interface for VTS Tools
-.DESCRIPTION
-    A clean, streamlined terminal interface for browsing and executing VTS PowerShell tools.
-    Designed for Windows PowerShell 5.1 with minimal dependencies.
-#>
 
-# Global variables
-$Global:CurrentCategory = ""
-$Global:AllFunctions = @()
-$Global:Categories = @()
+# Simple VTS Tools Menu
+# No fancy features, just basic PowerShell that works
 
-# Color scheme
-$Colors = @{
-    Header = "Cyan"
-    SubHeader = "DarkCyan"
-    Success = "Green"
-    Warning = "Yellow"
-    Error = "Red"
-    Info = "White"
-    Prompt = "Magenta"
-    Highlight = "DarkYellow"
-}
-
-# Function to display a clean header
-function Show-Header {
-    param([string]$Title, [string]$Color = $Colors.Header)
-    
+function Show-Title {
+    param([string]$Text)
     Clear-Host
-    $line = "=" * 60
-    Write-Host $line -ForegroundColor $Color
-    Write-Host $Title.PadLeft(($line.Length + $Title.Length) / 2) -ForegroundColor $Color
-    Write-Host $line -ForegroundColor $Color
+    Write-Host ""
+    Write-Host "================================" -ForegroundColor Cyan
+    Write-Host " $Text" -ForegroundColor Cyan
+    Write-Host "================================" -ForegroundColor Cyan
     Write-Host ""
 }
 
-# Function to show a simple menu
-function Show-Menu {
-    param(
-        [string]$Title,
-        [array]$Options,
-        [switch]$ShowNumbers = $true
-    )
+function Get-UserChoice {
+    param([array]$Options)
     
-    Write-Host $Title -ForegroundColor $Colors.SubHeader
-    Write-Host ("-" * $Title.Length) -ForegroundColor $Colors.SubHeader
-    Write-Host ""
-    
-    if ($ShowNumbers) {
-        for ($i = 0; $i -lt $Options.Count; $i++) {
-            Write-Host "  [$($i + 1)] $($Options[$i])" -ForegroundColor $Colors.Info
-        }
-    } else {
-        foreach ($option in $Options) {
-            Write-Host "  • $option" -ForegroundColor $Colors.Info
-        }
+    for ($i = 0; $i -lt $Options.Count; $i++) {
+        Write-Host "  $($i + 1). $($Options[$i])" -ForegroundColor White
     }
     Write-Host ""
     
-    if ($ShowNumbers) {
-        do {
-            $choice = Read-Host "Enter your choice (1-$($Options.Count))"
-            $index = $choice -as [int]
-        } while ($index -lt 1 -or $index -gt $Options.Count)
+    do {
+        $choice = Read-Host "Enter choice (1-$($Options.Count))"
+        $num = $choice -as [int]
+    } while ($num -lt 1 -or $num -gt $Options.Count)
+    
+    return $Options[$num - 1]
+}
+
+function Get-Functions {
+    $functionsPath = Join-Path $PSScriptRoot "functions"
+    
+    if (-not (Test-Path $functionsPath)) {
+        Write-Host "Functions folder not found!" -ForegroundColor Red
+        return @()
+    }
+    
+    $functions = @()
+    $files = Get-ChildItem -Path $functionsPath -Filter "*.ps1"
+    
+    foreach ($file in $files) {
+        $content = Get-Content $file.FullName -Raw
+        $name = $file.BaseName
+        $category = "General"
+        $description = ""
         
-        return $Options[$index - 1]
-    }
-}
-
-# Function to parse function information
-function Get-FunctionInfo {
-    param([string]$FilePath)
-    
-    $content = Get-Content $FilePath -Raw -ErrorAction SilentlyContinue
-    if (-not $content) { return $null }
-    
-    $functionInfo = @{
-        Name = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
-        Path = $FilePath
-        Category = "General"
-        Synopsis = ""
-        Description = ""
-        Examples = @()
-    }
-    
-    # Extract category from .LINK
-    if ($content -match '\.LINK\s*\r?\n\s*([^\r\n]+)') {
-        $functionInfo.Category = $matches[1].Trim()
-    }
-    
-    # Extract synopsis
-    if ($content -match '\.SYNOPSIS\s*\r?\n\s*([^\r\n]+)') {
-        $functionInfo.Synopsis = $matches[1].Trim()
-    }
-    
-    # Extract description (first paragraph only)
-    if ($content -match '\.DESCRIPTION\s*\r?\n\s*([^\r\n]+)') {
-        $functionInfo.Description = $matches[1].Trim()
-    }
-    
-    # Extract examples (simplified)
-    $exampleMatches = [regex]::Matches($content, '\.EXAMPLE\s*\r?\n\s*([^\r\n]+)')
-    foreach ($match in $exampleMatches) {
-        $example = $match.Groups[1].Value.Trim()
-        if ($example -and $example -ne "PS>") {
-            $functionInfo.Examples += $example
+        # Get category from .LINK
+        if ($content -match '\.LINK\s*\n\s*(.+)') {
+            $category = $matches[1].Trim()
+        }
+        
+        # Get description from .SYNOPSIS
+        if ($content -match '\.SYNOPSIS\s*\n\s*(.+)') {
+            $description = $matches[1].Trim()
+        }
+        
+        $functions += [PSCustomObject]@{
+            Name = $name
+            Category = $category
+            Description = $description
+            Path = $file.FullName
         }
     }
     
-    return $functionInfo
+    return $functions
 }
 
-# Function to load all functions
-function Initialize-Functions {
-    $functionPath = Join-Path $PSScriptRoot "functions"
+function Show-MainMenu {
+    param([array]$Functions)
     
-    if (-not (Test-Path $functionPath)) {
-        Write-Host "Functions directory not found at: $functionPath" -ForegroundColor $Colors.Error
-        return $false
-    }
-    
-    Write-Host "Loading functions..." -ForegroundColor $Colors.Info
-    
-    $Global:AllFunctions = Get-ChildItem -Path $functionPath -Filter "*.ps1" | ForEach-Object {
-        $funcInfo = Get-FunctionInfo -FilePath $_.FullName
-        if ($funcInfo) { $funcInfo }
-    } | Where-Object { $_ -ne $null }
-    
-    if ($Global:AllFunctions.Count -eq 0) {
-        Write-Host "No functions found!" -ForegroundColor $Colors.Error
-        return $false
-    }
+    Show-Title "VTS Tools Menu"
     
     # Group by category
-    $Global:Categories = $Global:AllFunctions | Group-Object -Property Category | Sort-Object Name
+    $categories = $Functions | Group-Object Category | Sort-Object Name
     
-    Write-Host "Loaded $($Global:AllFunctions.Count) functions in $($Global:Categories.Count) categories" -ForegroundColor $Colors.Success
-    Start-Sleep -Milliseconds 800
-    
-    return $true
-}
-
-# Main menu
-function Show-MainMenu {
-    Show-Header "VTS Tools - Main Menu"
-    
-    Write-Host "Available Categories:" -ForegroundColor $Colors.SubHeader
-    Write-Host "--------------------" -ForegroundColor $Colors.SubHeader
+    Write-Host "Categories:" -ForegroundColor Yellow
     Write-Host ""
     
-    $menuOptions = @()
-    $menuOptions += $Global:Categories | ForEach-Object { "$($_.Name) ($($_.Count) functions)" }
-    $menuOptions += "Exit"
+    $menuItems = @()
+    foreach ($cat in $categories) {
+        $menuItems += "$($cat.Name) ($($cat.Count) tools)"
+    }
+    $menuItems += "Exit"
     
-    $selected = Show-Menu -Title "Select a category:" -Options $menuOptions
+    $selected = Get-UserChoice -Options $menuItems
     
     if ($selected -eq "Exit") {
-        return "Exit"
+        return "EXIT"
     }
     
-    # Extract category name (remove count)
-    $categoryName = $selected -replace ' \(\d+ functions\)$', ''
+    # Extract category name
+    $categoryName = $selected -replace ' \(\d+ tools\)$', ''
     return $categoryName
 }
 
-# Category menu
 function Show-CategoryMenu {
-    param([string]$CategoryName)
+    param([string]$CategoryName, [array]$Functions)
     
-    $categoryFunctions = $Global:AllFunctions | Where-Object { $_.Category -eq $CategoryName } | Sort-Object Name
+    Show-Title "Category: $CategoryName"
     
-    Show-Header "Category: $CategoryName"
+    $categoryFunctions = $Functions | Where-Object { $_.Category -eq $CategoryName } | Sort-Object Name
     
-    Write-Host "Functions in this category:" -ForegroundColor $Colors.SubHeader
-    Write-Host "--------------------------" -ForegroundColor $Colors.SubHeader
+    Write-Host "Available tools:" -ForegroundColor Yellow
     Write-Host ""
     
-    $menuOptions = @()
+    $menuItems = @()
     foreach ($func in $categoryFunctions) {
-        $displayName = $func.Name
-        if ($func.Synopsis) {
-            $synopsis = $func.Synopsis
-            if ($synopsis.Length -gt 40) {
-                $synopsis = $synopsis.Substring(0, 37) + "..."
-            }
-            $displayName += " - $synopsis"
+        $item = $func.Name
+        if ($func.Description) {
+            $item += " - $($func.Description)"
         }
-        $menuOptions += $displayName
+        $menuItems += $item
     }
-    $menuOptions += "← Back to Main Menu"
+    $menuItems += "Back to Main Menu"
     
-    $selected = Show-Menu -Title "Select a function:" -Options $menuOptions
+    $selected = Get-UserChoice -Options $menuItems
     
-    if ($selected -eq "← Back to Main Menu") {
+    if ($selected -eq "Back to Main Menu") {
         return $null
     }
     
-    # Extract function name
+    # Find the function
     $functionName = ($selected -split ' - ')[0]
-    return $categoryFunctions | Where-Object { $_.Name -eq $functionName } | Select-Object -First 1
+    $function = $categoryFunctions | Where-Object { $_.Name -eq $functionName }
+    return $function
 }
 
-# Function details
-function Show-FunctionDetails {
-    param($Function)
+function Show-FunctionMenu {
+    param([object]$Function)
     
-    Show-Header "Function: $($Function.Name)"
-    
-    if ($Function.Synopsis) {
-        Write-Host "Synopsis:" -ForegroundColor $Colors.Highlight
-        Write-Host "  $($Function.Synopsis)" -ForegroundColor $Colors.Info
-        Write-Host ""
-    }
+    Show-Title "Tool: $($Function.Name)"
     
     if ($Function.Description) {
-        Write-Host "Description:" -ForegroundColor $Colors.Highlight
-        Write-Host "  $($Function.Description)" -ForegroundColor $Colors.Info
+        Write-Host "Description: $($Function.Description)" -ForegroundColor Green
         Write-Host ""
     }
     
-    if ($Function.Examples.Count -gt 0) {
-        Write-Host "Examples:" -ForegroundColor $Colors.Highlight
-        for ($i = 0; $i -lt $Function.Examples.Count; $i++) {
-            Write-Host "  $($i + 1). $($Function.Examples[$i])" -ForegroundColor $Colors.Info
-        }
-        Write-Host ""
-    }
+    Write-Host "What do you want to do?" -ForegroundColor Yellow
+    Write-Host ""
     
-    $actions = @("Run Function", "View Source Code", "← Back to Functions")
-    $selectedAction = Show-Menu -Title "What would you like to do?" -Options $actions
+    $actions = @("Run this tool", "View source code", "Back to category")
+    $selected = Get-UserChoice -Options $actions
     
-    return $selectedAction
+    return $selected
 }
 
-# Execute function
-function Invoke-Function {
-    param($Function)
+function Run-Function {
+    param([object]$Function)
     
-    Show-Header "Executing: $($Function.Name)"
+    Show-Title "Running: $($Function.Name)"
     
     try {
-        # Load and execute the function
+        # Load the function
         . $Function.Path
         
-        Write-Host "Running $($Function.Name)..." -ForegroundColor $Colors.Info
+        Write-Host "Starting $($Function.Name)..." -ForegroundColor Green
         Write-Host ""
         
-        # Execute the function
+        # Run it
         & $Function.Name
         
         Write-Host ""
-        Write-Host "Function completed." -ForegroundColor $Colors.Success
+        Write-Host "Completed!" -ForegroundColor Green
     }
     catch {
-        Write-Host "Error executing function: $($_.Exception.Message)" -ForegroundColor $Colors.Error
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
     }
     
     Write-Host ""
-    Write-Host "Press any key to continue..." -ForegroundColor $Colors.Prompt
+    Write-Host "Press any key to continue..."
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-# View source code
 function Show-SourceCode {
-    param($Function)
+    param([object]$Function)
     
-    Show-Header "Source Code: $($Function.Name)"
+    Show-Title "Source: $($Function.Name)"
+    
+    Write-Host "File: $($Function.Path)" -ForegroundColor Gray
+    Write-Host ""
     
     try {
-        $content = Get-Content $Function.Path
-        
-        Write-Host "File: $($Function.Path)" -ForegroundColor $Colors.SubHeader
-        Write-Host ("-" * 60) -ForegroundColor $Colors.SubHeader
-        Write-Host ""
-        
-        # Display with line numbers
-        for ($i = 0; $i -lt $content.Count; $i++) {
-            $lineNumber = ($i + 1).ToString().PadLeft(3)
-            Write-Host "$lineNumber : $($content[$i])" -ForegroundColor $Colors.Info
+        $lines = Get-Content $Function.Path
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            $lineNum = ($i + 1).ToString().PadLeft(3)
+            Write-Host "$lineNum : $($lines[$i])"
         }
     }
     catch {
-        Write-Host "Error reading source file: $($_.Exception.Message)" -ForegroundColor $Colors.Error
+        Write-Host "Cannot read file: $($_.Exception.Message)" -ForegroundColor Red
     }
     
     Write-Host ""
-    Write-Host "Press any key to continue..." -ForegroundColor $Colors.Prompt
+    Write-Host "Press any key to continue..."
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-# Main application loop
-function Start-VTSToolsTUI {
-    # Initialize
-    if (-not (Initialize-Functions)) {
-        Write-Host "Press any key to exit..." -ForegroundColor $Colors.Prompt
-        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+# Main program
+function Start-Menu {
+    Write-Host "Loading tools..." -ForegroundColor Yellow
+    $functions = Get-Functions
+    
+    if ($functions.Count -eq 0) {
+        Write-Host "No tools found!" -ForegroundColor Red
         return
     }
     
+    Write-Host "Found $($functions.Count) tools" -ForegroundColor Green
+    Start-Sleep -Seconds 1
+    
     # Main loop
     while ($true) {
-        $selectedCategory = Show-MainMenu
+        $selectedCategory = Show-MainMenu -Functions $functions
         
-        if ($selectedCategory -eq "Exit") {
-            Show-Header "Thank you for using VTS Tools!"
-            Start-Sleep -Milliseconds 1000
+        if ($selectedCategory -eq "EXIT") {
+            Show-Title "Goodbye!"
             break
         }
         
         # Category loop
         while ($true) {
-            $selectedFunction = Show-CategoryMenu -CategoryName $selectedCategory
+            $selectedFunction = Show-CategoryMenu -CategoryName $selectedCategory -Functions $functions
             
-            if (-not $selectedFunction) {
-                break # Back to main menu
+            if ($selectedFunction -eq $null) {
+                break
             }
             
-            # Function details loop
+            # Function loop
             while ($true) {
-                $action = Show-FunctionDetails -Function $selectedFunction
+                $action = Show-FunctionMenu -Function $selectedFunction
                 
-                switch ($action) {
-                    "Run Function" {
-                        Invoke-Function -Function $selectedFunction
-                    }
-                    "View Source Code" {
-                        Show-SourceCode -Function $selectedFunction
-                    }
-                    "← Back to Functions" {
-                        break
-                    }
+                if ($action -eq "Run this tool") {
+                    Run-Function -Function $selectedFunction
                 }
-                
-                if ($action -eq "← Back to Functions") {
+                elseif ($action -eq "View source code") {
+                    Show-SourceCode -Function $selectedFunction
+                }
+                elseif ($action -eq "Back to category") {
                     break
                 }
             }
@@ -341,5 +245,5 @@ function Start-VTSToolsTUI {
     }
 }
 
-# Start the application
-Start-VTSToolsTUI
+# Start the menu
+Start-Menu
