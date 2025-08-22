@@ -1,3 +1,7 @@
+param(
+  [string]$FunctionsPath = 'C:\Users\Administrator\source\Public\functions'
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
