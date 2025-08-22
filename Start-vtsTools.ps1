@@ -595,14 +595,14 @@ function Run-TUI([object[]]$model){
         $isSelTop = ($idxTop -eq $catIdx -and $focus -eq 'cat')
         $bgTop = if ($isSelTop) { [ConsoleColor]::Cyan } else { [ConsoleColor]::Black }
         [Console]::SetCursorPosition($xIndCat, $listTop)
-        [Console]::BackgroundColor = $bgTop; [Console]::ForegroundColor = [ConsoleColor]::DarkGray; [Console]::Write("^"); [Console]::ResetColor()
+        [Console]::BackgroundColor = $bgTop; [Console]::ForegroundColor = [ConsoleColor]::Green; [Console]::Write("^"); [Console]::ResetColor()
       }
       if ( ($scrollCat + $listHeight) -lt $cats.Count ) {
         $idxBot = [Math]::Min($cats.Count-1, $scrollCat + $listHeight - 1)
         $isSelBot = ($idxBot -eq $catIdx -and $focus -eq 'cat')
         $bgBot = if ($isSelBot) { [ConsoleColor]::Cyan } else { [ConsoleColor]::Black }
         [Console]::SetCursorPosition($xIndCat, ($listTop + $listHeight - 1))
-        [Console]::BackgroundColor = $bgBot; [Console]::ForegroundColor = [ConsoleColor]::DarkGray; [Console]::Write("v"); [Console]::ResetColor()
+        [Console]::BackgroundColor = $bgBot; [Console]::ForegroundColor = [ConsoleColor]::Green; [Console]::Write("v"); [Console]::ResetColor()
       }
       $dirtyCats = $false
     }
@@ -634,14 +634,14 @@ function Run-TUI([object[]]$model){
         $isSelTop = ($idxTop -eq $cmdIdx -and $focus -eq 'cmd')
         $bgTop = if ($isSelTop) { [ConsoleColor]::Green } else { [ConsoleColor]::Black }
         [Console]::SetCursorPosition($xIndCmd, $cmdTop)
-        [Console]::BackgroundColor = $bgTop; [Console]::ForegroundColor = [ConsoleColor]::DarkGray; [Console]::Write("^"); [Console]::ResetColor()
+        [Console]::BackgroundColor = $bgTop; [Console]::ForegroundColor = [ConsoleColor]::Green; [Console]::Write("^"); [Console]::ResetColor()
       }
       if ( ($scrollCmd + $cmdHeight) -lt $cmds.Count ) {
         $idxBot = [Math]::Min($cmds.Count-1, $scrollCmd + $cmdHeight - 1)
         $isSelBot = ($idxBot -eq $cmdIdx -and $focus -eq 'cmd')
         $bgBot = if ($isSelBot) { [ConsoleColor]::Green } else { [ConsoleColor]::Black }
         [Console]::SetCursorPosition($xIndCmd, ($cmdTop + $cmdHeight - 1))
-        [Console]::BackgroundColor = $bgBot; [Console]::ForegroundColor = [ConsoleColor]::DarkGray; [Console]::Write("v"); [Console]::ResetColor()
+        [Console]::BackgroundColor = $bgBot; [Console]::ForegroundColor = [ConsoleColor]::Green; [Console]::Write("v"); [Console]::ResetColor()
       }
       $dirtyCmds = $false
     }
