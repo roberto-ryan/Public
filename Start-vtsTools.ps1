@@ -1,5 +1,6 @@
 param(
   [string]$FunctionsPath
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
