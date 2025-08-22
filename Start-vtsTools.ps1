@@ -1,9 +1,5 @@
-# Simple VTS Tools TUI (single file)
-# Navigate with arrow keys. Enter runs a command with parameter prompts. Esc exits.
-
 param(
-  [string]$FunctionsPath = 'C:\Users\Administrator\source\Public\functions'
-)
+  [string]$FunctionsPath
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
