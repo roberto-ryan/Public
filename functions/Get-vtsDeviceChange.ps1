@@ -40,4 +40,3 @@ function Get-vtsDeviceChange {
     $FirstScan = $SecondScan
   }
 }
-
