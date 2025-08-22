@@ -525,8 +525,8 @@ function Run-TUI([object[]]$model){
       $dirtyCats = $true; $dirtyCmds = $true; $dirtyDetails = $true
     }
 
-    $header = " VTS Tools Browser - Arrow keys to navigate | Enter to run | F1: Help | Esc: Exit "
-    $footer = " Path: $FunctionsPath "
+  $header = " VTS Tools Browser "
+  $footer = " Up/Down/Left/Right: Navigate/Scroll | Enter: Run | Ctrl-C: Exit "
 
     # Layout
     $paneTop = 1
