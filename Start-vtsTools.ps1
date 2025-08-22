@@ -111,6 +111,25 @@ function Wrap-Bullet([string]$text,[int]$w,[string]$prefix=' - ',[string]$cont='
   return $out
 }
 
+function Normalize-Category([object]$c){
+  # Handle arrays: pick first non-empty string
+  if ($c -is [System.Collections.IEnumerable] -and -not ($c -is [string])) {
+    foreach ($e in $c) {
+      $n = Normalize-Category $e
+      if ($n -and $n -ne 'Uncategorized') { return $n }
+    }
+    return 'Uncategorized'
+  }
+  try { $s = if ($null -eq $c) { '' } else { [string]$c } } catch { $s = '' }
+  # Strip zero-width and non-breaking spaces, BOM
+  $s = $s -replace "[\u200B\uFEFF\u00A0]", ''
+  # collapse whitespace and trim
+  $s = ($s -replace '\s+', ' ').Trim()
+  if ([string]::IsNullOrWhiteSpace($s)) { return 'Uncategorized' }
+  if ($s -match '^(?i)uncategorized$') { return 'Uncategorized' }
+  return $s
+}
+
 function Prompt-String([string]$label,[string]$default=''){
   $prompt = if ($default) { "$label [$default]" } else { $label }
   Read-Host $prompt
@@ -355,7 +374,7 @@ function Build-Model([string]$functionsPath){
   $params = @(Filter-UserParameters -params $params)
     $items += [pscustomobject]@{
       Name        = $fn
-      Category    = $(if ([string]::IsNullOrWhiteSpace($help.Category)) { 'Uncategorized' } else { $help.Category.Trim() })
+      Category    = (Normalize-Category $help.Category)
       Synopsis    = $help.Synopsis
       Description = $help.Description
       Examples    = $help.Examples
@@ -366,7 +385,7 @@ function Build-Model([string]$functionsPath){
   $norm = foreach ($it in $items) {
     [pscustomobject]@{
       Name        = $it.Name
-      Category    = $(if ([string]::IsNullOrWhiteSpace($it.Category)) { 'Uncategorized' } else { "$(($it.Category))".Trim() })
+      Category    = (Normalize-Category $it.Category)
       Synopsis    = $it.Synopsis
       Description = $it.Description
       Examples    = $it.Examples
@@ -455,7 +474,7 @@ function Prompt-And-Run([pscustomobject]$cmdMeta){
       $preview += " -$k `"$v`""
     }
   }
-  Write-Host $preview -ForegroundColor DarkGray
+  Write-Host "`n$preview`n" -ForegroundColor Green
 
   $confirm = Read-Host "Press Enter to run, or type 'n' to cancel"
   if ($confirm -match '^(n|no)$') { return }
@@ -562,7 +581,7 @@ function Run-TUI([object[]]$model){
         $line = ' ' * ($leftW - 2)
         if ($idx -lt $cats.Count) {
           $catItem = $cats[$idx]
-          $name = if ($catItem -and ($catItem.PSObject.Properties['Category'])) { $catItem.Category } else { 'Uncategorized' }
+          $name = if ($catItem -and ($catItem.PSObject.Properties['Category'])) { Normalize-Category $catItem.Category } else { 'Uncategorized' }
           $count = if ($catItem -and ($catItem.PSObject.Properties['Commands'])) { @($catItem.Commands).Count } else { 0 }
           $txt = ("{0} ({1})" -f $name, $count)
           $line = TruncatePad $txt ($leftW - 2)
@@ -609,7 +628,7 @@ function Run-TUI([object[]]$model){
         [Console]::SetCursorPosition($leftW+$midW+3, $dTop+$yy)
         [Console]::Write((' ' * $wrapWidth))
       }
-      $lineY = $dTop
+  $lineY = $dTop
       if ($detail) {
         $lines = @()
         # Header
@@ -662,6 +681,16 @@ function Run-TUI([object[]]$model){
           Write-At $lineY ($leftW+$midW+3) (TruncatePad $l $wrapWidth) $color
           $lineY++
           $rendered++
+        }
+        # Draw scroll indicators at far-right column if overflow
+        $xInd = ($leftW+$midW+3) + ($wrapWidth - 1)
+        if ($scrollDetail -gt 0) {
+          # Up indicator at first visible line
+          Write-At $dTop $xInd '⬆' ([ConsoleColor]::Green)
+        }
+        if (($scrollDetail + $dHeight) -lt $detailLines.Count) {
+          # Down indicator at last visible line
+          Write-At ($dTop + $dHeight - 1) $xInd '⬇' ([ConsoleColor]::Green)
         }
       } else {
         Write-At $dTop ($leftW+$midW+3) "No commands in this category." ([ConsoleColor]::Yellow)
