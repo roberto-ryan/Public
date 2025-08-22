@@ -249,6 +249,34 @@ function Wrap-Bullet([string]$text,[int]$w,[string]$prefix=' - ',[string]$cont='
   return $out
 }
 
+function Shorten-UrlLabel([string]$s){
+  if (-not $s) { return $s }
+  $t = "$s".Trim()
+  # Drop anchors and queries
+  $t = ($t -replace '#.*$','')
+  $t = ($t -replace '\?.*$','')
+  # GitHub special-case -> owner/repo@branch
+  $gh = $null
+  try { $gh = Parse-GitHubRepoInfo -url $t -branchDefault $Branch } catch { $gh = $null }
+  if ($gh) {
+    $lbl = "$($gh.Owner)/$($gh.Repo)"
+    if ($gh.Branch) { $lbl += "@$($gh.Branch)" }
+    return $lbl
+  }
+  # Generic: host[/first-segment]
+  if ($t -match '^(?i)(https?://|www\.)') {
+    try {
+      if ($t -notmatch '^(?i)https?://') { $t = 'https://' + $t }
+      $u = [Uri]$t
+      $host = $u.Host
+      $path = $u.AbsolutePath.Trim('/')
+      if ($path) { return ("{0}/{1}" -f $host, ($path.Split('/')[0])) }
+      return $host
+    } catch { return $s }
+  }
+  return $s
+}
+
 function Normalize-Category([object]$c){
   # Handle arrays: pick first non-empty string
   if ($c -is [System.Collections.IEnumerable] -and -not ($c -is [string])) {
@@ -263,6 +291,8 @@ function Normalize-Category([object]$c){
   $s = $s -replace "[\u200B\uFEFF\u00A0]", ''
   # collapse whitespace and trim
   $s = ($s -replace '\s+', ' ').Trim()
+  # If URL-like, shorten to compact label
+  if ($s -match '^(?i)(https?://|www\.|mailto:|file:)') { $s = Shorten-UrlLabel $s }
   if ([string]::IsNullOrWhiteSpace($s)) { return 'Uncategorized' }
   if ($s -match '^(?i)uncategorized$') { return 'Uncategorized' }
   return $s
@@ -606,7 +636,8 @@ function Build-Model([string]$functionsPath){
   $help = Parse-HelpFromFile -filePath $f.FullName
     $params = @()
     if ($cmd) { $params = Get-ParameterMeta -cmd $cmd; $params = @(Filter-UserParameters -params $params) }
-    $display = Get-RelativePath $functionsPath $f.FullName
+  # Display concise base name for scripts to avoid overflow
+  $display = [IO.Path]::GetFileNameWithoutExtension($f.Name)
   $cat = Get-CategoryForItem -cmdName $f.FullName -filePath $f.FullName -root $functionsPath -parsedCat $help.Category
     $items += [pscustomobject]@{
       Name        = $display
