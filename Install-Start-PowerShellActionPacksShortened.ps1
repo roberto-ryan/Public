@@ -1,0 +1,1 @@
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-Expression (Invoke-WebRequest "https://raw.githubusercontent.com/roberto-ryan/Public/main/Install-Start-PowerShellActionPacks.ps1" -UseBasicParsing).Content

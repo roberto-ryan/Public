@@ -1,9 +1,150 @@
 param(
-  [string]$FunctionsPath = $PSScriptRoot
+  [string]$FunctionsPath = $PSScriptRoot,
+  # If provided, this script can download the repo ZIP, extract it, and run Start-vtsTools.ps1 from there.
+  [string]$BootstrapFromRepoUrl,
+  # Preferred branch to download when bootstrapping; may be overridden by URL if it contains a branch.
+  [string]$Branch = 'main',
+  # Relative path to the start script inside the repo when bootstrapping.
+  [string]$StartScriptRelPath = 'Start-vtsTools.ps1',
+  # Base folder for extraction; default chosen automatically if not provided.
+  [string]$InstallBase,
+  # Force re-download by deleting any existing extracted folder first.
+  [switch]$Reinstall,
+  # Build model and print a summary, skip launching the interactive TUI.
+  [switch]$ValidateOnly
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Write-Info($m){ try { Write-Host $m -ForegroundColor Cyan } catch { Write-Host $m } }
+function Write-Warn($m){ try { Write-Host $m -ForegroundColor Yellow } catch { Write-Host $m } }
+function Write-Err ($m){ try { Write-Host $m -ForegroundColor Red } catch { Write-Host $m } }
+
+function Safe-GetHelp([string]$name){
+  $prevProg = $ProgressPreference
+  try {
+    $ProgressPreference = 'SilentlyContinue'
+    return (Get-Help -Name $name -ErrorAction Stop)
+  } catch {
+    return $null
+  } finally {
+    $ProgressPreference = $prevProg
+  }
+}
+
+function Parse-GitHubRepoInfo([string]$url,[string]$branchDefault='main'){
+  if (-not $url) { return $null }
+  $owner = $null; $repo = $null; $branch = $null
+  try {
+    if ($url -match 'githubusercontent\.com/([^/]+)/([^/]+)/([^/]+)/') {
+      $owner = $Matches[1]; $repo = $Matches[2]; $branch = $Matches[3]
+    } elseif ($url -match 'github\.com/([^/]+)/([^/]+)(?:/(?:tree|blob)/([^/]+)/)?') {
+      $owner = $Matches[1]; $repo = $Matches[2]; if ($Matches[3]) { $branch = $Matches[3] }
+    }
+  } catch { }
+  if (-not $owner -or -not $repo) { return $null }
+  if (-not $branch) { $branch = $branchDefault }
+  [pscustomobject]@{ Owner=$owner; Repo=$repo; Branch=$branch }
+}
+
+function Get-InstallBase([string]$preferred){
+  if ($preferred) { return $preferred }
+  if ($env:USERNAME -eq 'SYSTEM') { return (Join-Path $env:SystemDrive 'Tools') }
+  return (Join-Path $env:LOCALAPPDATA 'VTS')
+}
+
+function Resolve-FunctionsPath([string]$inputPath){
+  # Choose a sane default when running from memory (IEX) where $PSScriptRoot is empty
+  $candidates = @()
+  if ($inputPath -and -not [string]::IsNullOrWhiteSpace($inputPath)) { $candidates += ,$inputPath }
+  if ($PSScriptRoot -and -not [string]::IsNullOrWhiteSpace($PSScriptRoot)) { $candidates += ,$PSScriptRoot }
+  try { if ($PWD -and $PWD.Path) { $candidates += ,$PWD.Path } } catch { }
+
+  foreach ($p in $candidates) {
+    try {
+      if ($p -and -not [string]::IsNullOrWhiteSpace($p)) {
+        $full = [IO.Path]::GetFullPath($p)
+        if (Test-Path -LiteralPath $full) {
+          # Prefer a 'functions' subfolder if present
+          $funcDir = Join-Path $full 'functions'
+          if (Test-Path -LiteralPath $funcDir) { return $funcDir }
+          return $full
+        }
+      }
+    } catch { }
+  }
+  # Fallback to current directory string if all else fails
+  try { return $PWD.Path } catch { return '' }
+}
+
+function Install-And-RunFromRepo([string]$repoUrl,[string]$branch,[string]$startRelPath,[string]$installBase,[switch]$reinstall){
+  $info = Parse-GitHubRepoInfo -url $repoUrl -branchDefault $branch
+  if (-not $info) { throw "Unable to parse GitHub repo from URL: $repoUrl" }
+  $base = Get-InstallBase -preferred $installBase
+  if (-not (Test-Path $base)) { New-Item -ItemType Directory -Path $base -Force | Out-Null }
+  $zipUrl = "https://github.com/$($info.Owner)/$($info.Repo)/archive/refs/heads/$($info.Branch).zip"
+  $zipPath = Join-Path $env:TEMP "$($info.Repo)-$($info.Branch).zip"
+  $effectiveBranch = $info.Branch
+  $repoDir = Join-Path $base "$($info.Repo)-$effectiveBranch"
+  if ($reinstall -and (Test-Path $repoDir)) {
+    Write-Warn "Removing existing folder: $repoDir"
+    Remove-Item -Recurse -Force -Path $repoDir -ErrorAction SilentlyContinue
+  }
+  $downloaded = $false
+  $prevTLS = $null
+  try { $prevTLS = [Net.ServicePointManager]::SecurityProtocol } catch { }
+  try {
+    try { [Net.ServicePointManager]::SecurityProtocol = $prevTLS -bor [Net.SecurityProtocolType]::Tls12 } catch { }
+  foreach ($b in @($info.Branch, $(if ($info.Branch -ieq 'main') {'master'} elseif ($info.Branch -ieq 'master') {'main'} else {$null}))) {
+    if (-not $b) { continue }
+    $tryZipUrl = "https://github.com/$($info.Owner)/$($info.Repo)/archive/refs/heads/$b.zip"
+    try {
+      Write-Info "Downloading $tryZipUrl ..."
+      Invoke-WebRequest -Uri $tryZipUrl -UseBasicParsing -OutFile $zipPath
+      $downloaded = $true
+      $effectiveBranch = $b
+      break
+    } catch {
+      Write-Warn ("Download failed for branch '$b': " + $_.Exception.Message)
+      continue
+    }
+  }
+  } finally {
+    try { if ($null -ne $prevTLS) { [Net.ServicePointManager]::SecurityProtocol = $prevTLS } } catch { }
+  }
+  if (-not $downloaded) { throw "Failed to download repository ZIP from $zipUrl" }
+  try {
+    if (Test-Path $repoDir) {
+      Write-Warn "Removing existing folder: $repoDir"
+      Remove-Item -Recurse -Force -Path $repoDir -ErrorAction SilentlyContinue
+    }
+    Write-Info "Extracting to $base ..."
+    try { Expand-Archive -Path $zipPath -DestinationPath $base -Force }
+    catch {
+      try { Import-Module Microsoft.PowerShell.Archive -ErrorAction Stop; Expand-Archive -Path $zipPath -DestinationPath $base -Force }
+      catch { throw }
+    }
+  } finally {
+    if (Test-Path $zipPath) { Remove-Item -Force $zipPath -ErrorAction SilentlyContinue }
+  }
+  $repoDir = Join-Path $base "$($info.Repo)-$effectiveBranch"
+  $startScript = Join-Path $repoDir $startRelPath
+  if (Test-Path $startScript) {
+    Write-Info "Launching $startRelPath from $repoDir ..."
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $startScript
+    return
+  } else {
+    Write-Warn "Start script not found ($startRelPath). Launching embedded TUI to scan: $repoDir"
+    try {
+      $model = Build-Model -functionsPath $repoDir
+      Run-TUI -model $model
+      return
+    } catch {
+      throw "Start script not found and embedded TUI failed: $($_.Exception.Message)"
+    }
+  }
+}
 
 function Ensure-Console {
   if (-not ($Host.Name -match 'ConsoleHost|Visual Studio Code')) {
@@ -219,7 +360,7 @@ function Detect-FunctionNameInFile([System.IO.FileInfo]$file){
 function Get-CategoryForItem([string]$cmdName,[string]$filePath,[string]$root,[string]$parsedCat){
   # 1) Prefer a URL from Get-Help (.LINK Uri or LinkText). If none, use first non-empty LinkText.
   try {
-    $h = Get-Help -Name $cmdName -ErrorAction Stop
+  $h = Safe-GetHelp -name $cmdName
     if ($h -and $h.RelatedLinks) {
       $lnk = $h.RelatedLinks | Select-Object -ExpandProperty NavigationLink -ErrorAction SilentlyContinue
       if ($lnk) {
@@ -252,7 +393,7 @@ function Get-CategoryForItem([string]$cmdName,[string]$filePath,[string]$root,[s
 
 function Get-CommandMeta([System.Management.Automation.CommandInfo]$cmd){
   $help = $null
-  try { $help = Get-Help $cmd.Name -ErrorAction Stop } catch { }
+  try { $help = Safe-GetHelp -name $cmd.Name } catch { $help = $null }
   $category = 'Uncategorized'
   if ($help -and $help.RelatedLinks) {
     try {
@@ -883,10 +1024,57 @@ try {
   Write-Host "[DEBUG] Starting Ensure-Console" -ForegroundColor DarkGray
   Ensure-Console
   Write-Host "[DEBUG] Ensure-Console OK" -ForegroundColor DarkGray
+  # Normalize/resolve FunctionsPath if empty or invalid
+  if (-not $FunctionsPath -or [string]::IsNullOrWhiteSpace($FunctionsPath)) {
+    $FunctionsPath = Resolve-FunctionsPath -inputPath $FunctionsPath
+    Write-Host "[DEBUG] Auto-resolved FunctionsPath to '$FunctionsPath'" -ForegroundColor DarkGray
+  }
+  elseif (-not (Test-Path -LiteralPath $FunctionsPath)) {
+    $FunctionsPath = Resolve-FunctionsPath -inputPath $FunctionsPath
+    Write-Host "[DEBUG] Adjusted FunctionsPath to '$FunctionsPath'" -ForegroundColor DarkGray
+  }
+
+  # Early bootstrap: if FunctionsPath doesn't contain any .ps1 besides this file, and a repo URL is configured, fetch and run from repo
+  $shouldBootstrap = $false
+  try {
+    if (-not (Test-Path $FunctionsPath)) { $shouldBootstrap = $true }
+    else {
+      $selfPath = if ($PSCommandPath) { $PSCommandPath } else { $MyInvocation.MyCommand.Path }
+      $hasAny = Get-ChildItem -Path $FunctionsPath -Recurse -File -Filter *.ps1 -ErrorAction SilentlyContinue | Where-Object { $_.FullName -ne $selfPath -and $_.FullName -notmatch "\\\.git\\" } | Select-Object -First 1
+      if (-not $hasAny) { $shouldBootstrap = $true }
+    }
+  } catch { $shouldBootstrap = $true }
+
+  if ($shouldBootstrap -and $BootstrapFromRepoUrl) {
+    # If a repo URL is explicitly provided, always bootstrap regardless of local content
+    Write-Host "[DEBUG] Bootstrapping from $BootstrapFromRepoUrl (branch=$Branch, start=$StartScriptRelPath)" -ForegroundColor DarkGray
+    Install-And-RunFromRepo -repoUrl $BootstrapFromRepoUrl -branch $Branch -startRelPath $StartScriptRelPath -installBase $InstallBase -reinstall:$Reinstall
+    return
+  } elseif ($BootstrapFromRepoUrl) {
+    Write-Host "[DEBUG] Bootstrapping (forced) from $BootstrapFromRepoUrl (branch=$Branch, start=$StartScriptRelPath)" -ForegroundColor DarkGray
+    Install-And-RunFromRepo -repoUrl $BootstrapFromRepoUrl -branch $Branch -startRelPath $StartScriptRelPath -installBase $InstallBase -reinstall:$Reinstall
+    return
+  } elseif ($shouldBootstrap) {
+    Write-Host "[DEBUG] No local commands and no repo URL provided; continuing without bootstrap" -ForegroundColor DarkGray
+  }
+
   Write-Host "[DEBUG] Building model from $FunctionsPath" -ForegroundColor DarkGray
   $model = Build-Model -functionsPath $FunctionsPath
   $catCount = if ($null -eq $model) { 0 } else { @($model).Count }
   Write-Host "[DEBUG] Model built: $catCount categories" -ForegroundColor DarkGray
+  if ($ValidateOnly) {
+    $totalCmds = 0
+    foreach ($g in @($model)) { $totalCmds += @($g.Commands).Count }
+    Write-Host "Validation summary:" -ForegroundColor Cyan
+    Write-Host (" - Categories: {0}" -f $catCount)
+    Write-Host (" - Total commands: {0}" -f $totalCmds)
+    foreach ($g in @($model)) {
+      $name = if ($g.PSObject.Properties['Category']) { "$($g.Category)" } else { 'Uncategorized' }
+      $cnt = if ($g.PSObject.Properties['Commands']) { @($g.Commands).Count } else { 0 }
+      Write-Host ("   * {0} ({1})" -f $name, $cnt) -ForegroundColor DarkGray
+    }
+    return
+  }
   Write-Host "[DEBUG] Launching TUI" -ForegroundColor DarkGray
   Run-TUI -model $model
 } catch {
