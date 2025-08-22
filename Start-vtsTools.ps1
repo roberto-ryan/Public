@@ -1,5 +1,5 @@
 param(
-  [string]$FunctionsPath = 'C:\Users\Administrator\source\Public\functions'
+  [string]$FunctionsPath = $PSScriptRoot
 )
 
 Set-StrictMode -Version Latest
@@ -173,20 +173,81 @@ function Try-Cast([string]$value,[string]$typeName,[ref]$casted){
   }
 }
 
-function Load-ModuleFromFolder([string]$path){
-  if (-not (Test-Path $path)) { throw "FunctionsPath not found: $path" }
-  $files = Get-ChildItem -Path $path -Filter *.ps1 -File | Sort-Object Name
-  if (-not $files) { throw "No .ps1 files found in $path" }
+function Load-ModuleFromFiles([System.IO.FileInfo[]]$files){
+  if (-not $files -or $files.Count -eq 0) { return $null }
   $sb = {
     param($files)
-    foreach ($f in $files) {
-      . $f.FullName
-    }
+    foreach ($f in $files) { try { . $f.FullName } catch { } }
     Export-ModuleMember -Function *
   }
   $module = New-Module -Name VTS.Dynamic -ScriptBlock $sb -ArgumentList (,$files)
-  Import-Module $module -Force -Global
+  try { Import-Module $module -Force -Global } catch { }
   return $module
+}
+
+function Get-RelativePath([string]$base,[string]$full){
+  try {
+    $b = [IO.Path]::GetFullPath($base)
+    $f = [IO.Path]::GetFullPath($full)
+    if ($f.ToLowerInvariant().StartsWith($b.ToLowerInvariant())) {
+      $rel = $f.Substring($b.Length).TrimStart('\\','/')
+      return ($rel -replace '\\','/')
+    }
+  } catch { }
+  return $full
+}
+
+function Derive-Category([string]$base,[System.IO.FileInfo]$file){
+  $rel = Get-RelativePath $base $file.DirectoryName
+  if (-not $rel) { return 'Root' }
+  $first = ($rel -split '[\\/]+')[0]
+  if (-not $first) { $first = 'Root' }
+  return (Normalize-Category $first)
+}
+
+function Detect-FunctionNameInFile([System.IO.FileInfo]$file){
+  try {
+    $lines = Get-Content -Path $file.FullName -TotalCount 200 -ErrorAction SilentlyContinue
+    if (-not $lines) { return $null }
+    foreach ($ln in $lines) {
+      if ($ln -match '^\s*function\s+([A-Za-z_][\w-]*)\s*') { return $Matches[1] }
+    }
+  } catch { }
+  return $null
+}
+
+function Get-CategoryForItem([string]$cmdName,[string]$filePath,[string]$root,[string]$parsedCat){
+  # 1) Prefer a URL from Get-Help (.LINK Uri or LinkText). If none, use first non-empty LinkText.
+  try {
+    $h = Get-Help -Name $cmdName -ErrorAction Stop
+    if ($h -and $h.RelatedLinks) {
+      $lnk = $h.RelatedLinks | Select-Object -ExpandProperty NavigationLink -ErrorAction SilentlyContinue
+      if ($lnk) {
+        $uris = @()
+        $texts = @()
+        foreach ($n in @($lnk)) {
+          try {
+            if ($n.Uri) { $uris += ,([string]$n.Uri) }
+          } catch { }
+          try {
+            if ($n.LinkText) { $texts += ,([string]$n.LinkText) }
+          } catch { }
+        }
+        $urlPick = $uris | Where-Object { $_ -and ($_ -match '^(?i)(https?://|www\.|mailto:|file:)') } | Select-Object -First 1
+        if ($urlPick) { return (Normalize-Category $urlPick) }
+        $txtPick = $texts | Where-Object { $_ } | Select-Object -First 1
+        if ($txtPick) { return (Normalize-Category $txtPick) }
+      }
+    }
+  } catch { }
+  # 2) Fall back to parsed .LINK category from file
+  if ($parsedCat -and -not [string]::IsNullOrWhiteSpace($parsedCat)) { return (Normalize-Category $parsedCat) }
+  # 3) Folder-based derivation
+  try {
+    $fi = Get-Item -LiteralPath $filePath -ErrorAction SilentlyContinue
+    if ($fi) { return (Derive-Category $root $fi) }
+  } catch { }
+  return 'Uncategorized'
 }
 
 function Get-CommandMeta([System.Management.Automation.CommandInfo]$cmd){
@@ -279,16 +340,16 @@ function Parse-HelpFromFile([string]$filePath){
       elseif ($curTag -eq 'DESCRIPTION' -and $text) { $desc = $text }
       elseif ($curTag -eq 'EXAMPLE' -and $text) { $examples += $text }
       elseif ($curTag -eq 'LINK' -and $text) {
-        $firstLine = ($text -split "`n")[0].Trim()
-        $cand = $firstLine
-        if ($cand -match '^(https?://|www\.|mailto:|file:)') { $cand = '' }
-        if (-not $cand) {
-          foreach ($ln in ($text -split "`n")) {
-            $tln = $ln.Trim()
-            if ($tln -and ($tln -notmatch '^(https?://|www\.|mailto:|file:)')) { $cand = $tln; break }
-          }
+  $url = $null
+  $firstNonEmpty = $null
+        foreach ($ln in ($text -split "`n")) {
+          $tln = $ln.Trim()
+          if (-not $tln) { continue }
+          if ($tln -match '^(?i)(https?://|www\.|mailto:|file:)') { $url = $tln; break }
+          if (-not $firstNonEmpty) { $firstNonEmpty = $tln }
         }
-        if ($cand) { $category = $cand }
+        if ($url) { $category = $url }
+        elseif ($firstNonEmpty) { $category = $firstNonEmpty }
       }
       break
     }
@@ -299,16 +360,16 @@ function Parse-HelpFromFile([string]$filePath){
       elseif ($curTag -eq 'DESCRIPTION' -and $text) { $desc = $text }
       elseif ($curTag -eq 'EXAMPLE' -and $text) { $examples += $text }
       elseif ($curTag -eq 'LINK' -and $text) {
-        $firstLine = ($text -split "`n")[0].Trim()
-        $cand = $firstLine
-        if ($cand -match '^(https?://|www\.|mailto:|file:)') { $cand = '' }
-        if (-not $cand) {
-          foreach ($ln in ($text -split "`n")) {
-            $tln = $ln.Trim()
-            if ($tln -and ($tln -notmatch '^(https?://|www\.|mailto:|file:)')) { $cand = $tln; break }
-          }
+        $url = $null
+        $firstNonEmpty = $null
+        foreach ($ln in ($text -split "`n")) {
+          $tln = $ln.Trim()
+          if (-not $tln) { continue }
+          if ($tln -match '^(?i)(https?://|www\.|mailto:|file:)') { $url = $tln; break }
+          if (-not $firstNonEmpty) { $firstNonEmpty = $tln }
         }
-        if ($cand) { $category = $cand }
+        if ($url) { $category = $url }
+        elseif ($firstNonEmpty) { $category = $firstNonEmpty }
       }
       # start new tag
       $curTag = $Matches[1].ToUpperInvariant()
@@ -326,6 +387,7 @@ function Parse-HelpFromFile([string]$filePath){
 
 function Get-ParameterMeta([System.Management.Automation.CommandInfo]$cmd){
   $arr = @()
+  if (-not $cmd -or -not $cmd.Parameters) { return @() }
   foreach ($kv in $cmd.Parameters.GetEnumerator()) {
     $p = $kv.Value
     $name = $p.Name
@@ -359,26 +421,65 @@ function Filter-UserParameters([object[]]$params){
 }
 
 function Build-Model([string]$functionsPath){
-  Load-ModuleFromFolder -path $functionsPath
-  $files = Get-ChildItem -Path $functionsPath -Filter *.ps1 -File | Sort-Object Name
+  if (-not (Test-Path $functionsPath)) { throw "Root not found: $functionsPath" }
+  $selfPath = if ($PSCommandPath) { $PSCommandPath } else { $MyInvocation.MyCommand.Path }
+  $all = Get-ChildItem -Path $functionsPath -Recurse -File -Filter *.ps1 -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -ne $selfPath -and $_.FullName -notmatch "\\\.git\\" }
+  $funcFiles = @()
+  foreach ($f in $all) {
+    $fn = Detect-FunctionNameInFile $f
+    if ($fn -and ($fn -eq [IO.Path]::GetFileNameWithoutExtension($f.Name))) { $funcFiles += $f }
+  }
+  # Import function files so their functions are callable
+  [void](Load-ModuleFromFiles -files $funcFiles)
+
   $items = @()
-  foreach ($f in $files) {
+  $funcSet = New-Object 'System.Collections.Generic.HashSet[string]'
+  foreach ($f in $funcFiles) { [void]$funcSet.Add($f.FullName) }
+
+  # Function commands
+  foreach ($f in $funcFiles) {
     $fn = [IO.Path]::GetFileNameWithoutExtension($f.Name)
     $cmd = Get-Command -Name $fn -ErrorAction SilentlyContinue
     if (-not $cmd) { continue }
-    $help = Parse-HelpFromFile -filePath $f.FullName
-  $params = Get-ParameterMeta -cmd $cmd
-  $params = @(Filter-UserParameters -params $params)
+  $help = Parse-HelpFromFile -filePath $f.FullName
+    $params = Get-ParameterMeta -cmd $cmd
+    $params = @(Filter-UserParameters -params $params)
+  $cat = Get-CategoryForItem -cmdName $fn -filePath $f.FullName -root $functionsPath -parsedCat $help.Category
     $items += [pscustomobject]@{
       Name        = $fn
-      Category    = (Normalize-Category $help.Category)
+      Category    = $cat
       Synopsis    = $help.Synopsis
       Description = $help.Description
       Examples    = $help.Examples
       Parameters  = $params
+      Invocation  = $fn
+      ScriptPath  = $f.FullName
     }
   }
-  # Normalize to ensure Category is always a single string
+
+  # Standalone scripts (not imported as functions)
+  foreach ($f in $all) {
+    if ($funcSet.Contains($f.FullName)) { continue }
+  $cmd = Get-Command -Name $f.FullName -ErrorAction SilentlyContinue
+  $help = Parse-HelpFromFile -filePath $f.FullName
+    $params = @()
+    if ($cmd) { $params = Get-ParameterMeta -cmd $cmd; $params = @(Filter-UserParameters -params $params) }
+    $display = Get-RelativePath $functionsPath $f.FullName
+  $cat = Get-CategoryForItem -cmdName $f.FullName -filePath $f.FullName -root $functionsPath -parsedCat $help.Category
+    $items += [pscustomobject]@{
+      Name        = $display
+      Category    = $cat
+      Synopsis    = $help.Synopsis
+      Description = $help.Description
+      Examples    = $help.Examples
+      Parameters  = $params
+      Invocation  = $f.FullName
+      ScriptPath  = $f.FullName
+    }
+  }
+
+  # Normalize and group
   $norm = foreach ($it in $items) {
     [pscustomobject]@{
       Name        = $it.Name
@@ -387,6 +488,8 @@ function Build-Model([string]$functionsPath){
       Description = $it.Description
       Examples    = $it.Examples
       Parameters  = $it.Parameters
+      Invocation  = $it.Invocation
+      ScriptPath  = $it.ScriptPath
     }
   }
   $groups = $norm | Group-Object Category | Sort-Object Name
@@ -458,7 +561,8 @@ function Prompt-And-Run([pscustomobject]$cmdMeta){
 
   Write-Host ""
   Write-Host "Command preview:" -ForegroundColor DarkGray
-  $preview = $cmdMeta.Name
+  $target = if ($cmdMeta.PSObject.Properties['Invocation']) { $cmdMeta.Invocation } else { $cmdMeta.Name }
+  $preview = $target
   foreach ($k in $splat.Keys) {
     $v = $splat[$k]
     if ($v -is [switch] -or ($v -is [bool] -and $v -eq $true)) {
@@ -483,7 +587,8 @@ function Prompt-And-Run([pscustomobject]$cmdMeta){
   $ErrorActionPreference = 'Continue'
   try {
     try { Set-StrictMode -Off } catch { }
-  & (Get-Command $cmdMeta.Name) @splat | Out-Host
+  $target = if ($cmdMeta.PSObject.Properties['Invocation']) { $cmdMeta.Invocation } else { $cmdMeta.Name }
+  & (Get-Command $target) @splat | Out-Host
   } catch {
     # Surface the original error without extra TUI formatting
     Write-Error $_
