@@ -526,7 +526,7 @@ function Run-TUI([object[]]$model){
     }
 
   $header = " VTS Tools Browser "
-  $footer = " Up/Down/Left/Right: Navigate/Scroll | Enter: Run | Ctrl-C: Exit "
+  $footer = " Up/Down/Left/Right: Navigate/Scroll | Enter: Run "
 
     # Layout
     $paneTop = 1
@@ -538,10 +538,10 @@ function Run-TUI([object[]]$model){
     if ($needFull) {
       [Console]::Clear()
       # Header and footer
-      Draw-Line 0 0 $w ([ConsoleColor]::DarkCyan) ' '
-      Write-At 0 0 (TruncatePad $header $w) ([ConsoleColor]::Black)
-      Draw-Line ($h-1) 0 $w ([ConsoleColor]::DarkCyan) ' '
-      Write-At ($h-1) 0 (TruncatePad $footer $w) ([ConsoleColor]::Black)
+  Draw-Line 0 0 $w ([ConsoleColor]::DarkCyan) ' '
+  Write-At 0 0 (TruncatePad $header $w) ([ConsoleColor]::Black) -NoNewline
+  Draw-Line ($h-1) 0 $w ([ConsoleColor]::DarkCyan) ' '
+  Write-At ($h-1) 0 (TruncatePad $footer $w) ([ConsoleColor]::Black) -NoNewline
       # Boxes
       Box $paneTop 0 $paneHeight $leftW "Categories" ([ConsoleColor]::DarkGray)
       Box $paneTop ($leftW+1) $paneHeight $midW "Commands" ([ConsoleColor]::DarkGray)
@@ -550,9 +550,10 @@ function Run-TUI([object[]]$model){
 
     if (-not $cats) {
       Write-At ([int]($paneTop+2)) 2 "No commands found." ([ConsoleColor]::Yellow)
-      Write-At ($h-2) 2 "Press Esc to exit." ([ConsoleColor]::DarkGray)
-      $k = Read-Key
-      if ($k.Key -eq 'Escape') { break } else { continue }
+      Write-At ($h-2) 2 "Press any key to refresh." ([ConsoleColor]::DarkGray)
+      [void](Read-Key)
+      $needFull = $true; $dirtyCats=$true; $dirtyCmds=$true; $dirtyDetails=$true
+      continue
     }
 
     if ($catIdx -ge $cats.Count) { $catIdx = 0 }
@@ -731,23 +732,8 @@ function Run-TUI([object[]]$model){
 
     # Key handling
     $k = Read-Key
-    switch ($k.Key) {
-      'Escape' { break }
-      'F1' {
-        [Console]::Clear()
-        $detail = $null
-        $selectedCat = if ($cats.Count) { $cats[$catIdx] } else { $null }
-        if ($selectedCat -and ($selectedCat.PSObject.Properties['Commands'])) { $cmds = @($selectedCat.Commands) } else { $cmds = @() }
-        if ($cmds.Count) { $detail = $cmds[$cmdIdx] }
-        if ($detail) { Get-Help $detail.Name -Full | more }
-        else {
-          Write-Host "No command selected." -ForegroundColor Yellow
-          Write-Host "Press any key to return..."
-          [void](Read-Key)
-        }
-        $needFull = $true; $dirtyCats=$true; $dirtyCmds=$true; $dirtyDetails=$true
-      }
-      'Enter' {
+  switch ($k.Key) {
+  'Enter' {
         $detail = $null
         $selectedCat = if ($cats.Count) { $cats[$catIdx] } else { $null }
         if ($selectedCat -and ($selectedCat.PSObject.Properties['Commands'])) { $cmds = @($selectedCat.Commands) } else { $cmds = @() }
