@@ -171,18 +171,18 @@ function New-RosePineTheme([string]$variant) {
         FooterBg   = [ConsoleColor]::Black
         FooterFg   = [ConsoleColor]::DarkCyan
         Border     = [ConsoleColor]::DarkCyan
-        CatSelBg   = [ConsoleColor]::Cyan     # Foam
-        CatSelFg   = [ConsoleColor]::Black
-        CmdSelBg   = [ConsoleColor]::Cyan      # Rose highlight
-        CmdSelFg   = [ConsoleColor]::Black
-        Accent     = [ConsoleColor]::Red
+        CatSelBg   = [ConsoleColor]::Black     # Foam
+        CatSelFg   = [ConsoleColor]::Cyan
+        CmdSelBg   = [ConsoleColor]::Black      # Rose highlight
+        CmdSelFg   = [ConsoleColor]::Cyan
+        Accent     = [ConsoleColor]::DarkMagenta
         Highlight  = [ConsoleColor]::Cyan
         Info       = [ConsoleColor]::Cyan
         Warn       = [ConsoleColor]::Yellow       # Gold
         Error      = [ConsoleColor]::DarkRed      # Love
         Preview    = [ConsoleColor]::DarkCyan
         NameColor  = [ConsoleColor]::White
-        SectionHdr = [ConsoleColor]::Green
+        SectionHdr = [ConsoleColor]::Cyan
       }
     }
     'rose-pine-moon' {
@@ -738,7 +738,7 @@ function Box([int]$top, [int]$left, [int]$height, [int]$width, [string]$title, [
     # No borders; render a subtle title line only
     if ($title) {
       $t = TruncatePad $title ($width - 2)
-      Write-At $top ($left + 1) $t $script:Theme.Subtle $script:Theme.Background
+  Write-At $top ($left + 1) $t $fg $script:Theme.Background
     }
     return
   }
@@ -1539,7 +1539,7 @@ function Run-TUI([object[]]$model) {
     $midW = [Math]::Max(24, [Math]::Min(42, [int]($w * 0.28)))
     $rightW = $w - $leftW - $midW - 4
 
-    if ($needFull) {
+  if ($needFull) {
       [Console]::Clear()
       # Header and footer
       $hdrBg = $(if ($ThemeStyle -eq 'minimal') { $script:Theme.Background } else { $script:Theme.HeaderBg })
@@ -1554,10 +1554,7 @@ function Run-TUI([object[]]$model) {
   # Center footer
   $fpad = [Math]::Max(0, [int](($w - $footer.Length) / 2))
   Write-At ($h - 1) $fpad (TruncatePad $footer ($w - $fpad)) ($ftrFg) $ftrBg -NoNewline
-      # Boxes
-      Box $paneTop 0 $paneHeight $leftW "Categories" ($script:Theme.Border)
-      Box $paneTop ($leftW + 1) $paneHeight $midW "Commands" ($script:Theme.Border)
-      Box $paneTop ($leftW + $midW + 2) $paneHeight $rightW "Details" ($script:Theme.Border)
+  # Frames drawn below based on active focus color
       # Fill pane backgrounds
       Fill-Rect ($paneTop + 1) 1 ($paneHeight - 2) ($leftW - 2) $script:Theme.Background
       Fill-Rect ($paneTop + 1) ($leftW + 2) ($paneHeight - 2) ($midW - 2) $script:Theme.Background
@@ -1568,6 +1565,19 @@ function Run-TUI([object[]]$model) {
         Draw-VertLine ($paneTop + 1) ($leftW - 1) ($paneHeight - 2) ($script:Theme.Border) $sepChar
         Draw-VertLine ($paneTop + 1) ($leftW + $midW) ($paneHeight - 2) ($script:Theme.Border) $sepChar
       }
+    }
+
+    # Draw frames (or redraw when focus changes)
+    if (-not (Get-Variable -Name prevFocus -Scope Script -EA SilentlyContinue)) { $script:prevFocus = $null }
+    $framesDirty = $needFull -or ($script:prevFocus -ne $focus)
+    if ($framesDirty) {
+      $script:prevFocus = $focus
+      $colCat = if ($focus -eq 'cat') { $script:Theme.Accent } else { $script:Theme.Border }
+      $colCmd = if ($focus -eq 'cmd') { $script:Theme.Accent } else { $script:Theme.Border }
+      $colDet = if ($focus -eq 'detail') { $script:Theme.Accent } else { $script:Theme.Border }
+      Box $paneTop 0 $paneHeight $leftW "Categories" $colCat
+      Box $paneTop ($leftW + 1) $paneHeight $midW "Commands" $colCmd
+      Box $paneTop ($leftW + $midW + 2) $paneHeight $rightW "Details" $colDet
     }
 
     if (-not $cats) {
