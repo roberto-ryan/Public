@@ -831,9 +831,9 @@ function Shorten-UrlLabel([string]$s) {
   $gh = $null
   try { $gh = Parse-GitHubRepoInfo -url $t -branchDefault $Branch } catch { $gh = $null }
   if ($gh) {
-    $lbl = "$($gh.Owner)/$($gh.Repo)"
-    if ($gh.Branch) { $lbl += "@$($gh.Branch)" }
-    return $lbl
+  $lbl = "$($gh.Owner)/$($gh.Repo)"
+  if ($gh.Branch) { $lbl += "@$($gh.Branch)" }
+  return $lbl
   }
   # Generic: host[/first-segment]
   if ($t -match '^(?i)(https?://|www\.)') {
@@ -910,7 +910,7 @@ function Format-FriendlyCategoryLabel([string]$label, [string]$style) {
 }
 
 function Normalize-Category([object]$c) {
-  # Sole-source categorization: use CategoryOverrideMap only
+  # Normalize a string or list of strings using the override map; otherwise return cleaned label
   if ($c -is [System.Collections.IEnumerable] -and -not ($c -is [string])) {
     foreach ($e in $c) {
       $n = Normalize-Category $e
@@ -937,7 +937,8 @@ function Normalize-Category([object]$c) {
     }
   }
   catch { }
-  return 'Uncategorized'
+  # No override matched; return cleaned friendly label
+  return (Format-FriendlyCategoryLabel -label (Sanitize-CategoryText $s) -style $CategoryLabelStyle)
 }
 
 function Prompt-String([string]$label, [string]$default = '') {
@@ -1158,7 +1159,37 @@ function Detect-FunctionNameInFile([System.IO.FileInfo]$file) {
 }
 
 function Get-CategoryForItem([string]$cmdName, [string]$filePath, [string]$root, [string]$parsedCat, [switch]$DisableHelp) {
-  # Sole-source: CategoryOverrideMap only, based on names
+  # Resolve help-derived and folder-derived candidates
+  $helpCat = $null
+  if (-not $DisableHelp -and $parsedCat) {
+    $s = ("$parsedCat").Trim()
+    if ($s) {
+      if ($s -match '^(?i)(https?://|www\.|mailto:|file:)') { $helpCat = (Format-FriendlyCategoryLabel -label (Shorten-UrlLabel $s) -style $CategoryLabelStyle) }
+      else { $helpCat = (Format-FriendlyCategoryLabel -label (Sanitize-CategoryText $s) -style $CategoryLabelStyle) }
+    }
+  }
+  $folderCat = $null
+  try {
+    $catRoot = if ($root) { $root } else { Resolve-CategoryRoot -path $filePath }
+    $fileObj = Get-Item -LiteralPath $filePath -EA SilentlyContinue
+    if ($fileObj) { $folderCat = Derive-Category -base $catRoot -file $fileObj }
+  }
+  catch { }
+
+  # Apply precedence: PreferFolderCategory means folder first, else help first
+  if ($PreferFolderCategory) {
+    $nFolder = if ($folderCat) { Normalize-Category $folderCat } else { 'Uncategorized' }
+    if ($nFolder -and $nFolder -ne 'Uncategorized') { return $nFolder }
+    $nHelp = if ($helpCat) { Normalize-Category $helpCat } else { 'Uncategorized' }
+    if ($nHelp -and $nHelp -ne 'Uncategorized') { return $nHelp }
+  }
+  else {
+    $nHelp = if ($helpCat) { Normalize-Category $helpCat } else { 'Uncategorized' }
+    if ($nHelp -and $nHelp -ne 'Uncategorized') { return $nHelp }
+    $nFolder = if ($folderCat) { Normalize-Category $folderCat } else { 'Uncategorized' }
+    if ($nFolder -and $nFolder -ne 'Uncategorized') { return $nFolder }
+  }
+  # Name-based override
   $candidates = @()
   if ($cmdName) { $candidates += , $cmdName }
   try { $base = [IO.Path]::GetFileNameWithoutExtension($filePath); if ($base) { $candidates += , $base } } catch { }
@@ -1166,6 +1197,13 @@ function Get-CategoryForItem([string]$cmdName, [string]$filePath, [string]$root,
     $n = Normalize-Category $cand
     if ($n -and $n -ne 'Uncategorized') { return $n }
   }
+  # Last resort: root folder category
+  try {
+    $catRoot = if ($root) { $root } else { Resolve-CategoryRoot -path $filePath }
+    $fileObj = Get-Item -LiteralPath $filePath -EA SilentlyContinue
+    if ($fileObj) { return (Derive-Category -base $catRoot -file $fileObj) }
+  }
+  catch { }
   return 'Uncategorized'
 }
 
@@ -1321,7 +1359,7 @@ function Build-Model([string]$functionsPath, [string]$CategoryRoot) {
       }
     }
     catch { $rootPerFile = $scanRoot }
-    $cat = Get-CategoryForItem -cmdName $fn -filePath $f.FullName -root $rootPerFile -parsedCat $help.Category -DisableHelp:$ScanSafe
+  $cat = Get-CategoryForItem -cmdName $fn -filePath $f.FullName -root $rootPerFile -parsedCat $help.Category -DisableHelp:$ScanSafe
     $items += [pscustomobject]@{
       Name        = $fn
       Category    = $cat
@@ -1352,7 +1390,7 @@ function Build-Model([string]$functionsPath, [string]$CategoryRoot) {
       }
     }
     catch { $rootPerFile = $scanRoot }
-    $cat = Get-CategoryForItem -cmdName $f.FullName -filePath $f.FullName -root $rootPerFile -parsedCat $help.Category -DisableHelp:$ScanSafe
+  $cat = Get-CategoryForItem -cmdName $f.FullName -filePath $f.FullName -root $rootPerFile -parsedCat $help.Category -DisableHelp:$ScanSafe
     $items += [pscustomobject]@{
       Name        = $display
       Category    = $cat

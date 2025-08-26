@@ -34,6 +34,7 @@ type RepoConfig = {
   owner: string; repo: string; branch: string; path: string;
   categoryDepth: number; ignore: string[]; token?: string;
   preferFolderCategory: boolean; // if true, use folder-derived category first
+  categoryLabelStyle: 'Full'|'OwnerRepo'|'Repo'; // how to render link-derived labels
 };
 
 const DEFAULT_REPO: RepoConfig = {
@@ -44,6 +45,7 @@ const DEFAULT_REPO: RepoConfig = {
   categoryDepth: 2,
   ignore: ['functions','function','scripts','script','src','source','powershell','pwsh','ps','bin','build','.github','.vscode','lib','modules','module','samples','examples','test','tests','docs','documentation'],
   preferFolderCategory: true,
+  categoryLabelStyle: 'OwnerRepo',
 };
 
 function getRepoConfigFromUrl(): RepoConfig {
@@ -59,6 +61,10 @@ function getRepoConfigFromUrl(): RepoConfig {
   ignore: (p.get('ignore') || DEFAULT_REPO.ignore.join(',')).split(',').map(s=>s.trim()).filter(Boolean),
   token: p.get('token') || undefined,
   preferFolderCategory: (p.get('preferFolder') ?? '1') !== '0',
+  categoryLabelStyle: ((): RepoConfig['categoryLabelStyle'] => {
+    const v = (p.get('label') || DEFAULT_REPO.categoryLabelStyle) as RepoConfig['categoryLabelStyle'];
+    return (v==='Full'||v==='OwnerRepo'||v==='Repo') ? v : 'OwnerRepo';
+  })(),
   };
 }
 
@@ -140,7 +146,12 @@ function parseHelpBlock(text: string) {
   for (const k of keys) {
     const t = (sections[k]||[]).join('\n').trim(); if (t) exs.push(t);
   }
-  return { synopsis: syn, description: desc, examples: exs, paramHelpNames };
+  // Extract .LINK or .CATEGORY as the category training source
+  const linkRaw = (sections['LINK']||[]).join('\n').trim();
+  const catRaw = (sections['CATEGORY']||[]).join('\n').trim();
+  const firstNonEmpty = (s: string) => (s.replace(/\r\n/g,'\n').split('\n').map(l=>l.trim()).find(Boolean) || '').trim();
+  const linkOrText = firstNonEmpty(linkRaw) || firstNonEmpty(catRaw);
+  return { synopsis: syn, description: desc, examples: exs, paramHelpNames, linkCategory: linkOrText };
 }
 
 // Robustly parse PowerShell param(...) block including attributes
@@ -303,6 +314,62 @@ function deriveCategory(cfg: RepoConfig, filePath: string, content?: string): st
   return regexCat || folderCat || 'General';
 }
 
+// Make a friendly label from a .LINK or free text
+function sanitizeCategoryText(s: string): string {
+  const t = (s || '').replace(/\s+/g,' ').trim();
+  if (!t) return t;
+  for (const sep of [' - ', ' — ', ':', ' | ']) {
+    const i = t.indexOf(sep); if (i > 0) return t.slice(0, i).trim();
+  }
+  const words = t.split(' ');
+  if (words.length > 5 || t.length > 40) return words.slice(0, Math.min(4, words.length)).join(' ');
+  return t.replace(/\b(for|with|using|via|and|to|on)$/i,'').trim();
+}
+function shortenUrlLabel(s: string): string {
+  let t = (s||'').trim(); if (!t) return t;
+  t = t.replace(/#.*$/, '').replace(/\?.*$/, '');
+  const gh = t.match(/github(?:usercontent)?\.com\/([^\/]+)\/([^\/]+)(?:\/(?:tree|blob)\/([^\/]+)\/)?/i);
+  if (gh) {
+    const owner = gh[1], repo = gh[2], branch = gh[3];
+    return branch ? `${owner}/${repo}@${branch}` : `${owner}/${repo}`;
+  }
+  if (/^(https?:\/\/|www\.)/i.test(t)) {
+    try {
+      if (!/^https?:\/\//i.test(t)) t = 'https://' + t;
+      const u = new URL(t);
+      const host = u.host; const path = u.pathname.replace(/^\/+|\/+$/g,'');
+      if (path) return `${host}/${path.split('/')[0]}`; else return host;
+    } catch { return s; }
+  }
+  return s;
+}
+function formatFriendlyCategoryLabel(label: string, style: RepoConfig['categoryLabelStyle']): string {
+  const textInfo = (x: string) => x.replace(/[-_.]+/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+  const s = (label||'').trim(); if (!s) return s;
+  const m = s.match(/^([^/@]+)\/([^/@]+)(?:@([^@]+))?$/);
+  if (m) {
+    const owner = m[1], repo = m[2], branch = m[3];
+    if (style==='Repo') return textInfo(repo);
+    if (style==='OwnerRepo') return `${textInfo(owner)}/${textInfo(repo)}`;
+    const core = `${textInfo(owner)}/${textInfo(repo)}`;
+    return branch ? `${core}@${textInfo(branch)}` : core;
+  }
+  const m2 = s.match(/^[^/]+\/([^/]+)$/);
+  if (m2) {
+    const seg = m2[1];
+    if (style==='Repo') return textInfo(seg);
+    return `${s.split('/')[0]}/${textInfo(seg)}`;
+  }
+  return textInfo(s);
+}
+function linkToCategory(raw: string, style: RepoConfig['categoryLabelStyle']): string {
+  const t = (raw||'').trim(); if (!t) return '';
+  const isUrl = /^(https?:\/\/|www\.|mailto:|file:)/i.test(t);
+  if (isUrl) return formatFriendlyCategoryLabel(shortenUrlLabel(t), style);
+  // free text
+  return formatFriendlyCategoryLabel(sanitizeCategoryText(t), style);
+}
+
 function parsePowerShellFile(cfg: RepoConfig, text: string, ghPath: string): CmdItem | null {
   const nameMatch = text.match(/^[\s\S]{0,2000}?function\s+([A-Za-z0-9_-]+)\b/m); // search early area
   const name = nameMatch?.[1] || ghPath.split('/').pop()!.replace(/\.ps1$/i,'');
@@ -317,9 +384,24 @@ function parsePowerShellFile(cfg: RepoConfig, text: string, ghPath: string): Cmd
     if (!pmap.has(key) && hasVar(h)) pmap.set(key, { Name: h, Required: false, Type: 'String', Position: 0 });
   }
   const params = Array.from(pmap.values()).sort((a,b) => a.Position - b.Position);
+  // Category resolution: prefer .LINK/.CATEGORY when available, else folder/regex
+  const linkCat = help.linkCategory ? linkToCategory(help.linkCategory, cfg.categoryLabelStyle) : '';
+  const normPath = ghPath.replace(/\\/g,'/');
+  const base = cfg.path.replace(/\\/g,'/').replace(/^\/+|\/+$/g,'');
+  const idx = normPath.toLowerCase().indexOf(base.toLowerCase());
+  const rel = idx >= 0 ? normPath.slice(idx + base.length).replace(/^\/+/, '') : normPath;
+  const parts = rel.split('/').slice(0, -1).filter(Boolean).filter(p => !cfg.ignore.some(ig => ig.toLowerCase() === p.toLowerCase()));
+  const taken = parts.slice(0, cfg.categoryDepth);
+  const folderCat = taken.length ? taken.join(' / ') : '';
+  let regexCat = '';
+  const probe = `${ghPath}\n${text || ''}`;
+  for (const [rx, label] of CATEGORY_OVERRIDE_MAP) { if (rx.test(probe)) { regexCat = label; break; } }
+  const category = cfg.preferFolderCategory
+    ? (folderCat || linkCat || regexCat || 'General')
+    : (linkCat || folderCat || regexCat || 'General');
   return {
     Name: name,
-  Category: deriveCategory(cfg, ghPath, text),
+  Category: category,
     Synopsis: help.synopsis || '',
     Description: help.description || '',
     Examples: help.examples || [],
