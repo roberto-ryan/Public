@@ -1,0 +1,128 @@
+/* Minimal CSS reset + console look */
+:root{
+  /* Rose Pine-inspired palette */
+  --bg: #191724;           /* Base */
+  --surface: #1f1d2e;      /* Surface */
+  --fg: #e0def4;           /* Text (muted) */
+  --text: #e0def4;         /* Text */
+  --subtle: #6e6a86;       /* Subtle */
+  --header-bg: #1f1d2e;    /* Surface */
+  --header-fg: #e0def4;    /* Text */
+  --footer-bg: #1f1d2e;    /* Surface */
+  --footer-fg: #e0def4;    /* Text */
+  --border: #26233a;       /* Overlay */
+  --accent-active: #eb6f92;/* Rose/Pink for active */
+  --accent-idle: #9ccfd8;  /* Foam/Teal for inactive */
+  --warn: #f6c177;         /* Gold */
+  --error: #eb6f92;        /* Love */
+  --sel-active: rgba(235,111,146,0.18);
+  --sel-idle: rgba(156,207,216,0.14);
+
+  /* Scrollbar theme */
+  --scrollbar-track: var(--surface);
+  --scrollbar-thumb: #403d52; /* muted plum */
+}
+
+*{ box-sizing: border-box; }
+html, body, #root{ height: 100%; min-height: 100%; }
+body{
+  margin: 0; background: var(--bg); color: var(--fg); overflow: hidden;
+  font: 14px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Cross-browser scrollbar styling */
+/* Firefox-only, guarded by feature queries */
+@supports (scrollbar-color: red blue) {
+  *{ scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+}
+@supports (scrollbar-width: thin) {
+  *{ scrollbar-width: thin; }
+}
+/* WebKit (Chromium, Safari, Edge) */
+*::-webkit-scrollbar{ width: 10px; height: 10px; }
+*::-webkit-scrollbar-track{ background: var(--scrollbar-track); border-left: 1px solid var(--border); }
+*::-webkit-scrollbar-thumb{
+  background-color: var(--scrollbar-thumb);
+  border: 2px solid var(--scrollbar-track);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover{ background-color: var(--accent-active); }
+*::-webkit-scrollbar-corner{ background: var(--scrollbar-track); }
+.app{ display: flex; flex-direction: column; height: 100dvh; min-height: 100dvh; }
+.header, .footer{
+  background: var(--header-bg); color: var(--header-fg);
+  padding: 4px 8px; text-align: center;
+}
+.footer{ background: var(--footer-bg); color: var(--footer-fg); }
+
+.main{ flex: 1 1 auto; display: grid; grid-template-columns: minmax(180px,26%) minmax(220px,32%) 1fr; gap: 8px; padding: 8px; min-width: 0; min-height: 0; }
+.pane{ position: relative; border: 1px solid var(--border); background: var(--surface); overflow: visible; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.pane.active{ border-color: var(--accent-active); box-shadow: 0 0 0 1px var(--accent-active) inset; }
+.pane:not(.active){ border-color: var(--accent-idle); }
+.pane-title{ position: absolute; top: -10px; left: 8px; padding: 0 6px; background: var(--surface); color: var(--accent-idle); line-height: 1.1; z-index: 2; }
+.pane.active .pane-title{ color: var(--accent-active); }
+
+.list{ flex: 1 1 auto; min-height: 0; overflow: auto; padding: 6px; }
+.row{ padding: 2px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Selection colors vary by pane focus */
+.pane .row.selected{ background: var(--sel-idle); color: var(--text); }
+.pane.active .row.selected{ background: var(--sel-active); color: var(--text); }
+.bullet{ color: var(--accent-idle); margin-right: 6px; }
+.pane.active .bullet{ color: var(--accent-active); }
+.subtle{ color: var(--subtle); }
+.warn{ color: var(--warn); }
+.section{ color: var(--accent-idle); margin: 8px 0 4px; }
+.pane.active .section{ color: var(--accent-active); }
+.code{ white-space: pre-wrap; font-family: inherit; color: var(--text); }
+.preview-cmd{ margin-bottom: 6px; color: var(--text); }
+.param-row{ display: flex; align-items: center; gap: 6px; }
+.param-field{ margin-left: 8px; }
+.param-input{
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font: inherit;
+  outline: none;
+}
+.param-input:focus{ border-color: var(--accent-active); box-shadow: 0 0 0 1px var(--accent-active) inset; }
+
+/* Keyboard-only parameter list */
+.param-item{ padding: 1px 2px; }
+.param-item.selected{ background: var(--sel-active); }
+.section-subtle{ color: var(--subtle); margin: 4px 0; }
+
+/* In-place edit overlay */
+.edit-overlay{
+  position: absolute; left: 6px; right: 6px; bottom: 8px;
+  background: rgba(31,29,46,0.96);
+  border: 1px solid var(--accent-active);
+  padding: 6px; border-radius: 4px;
+  z-index: 5;
+}
+.cursor{ animation: blink 1s step-start infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Full-screen prompt wizard */
+.prompt-overlay{
+  position: fixed; inset: 0; background: rgba(25,23,36,0.85);
+  display: flex; align-items: center; justify-content: center; z-index: 10;
+}
+.prompt{
+  width: min(900px, 92vw);
+  border: 1px solid var(--accent-active); background: var(--surface);
+  padding: 12px; border-radius: 6px;
+}
+.prompt-title{ color: var(--accent-active); font-weight: 600; margin-bottom: 6px; }
+.prompt-sub{ color: var(--subtle); margin-bottom: 8px; }
+.prompt-body .code{ white-space: pre-wrap; }
+.copy-toast{ position: fixed; bottom: 16px; right: 16px; background: #1f1d2e; color: #e0def4; padding: 8px 10px; border: 1px solid var(--accent-active); border-radius: 4px; opacity: 0; transform: translateY(6px); transition: all .2s ease; }
+.copy-toast.show{ opacity: 1; transform: translateY(0); }
+
+.scroll-hint{ position: sticky; bottom: 0; text-align: right; padding: 2px 4px; color: var(--accent-idle); background: linear-gradient(180deg, rgba(25,23,36,0), rgba(25,23,36,0.85)); }
+
+@media (max-width: 900px){
+  .main{ grid-template-columns: minmax(140px,30%) minmax(160px,34%) 1fr; gap: 6px; }
+  body{ font-size: 13px; }
+}
