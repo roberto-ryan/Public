@@ -2191,7 +2191,7 @@ function Add-vtsPrinterDriver {
         $currentDriver++
         Write-Progress -Activity "Installing printer drivers..." -Status "$([math]::Round(($currentDriver / $totalDrivers) * 100))%" -PercentComplete (($currentDriver / $totalDrivers) * 100)
         Add-PrinterDriver -Name $Driver 2>$null | Out-Null
-        if ($?) { Write-Host "✔ Added $Driver driver" -ForegroundColor Green }
+        if ($?) { Write-Host "✔ Added $Driver" -ForegroundColor Green }
       }
       Write-Progress -Activity "Adding printer drivers..." -Completed
     }
@@ -8995,6 +8995,7 @@ It can read files that are locked for writing by other processes.
         } catch {}
     }
 }
+
 
 
 
