@@ -2209,7 +2209,7 @@ function Add-vtsPrinterDriver {
     }
   }
   finally {
-    Remove-Item "$WorkingDir" -Force -Recurse -confirm:$false
+    Remove-Item "$WorkingDir" -Force -Recurse -confirm:$true
   }
 }
 
@@ -9004,3 +9004,4 @@ It can read files that are locked for writing by other processes.
         } catch {}
     }
 }
+
