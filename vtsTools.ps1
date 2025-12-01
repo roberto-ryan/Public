@@ -2106,15 +2106,6 @@ function Add-vtsPrinterDriver {
   try {
     $FileName = (get-date -f hhmmyy) + (1111..999999 | Get-Random)
   
-    if (Test-Path "$WorkingDir\$FileName") {
-      try {
-        Rename-Item "$WorkingDir\$FileName" "$WorkingDir\$FileName.old" -Force -ErrorAction Stop
-      }
-      catch {
-        Write-Host "Failed to rename $FileName. Error: $_" -ForegroundColor Red
-      }
-    }
-  
     # Make $WorkingDir
     if (!(Test-Path $WorkingDir)) {
       $FileName
@@ -9004,5 +8995,6 @@ It can read files that are locked for writing by other processes.
         } catch {}
     }
 }
+
 
 
