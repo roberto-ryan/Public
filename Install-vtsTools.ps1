@@ -50,16 +50,21 @@ Get-Command -Module VTS |
 Select-Object Name, Description |
 Sort-Object Name |
 ForEach-Object {
-    $commands += [pscustomobject]@{
-        Category            = (Get-help $_.Name |
-        Select-Object -ExpandProperty relatedLinks |
+    $help = Get-Help $_.Name -ErrorAction SilentlyContinue
+    $category = try {
+        $help | Select-Object -ExpandProperty relatedLinks |
         Select-Object -ExpandProperty navigationLink |
-        Select-Object -ExpandProperty linkText )
+        Select-Object -ExpandProperty linkText
+    } catch { 'Uncategorized' }
+    if (-not $category) { $category = 'Uncategorized' }
+    $description = try {
+        $help | Select-Object -ExpandProperty Description |
+        Select-Object -ExpandProperty Text
+    } catch { '' }
+    $commands += [pscustomobject]@{
+        Category            = $category
         'Installed Command' = $_.Name
-        Description         = (Get-Help $_.Name |
-            Select-Object -ExpandProperty Description |
-            Select-Object -ExpandProperty Text
-        )
+        Description         = $description
     }
 }
 
@@ -91,3 +96,4 @@ Example: PS> get-help -full Get-vtsMappedDrive`n"
 $script:windowWidth = (Get-Host).UI.RawUI.WindowSize.Width
 Write-Host ('█' * $windowWidth) -ForegroundColor Cyan
 ""
+return
