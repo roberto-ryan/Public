@@ -4,29 +4,45 @@ $moduleURL = "https://raw.githubusercontent.com/roberto-ryan/Public/main/vtsTool
 $moduleName = "VTS"
 $filename = "$moduleName.psm1"
 
-Set-ExecutionPolicy Bypass -Scope Process
+# Set execution policy (Windows only - silently skip on Linux/macOS)
+try { Set-ExecutionPolicy Bypass -Scope Process -ErrorAction Stop } catch { }
 
-if ($env:USERNAME -eq "SYSTEM") {
+# Determine current username (cross-platform)
+$currentUser = if ($env:USERNAME) { $env:USERNAME } elseif ($env:USER) { $env:USER } else { 'unknown' }
+
+# Determine module path (cross-platform)
+if ($currentUser -eq 'SYSTEM') {
     $modulePath = "$env:SystemDrive\Tools"
 }
 else {
-    $modulePath = $env:PSModulePath -split ";" |
-    Select-String "$env:USERNAME" |
-    Select-Object -First 1
+    $pathSeparator = if ($IsWindows -or $env:OS -match 'Windows') { ';' } else { ':' }
+    $modulePath = $env:PSModulePath -split $pathSeparator |
+        Where-Object { $_ -and $currentUser -and $_ -match [regex]::Escape($currentUser) } |
+        Select-Object -First 1
+    
+    # Fallback to user's home-based module path if not found
+    if (-not $modulePath) {
+        if ($IsWindows -or $env:OS -match 'Windows') {
+            $modulePath = Join-Path $env:USERPROFILE 'Documents\PowerShell\Modules'
+        } else {
+            $modulePath = Join-Path $HOME '.local/share/powershell/Modules'
+        }
+    }
 }
 
-if (-not (Test-Path $modulePath\$moduleName)) {
-    New-Item -Path $modulePath\$moduleName -ItemType Directory -Force |
-    Out-Null
+$moduleDir = Join-Path $modulePath $moduleName
+if (-not (Test-Path $moduleDir)) {
+    New-Item -Path $moduleDir -ItemType Directory -Force | Out-Null
 }
 
-Remove-Item "$modulePath\$moduleName\$filename" -Force 2>$null
-Get-Module VTS | Remove-Module
+$moduleFile = Join-Path $moduleDir $filename
+Remove-Item $moduleFile -Force -ErrorAction SilentlyContinue
+Get-Module VTS | Remove-Module -ErrorAction SilentlyContinue
 
-Invoke-WebRequest -uri $moduleURL -UseBasicParsing |
-Select-Object -ExpandProperty Content |
-Out-File -FilePath "$modulePath\$moduleName\$filename" -Force
-Import-Module $modulePath\$moduleName
+Invoke-WebRequest -Uri $moduleURL -UseBasicParsing |
+    Select-Object -ExpandProperty Content |
+    Out-File -FilePath $moduleFile -Force
+Import-Module $moduleDir
 
 $commands = @()
 

@@ -9152,10 +9152,7 @@ function Sync-vtsSharePointRcloneDelete {
                 $dirPath = $dir.TrimEnd('/')
                 Write-Progress -Activity "Purging directories" -Status "$dirPath" -PercentComplete (($dirCount / $topLevelDirs.Count) * 100)
                 
-                rclone purge "${Destination}${dirPath}" \
-                    --user-agent $UserAgent \
-                    --retries 3 \
-                    --retries-sleep 10s 2>&1 | Out-Null
+                rclone purge "${Destination}${dirPath}" --user-agent $UserAgent --retries 3 --retries-sleep 10s 2>&1 | Out-Null
             }
             Write-Progress -Activity "Purging directories" -Completed
             Write-Host "      Directories purged." -ForegroundColor Green
@@ -9164,11 +9161,7 @@ function Sync-vtsSharePointRcloneDelete {
         # Delete root files
         if ($rootFiles.Count -gt 0) {
             Write-Host "      Deleting $($rootFiles.Count) root files..." -ForegroundColor Cyan
-            rclone delete $Destination \
-                --files-from $rootFilesFile \
-                --user-agent $UserAgent \
-                --retries 3 \
-                --retries-sleep 10s
+            rclone delete $Destination --files-from $rootFilesFile --user-agent $UserAgent --retries 3 --retries-sleep 10s
             Write-Host "      Root files deleted." -ForegroundColor Green
         }
         
