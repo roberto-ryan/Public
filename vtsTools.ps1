@@ -8861,6 +8861,9 @@ Performs case-sensitive search for "TokenExpired" in the current directory.
 .NOTES
 This function uses .NET APIs for efficient directory traversal and file access.
 It can read files that are locked for writing by other processes.
+
+.LINK
+Utilities
 #>
 
     param(
@@ -9026,6 +9029,9 @@ function Sync-vtsSharePointRcloneDelete {
     
     .EXAMPLE
         Sync-vtsSharePointRcloneDelete -Source "\\server2023\Network\public" -Destination "PublicDocuments:"
+
+    .LINK
+    Utilities
     #>
     
     [CmdletBinding()]
